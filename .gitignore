@@ -36,5 +36,5 @@ bun-debug.log*
 .DS_Store
 *.pem
 
-# Documentation (internal only)
-docs/
+# Documentation (internal only - root level)
+/docs/

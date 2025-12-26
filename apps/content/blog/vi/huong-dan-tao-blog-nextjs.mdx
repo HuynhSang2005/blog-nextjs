@@ -1,0 +1,166 @@
+---
+title: Hướng dẫn tạo Blog với Next.js và MDX 📝
+date: 2025-12-26 11:00:00
+excerpt: Tìm hiểu cách xây dựng một blog hiện đại với Next.js, MDX, Tailwind CSS và các công nghệ web mới nhất.
+author_id: huynhsang
+tags:
+  - nextjs
+  - mdx
+  - blog
+  - tutorial
+  - programming
+  - web-development
+---
+
+Trong bài viết này, tôi sẽ chia sẻ cách tạo một blog cá nhân với Next.js và MDX - hai công nghệ mạnh mẽ giúp bạn xây dựng blog nhanh chóng và dễ dàng tùy chỉnh.
+
+## Tại sao chọn Next.js?
+
+Next.js là một framework React mạnh mẽ với nhiều ưu điểm:
+
+- 🚀 **Performance tốt**: Server-side rendering và static generation
+- 🎯 **SEO friendly**: Tối ưu cho công cụ tìm kiếm
+- 🔥 **Hot reload**: Phát triển nhanh với live reload
+- 📦 **Built-in optimization**: Tự động tối ưu images, fonts, scripts
+- 🛣️ **File-based routing**: Hệ thống routing đơn giản
+
+## MDX là gì?
+
+MDX cho phép bạn sử dụng JSX trong Markdown. Điều này có nghĩa là bạn có thể:
+
+- ✍️ Viết nội dung bằng Markdown đơn giản
+- ⚛️ Nhúng React components trực tiếp vào nội dung
+- 🎨 Tạo các interactive components trong bài viết
+- 🔧 Tùy chỉnh styling dễ dàng
+
+## Các tính năng chính
+
+### 1. Quản lý nội dung với Contentlayer
+
+Contentlayer giúp bạn:
+- Chuyển đổi Markdown/MDX thành dữ liệu type-safe
+- Tự động generate TypeScript types
+- Validate frontmatter
+- Tối ưu performance
+
+### 2. Styling với Tailwind CSS
+
+```tsx
+<div className="rounded-lg border bg-card p-6 shadow-sm">
+  <h2 className="text-2xl font-bold">Beautiful Card</h2>
+  <p className="text-muted-foreground">Styled with Tailwind</p>
+</div>
+```
+
+### 3. Syntax Highlighting
+
+Code blocks tự động có syntax highlighting đẹp mắt:
+
+```javascript
+function greet(name) {
+  console.log(`Hello, ${name}!`);
+}
+
+greet('World');
+```
+
+### 4. Responsive Design
+
+Blog tự động responsive trên mọi thiết bị:
+- 📱 Mobile friendly
+- 💻 Desktop optimized
+- 🎨 Dark/Light mode
+
+## Cấu trúc dự án
+
+```
+blog-nextjs/
+├── apps/
+│   ├── content/          # Nội dung blog và docs
+│   │   ├── blog/
+│   │   │   └── vi/      # Blog posts tiếng Việt
+│   │   └── docs/
+│   │       └── vi/      # Documentation
+│   └── web/             # Next.js app
+│       ├── src/
+│       │   ├── app/     # App router
+│       │   ├── components/
+│       │   ├── config/  # Cấu hình
+│       │   └── lib/
+│       └── public/      # Static assets
+└── packages/            # Shared packages
+```
+
+## Tạo bài viết mới
+
+Để tạo một bài viết mới, chỉ cần:
+
+1. Tạo file `.mdx` trong `apps/content/blog/vi/`
+2. Thêm frontmatter:
+
+```yaml
+---
+title: Tiêu đề bài viết
+date: 2025-12-26 12:00:00
+excerpt: Mô tả ngắn
+author_id: huynhsang
+tags: [tag1, tag2]
+---
+```
+
+3. Viết nội dung bằng Markdown/MDX
+4. Save và reload - bài viết tự động xuất hiện!
+
+## Tính năng nâng cao
+
+### RSS Feed
+
+Blog tự động generate RSS feed:
+- `/feed/blog.xml` - XML format
+- `/feed/blog.json` - JSON format
+
+### Sitemap
+
+Sitemap tự động được tạo tại `/sitemap.xml` giúp SEO tốt hơn.
+
+### Reading Time
+
+Thời gian đọc được tính tự động dựa trên số từ trong bài viết.
+
+### Tags & Categories
+
+Hệ thống tags giúp phân loại và tìm kiếm bài viết dễ dàng.
+
+## Deployment
+
+Deploy blog lên Vercel chỉ trong vài phút:
+
+1. Push code lên GitHub
+2. Import project vào Vercel
+3. Deploy tự động!
+
+```bash
+# Hoặc dùng Vercel CLI
+vercel deploy
+```
+
+## Kết luận
+
+Với Next.js và MDX, việc tạo một blog cá nhân trở nên đơn giản và linh hoạt. Bạn có thể:
+
+- ✅ Viết nội dung nhanh chóng
+- ✅ Tùy chỉnh dễ dàng
+- ✅ Performance tốt
+- ✅ SEO friendly
+- ✅ Hoàn toàn miễn phí
+
+Hãy thử tạo blog của riêng bạn ngay hôm nay! 🚀
+
+## Tài nguyên tham khảo
+
+- [Next.js Documentation](https://nextjs.org/docs)
+- [MDX Documentation](https://mdxjs.com/)
+- [Tailwind CSS](https://tailwindcss.com/)
+- [Source code blog này](https://github.com/HuynhSang2005/blog-nextjs)
+
+Happy coding! 💻
