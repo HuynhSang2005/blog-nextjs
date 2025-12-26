@@ -1,0 +1,103 @@
+{
+  "site": {
+    "heading": "Blog Cá Nhân - Chia Sẻ Kiến Thức Lập Trình",
+    "description": "Blog cá nhân mã nguồn mở của Huỳnh Sang - Chia sẻ kiến thức về Next.js, React, TypeScript, ExpressJS, NestJS và các công nghệ web hiện đại. Nơi lưu giữ những trải nghiệm thực tế, bài học từ các dự án và các demo.",
+    "announcement": "Chào mừng bạn đến với Blog của tôi!",
+    "changelog": "Lịch sử cập nhật",
+
+    "buttons": {
+      "get_started": "Bắt đầu khám phá",
+      "toggle_menu": "Menu",
+      "toggle_language": "Ngôn ngữ",
+      "deploy_vercel": "Xem mã nguồn trên GitHub",
+      "view_repo": "Xem trên GitHub"
+    },
+    "github_cta": "Fork, đóng góp hoặc phát hành bản tùy chỉnh: https://github.com/HuynhSang2005/blog-nextjs",
+
+    "words": {
+      "menu": "Menu",
+      "docs": "Tài liệu",
+      "blog": "Blog"
+    },
+
+    "featured_cards": {
+      "nextjs": {
+        "description": "Xây dựng với Next.js 16.1.1 - App Router, React 19 Server Components và Turbopack."
+      },
+
+      "shadcn": {
+        "description": "Shadcn UI components với Radix UI primitives và Tailwind CSS 4 cho UX tuyệt vời."
+      },
+
+      "tailwind": {
+        "description": "Tailwind CSS 4 với CSS-native engine, thiết kế responsive và dark mode dễ dàng."
+      },
+
+      "i18n": {
+        "description": "Hỗ trợ đa ngôn ngữ với next-intl 4.6.1 (có thể mở rộng cho nhiều ngôn ngữ)."
+      },
+
+      "more": {
+        "title": "Open Source & Modern Stack",
+        "description": "Mã nguồn mở 100%! Next.js 16.1, React 19, TypeScript 5.9, Bun 1.3.5, Turborepo 2.7, Biome 2.3, MDX với Contentlayer2, syntax highlighting Shiki, RSS feed, sitemap tự động. Deploy lên Vercel trong vài phút. Fork và customize theo ý bạn!"
+      }
+    },
+
+    "footer": {
+      "created_by": "Được phát triển bởi"
+    },
+
+    "search": {
+      "search": "Tìm kiếm",
+      "no_results_found": "Không tìm thấy kết quả",
+      "search_documentation": "Tìm kiếm tài liệu",
+      "type_command_or_search": "Nhập lệnh hoặc tìm kiếm..."
+    },
+
+    "themes": {
+      "theme": "Giao diện",
+      "dark": "Tối",
+      "light": "Sáng",
+      "system": "Hệ thống"
+    }
+  },
+
+  "docs": {
+    "on_this_page": "Trên trang này",
+    "edit_page_on_github": "Đóng góp trên GitHub",
+    "start_discussion_on_github": "Thảo luận trên GitHub",
+    "api_reference": "Tài liệu kỹ thuật",
+    "docs": "Tài liệu",
+    "source": "Mã nguồn",
+
+    "not_found": {
+      "description": "Trang tài liệu bạn tìm kiếm không tồn tại. Hãy thử tìm kiếm hoặc quay lại trang chủ.",
+      "title": "404 - Không tìm thấy"
+    }
+  },
+
+  "blog": {
+    "words": {
+      "posts": "Bài viết",
+      "by": "bởi",
+      "tags": "Thẻ",
+      "all_posts": "Tất cả bài viết"
+    },
+
+    "cards": {
+      "min_read": "phút đọc",
+      "updated": "Cập nhật",
+      "published": "Xuất bản"
+    },
+
+    "buttons": {
+      "next": "Tiếp theo",
+      "previous": "Trước đó",
+      "rss_feed": "RSS Feed",
+      "read_more": "đọc thêm",
+      "go_to_next_page": "Trang tiếp theo",
+      "go_to_previous_page": "Trang trước đó",
+      "back_to_blog": "Quay lại Blog"
+    }
+  }
+}
