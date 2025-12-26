@@ -1,0 +1,60 @@
+'use client'
+
+import { motion, stagger, useAnimate } from 'framer-motion'
+import { useEffect } from 'react'
+
+import { cn } from '@/lib/utils'
+
+export const TextGenerateEffect = ({
+  words,
+  className,
+  filter = true,
+  duration = 0.5,
+}: {
+  words: string
+  className?: string
+  filter?: boolean
+  duration?: number
+}) => {
+  const [scope, animate] = useAnimate()
+  const wordsArray = words.split(' ')
+  useEffect(() => {
+    animate(
+      'span',
+      {
+        opacity: 1,
+        filter: filter ? 'blur(0px)' : 'none',
+      },
+      {
+        duration: duration ? duration : 1,
+        delay: stagger(0.2),
+      }
+    )
+  }, [animate, duration, filter])
+
+  const renderWords = () => {
+    return (
+      <motion.div
+        className={cn('inline-block whitespace-nowrap', className)}
+        ref={scope}
+      >
+        {wordsArray.map((word, idx) => {
+          return (
+            <motion.span
+              className={cn('dark:text-white text-black opacity-0', className)}
+              // biome-ignore lint/suspicious/noArrayIndexKey: Index is stable for word animation
+              key={`word-${word}-${idx}`}
+              style={{
+                filter: filter ? 'blur(10px)' : 'none',
+              }}
+            >
+              {word}{' '}
+            </motion.span>
+          )
+        })}
+      </motion.div>
+    )
+  }
+
+  return renderWords()
+}
