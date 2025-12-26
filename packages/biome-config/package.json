@@ -1,0 +1,20 @@
+{
+  "name": "@huynhsang-blog/biome-config",
+  "version": "1.0.0",
+  "description": "Shared Biome configuration for Huynhsang Blog monorepo",
+  "main": "biome.json",
+  "files": [
+    "biome.json"
+  ],
+  "peerDependencies": {
+    "@biomejs/biome": "^2.0.0"
+  },
+  "keywords": [
+    "biome",
+    "config",
+    "linting",
+    "formatting"
+  ],
+  "author": "Huỳnh Sang",
+  "license": "MIT"
+}
