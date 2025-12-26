@@ -1,0 +1,33 @@
+{
+  "name": "huynhsang-blog",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "turbo build",
+    "dev": "turbo dev",
+    "start": "turbo start",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint:fix",
+    "prepare": "husky",
+    "format": "turbo format"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^20.2.0",
+    "@commitlint/config-conventional": "^20.2.0",
+    "husky": "^9.1.7",
+    "turbo": "^2.7.2",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "bun@1.3.5",
+  "engines": {
+    "node": ">=20",
+    "bun": ">=1.3.5"
+  },
+  "dependencies": {
+    "lucide-react": "^0.562.0",
+    "next": "16.0.10"
+  }
+}
