@@ -11,7 +11,7 @@
 
 -- Note: Schema sẽ được thêm vào từng phần trong các task tiếp theo
 -- Task 1.2.2: profiles, media tables ✅
--- Task 1.2.3: blog_posts, blog_tags, blog_post_tags tables
+-- Task 1.2.3: blog_posts, blog_tags, blog_post_tags tables ✅
 -- Task 1.2.4: projects, project_media, project_tags, project_tech_stack tables
 -- Task 1.2.5: docs_topics, about_sections, timeline_events, skills tables
 
@@ -126,3 +126,83 @@ ALTER TABLE profiles
 
 CREATE INDEX idx_profiles_avatar ON profiles(avatar_media_id);
 
+-- ============================================
+-- TAGS TABLE (Reusable for Blog & Projects)
+-- ============================================
+CREATE TABLE tags (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL UNIQUE,
+  slug TEXT NOT NULL UNIQUE,
+  color TEXT, -- Hex color for UI (e.g., #3178C6)
+  description TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+COMMENT ON TABLE tags IS 'Reusable tags for blog posts and projects';
+
+CREATE INDEX idx_tags_slug ON tags(slug);
+CREATE INDEX idx_tags_name ON tags(name);
+
+-- ============================================
+-- BLOG POSTS TABLE
+-- ============================================
+CREATE TABLE blog_posts (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  excerpt TEXT,
+  content TEXT NOT NULL, -- MDX content
+  cover_media_id UUID REFERENCES media(id) ON DELETE SET NULL, -- Cloudinary cover image
+  og_media_id UUID REFERENCES media(id) ON DELETE SET NULL, -- Cloudinary OG image
+  author_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  status TEXT NOT NULL DEFAULT 'draft' CHECK (status IN ('draft', 'published', 'archived')),
+  locale TEXT NOT NULL DEFAULT 'vi',
+  featured BOOLEAN DEFAULT FALSE,
+  allow_comments BOOLEAN DEFAULT TRUE,
+  meta_description TEXT,
+  read_time_minutes INTEGER,
+  view_count INTEGER DEFAULT 0,
+  series_id UUID REFERENCES blog_posts(id) ON DELETE SET NULL, -- For series
+  series_order INTEGER,
+  published_at TIMESTAMPTZ,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(slug, locale)
+);
+
+COMMENT ON TABLE blog_posts IS 'Blog post content stored in database';
+COMMENT ON COLUMN blog_posts.status IS 'Publication status: draft, published, archived';
+COMMENT ON COLUMN blog_posts.series_id IS 'Parent post if part of a series';
+COMMENT ON COLUMN blog_posts.cover_media_id IS 'Cover image from Cloudinary (media table)';
+COMMENT ON COLUMN blog_posts.og_media_id IS 'Open Graph image from Cloudinary (media table)';
+COMMENT ON COLUMN blog_posts.content IS 'MDX content stored as text';
+
+-- Indexes
+CREATE INDEX idx_blog_posts_slug ON blog_posts(slug);
+CREATE INDEX idx_blog_posts_status ON blog_posts(status);
+CREATE INDEX idx_blog_posts_locale ON blog_posts(locale);
+CREATE INDEX idx_blog_posts_published_at ON blog_posts(published_at DESC NULLS LAST);
+CREATE INDEX idx_blog_posts_author ON blog_posts(author_id);
+CREATE INDEX idx_blog_posts_featured ON blog_posts(featured) WHERE featured = TRUE;
+CREATE INDEX idx_blog_posts_series ON blog_posts(series_id);
+CREATE INDEX idx_blog_posts_cover_media ON blog_posts(cover_media_id);
+CREATE INDEX idx_blog_posts_og_media ON blog_posts(og_media_id);
+
+-- Full-text search index
+CREATE INDEX idx_blog_posts_search ON blog_posts 
+  USING gin(to_tsvector('english', title || ' ' || COALESCE(excerpt, '') || ' ' || content));
+
+-- ============================================
+-- BLOG POST TAGS (Junction Table)
+-- ============================================
+CREATE TABLE blog_post_tags (
+  blog_post_id UUID REFERENCES blog_posts(id) ON DELETE CASCADE,
+  tag_id UUID REFERENCES tags(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (blog_post_id, tag_id)
+);
+
+COMMENT ON TABLE blog_post_tags IS 'Many-to-many relationship between blog posts and tags';
+
+CREATE INDEX idx_blog_post_tags_post ON blog_post_tags(blog_post_id);
+CREATE INDEX idx_blog_post_tags_tag ON blog_post_tags(tag_id);
