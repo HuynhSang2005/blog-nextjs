@@ -175,34 +175,30 @@ async function seedSkills() {
 
   const skills = [
     // Frontend
-    { name: 'Next.js', category: 'frontend', proficiency_level: 90, order_index: 1 },
-    { name: 'React', category: 'frontend', proficiency_level: 95, order_index: 2 },
-    { name: 'TypeScript', category: 'frontend', proficiency_level: 85, order_index: 3 },
-    { name: 'Tailwind CSS', category: 'frontend', proficiency_level: 90, order_index: 4 },
-    { name: 'HTML/CSS', category: 'frontend', proficiency_level: 95, order_index: 5 },
-    { name: 'JavaScript', category: 'frontend', proficiency_level: 90, order_index: 6 },
+    { name: 'Next.js', category: 'frontend', proficiency: 90, order_index: 1 },
+    { name: 'React', category: 'frontend', proficiency: 95, order_index: 2 },
+    { name: 'TypeScript', category: 'frontend', proficiency: 85, order_index: 3 },
+    { name: 'Tailwind CSS', category: 'frontend', proficiency: 90, order_index: 4 },
+    { name: 'HTML/CSS', category: 'frontend', proficiency: 95, order_index: 5 },
+    { name: 'JavaScript', category: 'frontend', proficiency: 90, order_index: 6 },
 
     // Backend
-    { name: 'Node.js', category: 'backend', proficiency_level: 85, order_index: 7 },
-    { name: 'Express.js', category: 'backend', proficiency_level: 80, order_index: 8 },
-    { name: 'Supabase', category: 'backend', proficiency_level: 85, order_index: 9 },
-    { name: 'REST API', category: 'backend', proficiency_level: 90, order_index: 10 },
-
-    // Database
-    { name: 'PostgreSQL', category: 'database', proficiency_level: 80, order_index: 11 },
-    { name: 'MongoDB', category: 'database', proficiency_level: 75, order_index: 12 },
-    { name: 'SQL', category: 'database', proficiency_level: 85, order_index: 13 },
-
-    // DevOps
-    { name: 'Git', category: 'devops', proficiency_level: 90, order_index: 14 },
-    { name: 'Docker', category: 'devops', proficiency_level: 70, order_index: 15 },
-    { name: 'Vercel', category: 'devops', proficiency_level: 85, order_index: 16 },
-    { name: 'GitHub Actions', category: 'devops', proficiency_level: 75, order_index: 17 },
+    { name: 'Node.js', category: 'backend', proficiency: 85, order_index: 7 },
+    { name: 'Express.js', category: 'backend', proficiency: 80, order_index: 8 },
+    { name: 'Supabase', category: 'backend', proficiency: 85, order_index: 9 },
+    { name: 'REST API', category: 'backend', proficiency: 90, order_index: 10 },
+    { name: 'PostgreSQL', category: 'backend', proficiency: 80, order_index: 11 },
+    { name: 'MongoDB', category: 'backend', proficiency: 75, order_index: 12 },
+    { name: 'SQL', category: 'backend', proficiency: 85, order_index: 13 },
 
     // Tools
-    { name: 'VS Code', category: 'tools', proficiency_level: 95, order_index: 18 },
-    { name: 'Figma', category: 'tools', proficiency_level: 70, order_index: 19 },
-    { name: 'Postman', category: 'tools', proficiency_level: 85, order_index: 20 },
+    { name: 'Git', category: 'tools', proficiency: 90, order_index: 14 },
+    { name: 'Docker', category: 'tools', proficiency: 70, order_index: 15 },
+    { name: 'Vercel', category: 'tools', proficiency: 85, order_index: 16 },
+    { name: 'GitHub Actions', category: 'tools', proficiency: 75, order_index: 17 },
+    { name: 'VS Code', category: 'tools', proficiency: 95, order_index: 18 },
+    { name: 'Figma', category: 'tools', proficiency: 70, order_index: 19 },
+    { name: 'Postman', category: 'tools', proficiency: 85, order_index: 20 },
   ]
 
   let inserted = 0
@@ -227,7 +223,7 @@ async function seedSkills() {
     if (error) {
       console.error(`   ❌ Failed to insert skill "${skill.name}":`, error.message)
     } else {
-      console.log(`   ✅ Inserted skill: ${skill.name} (${skill.proficiency_level}%)`)
+      console.log(`   ✅ Inserted skill: ${skill.name} (${skill.proficiency}%)`)
       inserted++
     }
   }
@@ -244,17 +240,18 @@ async function seedAboutSections() {
   const sections = [
     {
       title: 'Giới thiệu',
-      slug: 'introduction',
+      section_key: 'introduction',
       content: `Xin chào! Mình là Huỳnh Sang, một Full-stack Developer đam mê xây dựng các ứng dụng web hiện đại.
 
 Với kinh nghiệm trong việc phát triển web sử dụng Next.js, React, và TypeScript, mình luôn tìm kiếm cơ hội để học hỏi và chia sẻ kiến thức với cộng đồng.
 
 Blog này là nơi mình chia sẻ những kinh nghiệm, tutorials, và các best practices trong quá trình phát triển web.`,
       order_index: 1,
+      locale: 'vi',
     },
     {
       title: 'Kinh nghiệm',
-      slug: 'experience',
+      section_key: 'experience',
       content: `## Full-stack Developer
 
 Chuyên về phát triển ứng dụng web với:
@@ -268,10 +265,11 @@ Chuyên về phát triển ứng dụng web với:
 - E-commerce Platform (React + Node.js)
 - Task Management System (Next.js + PostgreSQL)`,
       order_index: 2,
+      locale: 'vi',
     },
     {
       title: 'Học vấn',
-      slug: 'education',
+      section_key: 'education',
       content: `## Đại học
 
 Đang theo học chuyên ngành Công nghệ Thông tin
@@ -282,10 +280,11 @@ Chuyên về phát triển ứng dụng web với:
 - Documentation: Next.js, React, TypeScript
 - Community: Dev.to, Stack Overflow, Reddit`,
       order_index: 3,
+      locale: 'vi',
     },
     {
       title: 'Liên hệ',
-      slug: 'contact',
+      section_key: 'contact',
       content: `## Kết nối với mình
 
 - **Email**: contact@huynhsang.com
@@ -294,6 +293,7 @@ Chuyên về phát triển ứng dụng web với:
 
 Luôn sẵn sàng kết nối và trao đổi về web development!`,
       order_index: 4,
+      locale: 'vi',
     },
   ]
 
@@ -301,7 +301,7 @@ Luôn sẵn sàng kết nối và trao đổi về web development!`,
   let skipped = 0
 
   for (const section of sections) {
-    const exists = await recordExists('about_sections', 'slug', section.slug)
+    const exists = await recordExists('about_sections', 'section_key', section.section_key)
 
     if (exists) {
       console.log(`   ⏭️  About section "${section.title}" already exists`)
