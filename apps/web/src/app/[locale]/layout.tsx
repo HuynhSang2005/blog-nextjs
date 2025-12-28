@@ -13,6 +13,8 @@ import { defaultLocale } from '@/config/i18n'
 import { siteConfig } from '@/config/site'
 import { getSansFont } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
+import { QueryProvider } from '@/providers/query-provider'
+import { Toaster } from '@/components/ui/sonner'
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>
@@ -138,17 +140,20 @@ export default async function RootLayout(props: {
             disableTransitionOnChange
             enableSystem
           >
-            <div>
-              <div className="relative z-10 flex min-h-screen flex-col">
-                <SiteHeader />
+            <QueryProvider>
+              <div>
+                <div className="relative z-10 flex min-h-screen flex-col">
+                  <SiteHeader />
 
-                <main className="flex-1">{children}</main>
+                  <main className="flex-1">{children}</main>
 
-                <SiteFooter />
+                  <SiteFooter />
+                </div>
+
+                <div className="fixed left-0 top-0 size-full bg-gradient-to-b from-[#a277ff] via-transparent to-transparent opacity-10" />
               </div>
-
-              <div className="fixed left-0 top-0 size-full bg-gradient-to-b from-[#a277ff] via-transparent to-transparent opacity-10" />
-            </div>
+              <Toaster />
+            </QueryProvider>
           </ThemeProvider>
         </NextIntlClientProvider>
       </body>
