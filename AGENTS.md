@@ -3,7 +3,7 @@
 > Instructions for AI coding agents working on this Next.js 16 blog monorepo
 
 **Project**: Huỳnh Sang Blog  
-**Tech Stack**: Next.js 16 + React 19 + TypeScript + Contentlayer + Turborepo  
+**Tech Stack**: Next.js 16 + React 19 + TypeScript + Contentlayer + Turborepo + Supabase + Cloudinary  
 **Primary Language**: Vietnamese (vi)  
 **Last Updated**: December 27, 2025
 
@@ -11,14 +11,24 @@
 
 ## 📋 Project Overview
 
-Personal blog platform built with Next.js 16 App Router in a Turborepo monorepo. Features MDX-based blog posts, documentation system, internationalization, dark mode, and SEO optimization. Currently Vietnamese only but designed for multi-language expansion.
+Personal blog-portfolio platform built with Next.js 16 App Router in a Turborepo monorepo. Features database-backed blog posts, MDX documentation, admin dashboard, portfolio sections, internationalization, dark mode, and SEO optimization.
 
 **Key Characteristics:**
-- Monorepo with `apps/content` (MDX files) and `apps/web` (Next.js app)
-- Type-safe content via Contentlayer2 (generates TypeScript types from MDX)
+- Monorepo with `apps/content` (MDX docs) and `apps/web` (Next.js app)
+- **Hybrid Content Strategy**:
+  - Blog posts: Database (Supabase) with admin CRUD
+  - Documentation: MDX files (Git-based, Contentlayer2)
+- **Media Storage**: Cloudinary CDN (not database)
+- Type-safe content via Contentlayer2 and Supabase generated types
 - Shadcn UI component system (copy-paste components, not npm package)
 - Biome for linting/formatting (replaces ESLint + Prettier)
 - Bun as package manager (not npm/yarn/pnpm)
+
+**I18n & Content Rules:**
+- ✅ **All UI text must be in Vietnamese** (`vi.json` translations)
+- ⚠️ **Keep technical terms in English** (Next.js, React, API, etc.)
+- ✅ **Buttons, labels, messages**: Tiếng Việt
+- ⚠️ **Code, endpoints, variables**: English
 
 ---
 
@@ -44,7 +54,15 @@ blog-nextjs/
 │   ├── biome-config/        # Shared Biome config
 │   └── typescript-config/   # Shared TS config
 └── docs/                    # Project documentation
-    ├── dev-v1/              # Development guides (Phase 1-6)
+    ├── dev-v1/              # Development guides
+    │   ├── PHASE-1-FOUNDATION.md (Database + Auth)
+    │   ├── PHASE-2-ADMIN-DASHBOARD.md (Admin UI)
+    │   ├── PHASE-3-PORTFOLIO.md (About + Projects)
+    │   ├── database-schema-cloudinary.md (Schema)
+    │   ├── environment-variables.md (Env setup)
+    │   ├── I18N-CONTENT-GUIDELINES.md (Vietnamese UI)
+    │   ├── MDX-CONTENT-STRATEGY.md (Hybrid approach)
+    │   └── ui-ux-design/ (UI/UX layouts)
     ├── README.md
     ├── architecture.md
     └── development.md
@@ -123,7 +141,146 @@ bun run contentlayer:build
 
 ---
 
-## 📐 Conventions & Patterns
+## �️ Database & Backend
+
+### Supabase PostgreSQL Database
+
+**Primary Tables:**
+- **`blog_posts`**: Title, slug, content (MDX), excerpt, status, locale, published_at, author_id, cover_media_id
+- **`projects`**: Title, slug, description (MDX), status, locale, start_date, end_date, cover_media_id, og_media_id
+- **`media`**: Cloudinary metadata (public_id, version, resource_type, format, width, height, alt_text)
+- **`profiles`**: User profiles (id, email, full_name, role, avatar_media_id)
+- **`project_media`**: Junction table for project galleries (many-to-many)
+
+**Authentication:**
+- Supabase Auth with Row Level Security (RLS)
+- Admin role check in middleware
+- No public user registration (admin-only system)
+
+**Database Queries:**
+```typescript
+// apps/web/src/lib/supabase/queries.ts
+import { createClient } from '@/lib/supabase/server'
+
+export async function getBlogPosts(locale: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select('*, media(*), profiles(*)')
+    .eq('locale', locale)
+    .eq('status', 'published')
+    .order('published_at', { ascending: false })
+  
+  if (error) throw error
+  return data
+}
+
+export async function getProjects(locale: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('projects')
+    .select('*, media!cover_media_id(*)')
+    .eq('locale', locale)
+    .eq('status', 'published')
+    .order('start_date', { ascending: false })
+  
+  if (error) throw error
+  return data
+}
+```
+
+**See:** [database-schema-cloudinary.md](docs/dev-v1/database-schema-cloudinary.md) for full schema
+
+---
+
+## 📸 Cloudinary Media Storage
+
+**Architecture:**
+- **Cloudinary CDN**: Stores actual image/video files (not in database)
+- **Supabase `media` table**: Stores only metadata (public_id, dimensions, alt_text)
+- **Upload Widget**: Client-side unsigned upload to Cloudinary preset
+
+**Media Table Structure:**
+```sql
+CREATE TABLE media (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  cloudinary_public_id TEXT NOT NULL UNIQUE,
+  cloudinary_version INTEGER,
+  resource_type TEXT NOT NULL DEFAULT 'image', -- image | video | raw
+  format TEXT, -- jpg, png, mp4, etc.
+  width INTEGER,
+  height INTEGER,
+  bytes INTEGER,
+  alt_text TEXT,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+```
+
+**Upload Pattern:**
+```typescript
+// Client Component with Cloudinary Widget
+'use client'
+
+import { CldUploadWidget } from 'next-cloudinary'
+import { createClient } from '@/lib/supabase/client'
+
+export function ImageUploader({ onUpload }) {
+  const supabase = createClient()
+  
+  async function handleSuccess(result: any) {
+    // Save metadata to Supabase
+    const { data, error } = await supabase
+      .from('media')
+      .insert({
+        cloudinary_public_id: result.info.public_id,
+        cloudinary_version: result.info.version,
+        resource_type: result.info.resource_type,
+        format: result.info.format,
+        width: result.info.width,
+        height: result.info.height,
+        bytes: result.info.bytes,
+      })
+      .select()
+      .single()
+    
+    if (error) throw error
+    onUpload(data)
+  }
+  
+  return (
+    <CldUploadWidget
+      uploadPreset="blog-uploads"
+      onSuccess={handleSuccess}
+    >
+      {({ open }) => <button onClick={() => open()}>Upload Image</button>}
+    </CldUploadWidget>
+  )
+}
+```
+
+**Display Pattern:**
+```typescript
+import { CldImage } from 'next-cloudinary'
+
+export function BlogCoverImage({ media }) {
+  return (
+    <CldImage
+      src={media.cloudinary_public_id}
+      width={media.width}
+      height={media.height}
+      alt={media.alt_text || ''}
+      crop="fill"
+      gravity="auto"
+    />
+  )
+}
+```
+
+**See:** [environment-variables.md](docs/dev-v1/environment-variables.md) for setup
+
+---
+
+## �📐 Conventions & Patterns
 
 ### File Naming
 - **Components**: PascalCase (`BlogPost.tsx`, `SiteHeader.tsx`)
@@ -470,10 +627,16 @@ bun add @huynhsang-blog/package-name --workspace
 ## ⚠️ Important Notes
 
 ### Contentlayer Integration
-- All blog posts and docs are **statically generated** at build time
-- Contentlayer runs during build to generate TypeScript types from MDX
+- Documentation content is **statically generated** from MDX at build time
+- Blog posts are **dynamically fetched** from Supabase database (not MDX)
+- Contentlayer runs during build to generate TypeScript types from MDX docs
 - If you modify `contentlayer.config.ts`, run `bun run contentlayer:build`
 - Generated types are in `contentlayer/generated` (gitignored)
+
+**Hybrid Content Strategy:**
+- ✅ **Blog posts**: Supabase database with admin CRUD interface
+- ✅ **Documentation**: MDX files (Git-based, Contentlayer2 processing)
+- ✅ **Media**: Cloudinary CDN (metadata in database, files in cloud)
 
 ### Next.js 16 App Router
 - All routes are in `apps/web/src/app/[locale]/`
@@ -523,9 +686,11 @@ When implementing new features, **always follow the phase guides** in `docs/dev-
 3. **Be conservative**: Don't add dependencies or make architectural changes without asking
 4. **Test locally**: Always verify changes work with `bun dev`
 5. **Check types**: Run `bun run tsc --noEmit` to catch type errors
-6. **Use Contentlayer types**: Import from `contentlayer/generated` for type-safe content
-7. **Respect boundaries**: Don't modify files in `lib/core/` or package configs
-8. **Ask before**: Clarify requirements for complex features or architectural decisions
+6. **Use Contentlayer types**: Import from `contentlayer/generated` for docs only (not blog posts)
+7. **Use Supabase queries**: For blog posts, use database queries (not MDX files)
+8. **Respect boundaries**: Don't modify files in `lib/core/` or package configs
+9. **Vietnamese UI first**: Write all UI text in Vietnamese, use `vi.json` translations
+10. **Ask before**: Clarify requirements for complex features or architectural decisions
 
 ---
 
