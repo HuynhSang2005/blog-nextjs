@@ -12,7 +12,7 @@
 -- Note: Schema sẽ được thêm vào từng phần trong các task tiếp theo
 -- Task 1.2.2: profiles, media tables ✅
 -- Task 1.2.3: blog_posts, blog_tags, blog_post_tags tables ✅
--- Task 1.2.4: projects, project_media, project_tags, project_tech_stack tables
+-- Task 1.2.4: projects, project_media, project_tags, project_tech_stack tables ✅
 -- Task 1.2.5: docs_topics, about_sections, timeline_events, skills tables
 
 -- ============================================
@@ -206,3 +206,100 @@ COMMENT ON TABLE blog_post_tags IS 'Many-to-many relationship between blog posts
 
 CREATE INDEX idx_blog_post_tags_post ON blog_post_tags(blog_post_id);
 CREATE INDEX idx_blog_post_tags_tag ON blog_post_tags(tag_id);
+
+-- ============================================
+-- PROJECTS TABLE
+-- ============================================
+CREATE TABLE projects (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  slug TEXT NOT NULL,
+  description TEXT, -- Short description (excerpt)
+  long_description TEXT, -- Full MDX content
+  cover_media_id UUID REFERENCES media(id) ON DELETE SET NULL, -- Main thumbnail
+  og_media_id UUID REFERENCES media(id) ON DELETE SET NULL, -- Open Graph image
+  demo_url TEXT, -- Live demo URL
+  github_url TEXT, -- Source code URL
+  status TEXT DEFAULT 'completed' CHECK (status IN ('in_progress', 'completed', 'archived')),
+  featured BOOLEAN DEFAULT FALSE,
+  start_date DATE,
+  end_date DATE,
+  locale TEXT NOT NULL DEFAULT 'vi',
+  order_index INTEGER DEFAULT 0, -- For manual ordering
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(slug, locale)
+);
+
+COMMENT ON TABLE projects IS 'Portfolio projects';
+COMMENT ON COLUMN projects.cover_media_id IS 'Main project thumbnail (Cloudinary)';
+COMMENT ON COLUMN projects.og_media_id IS 'Open Graph image (Cloudinary)';
+COMMENT ON COLUMN projects.long_description IS 'Full project description in MDX format';
+COMMENT ON COLUMN projects.order_index IS 'Manual ordering for projects list';
+
+-- Indexes
+CREATE INDEX idx_projects_slug ON projects(slug);
+CREATE INDEX idx_projects_status ON projects(status);
+CREATE INDEX idx_projects_featured ON projects(featured) WHERE featured = TRUE;
+CREATE INDEX idx_projects_locale ON projects(locale);
+CREATE INDEX idx_projects_order ON projects(order_index);
+CREATE INDEX idx_projects_cover_media ON projects(cover_media_id);
+CREATE INDEX idx_projects_og_media ON projects(og_media_id);
+
+-- Full-text search
+CREATE INDEX idx_projects_search ON projects 
+  USING gin(to_tsvector('english', title || ' ' || COALESCE(description, '') || ' ' || COALESCE(long_description, '')));
+
+-- ============================================
+-- PROJECT MEDIA (Gallery Junction Table)
+-- ============================================
+CREATE TABLE project_media (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  media_id UUID NOT NULL REFERENCES media(id) ON DELETE CASCADE,
+  order_index INTEGER DEFAULT 0, -- For gallery ordering
+  caption TEXT, -- Optional caption for this media in gallery
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(project_id, media_id)
+);
+
+COMMENT ON TABLE project_media IS 'Gallery media for projects (many-to-many)';
+COMMENT ON COLUMN project_media.order_index IS 'Display order in project gallery';
+
+-- Indexes
+CREATE INDEX idx_project_media_project ON project_media(project_id);
+CREATE INDEX idx_project_media_order ON project_media(project_id, order_index);
+
+-- ============================================
+-- PROJECT TAGS (Junction Table)
+-- ============================================
+CREATE TABLE project_tags (
+  project_id UUID REFERENCES projects(id) ON DELETE CASCADE,
+  tag_id UUID REFERENCES tags(id) ON DELETE CASCADE,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  PRIMARY KEY (project_id, tag_id)
+);
+
+COMMENT ON TABLE project_tags IS 'Many-to-many relationship between projects and tags';
+
+CREATE INDEX idx_project_tags_project ON project_tags(project_id);
+CREATE INDEX idx_project_tags_tag ON project_tags(tag_id);
+
+-- ============================================
+-- PROJECT TECH STACK TABLE
+-- ============================================
+CREATE TABLE project_tech_stack (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  project_id UUID NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+  name TEXT NOT NULL, -- e.g., "Next.js", "TypeScript"
+  category TEXT CHECK (category IN ('frontend', 'backend', 'database', 'devops', 'tools', 'other')),
+  icon TEXT, -- Lucide icon name or custom icon URL
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+COMMENT ON TABLE project_tech_stack IS 'Technologies used in each project';
+COMMENT ON COLUMN project_tech_stack.icon IS 'Lucide icon name (e.g., "react") or custom icon URL';
+
+CREATE INDEX idx_project_tech_stack_project ON project_tech_stack(project_id);
+CREATE INDEX idx_project_tech_stack_order ON project_tech_stack(project_id, order_index);
