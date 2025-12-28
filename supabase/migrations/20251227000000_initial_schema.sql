@@ -13,7 +13,7 @@
 -- Task 1.2.2: profiles, media tables ✅
 -- Task 1.2.3: blog_posts, blog_tags, blog_post_tags tables ✅
 -- Task 1.2.4: projects, project_media, project_tags, project_tech_stack tables ✅
--- Task 1.2.5: docs_topics, about_sections, timeline_events, skills tables
+-- Task 1.2.5: docs_topics, about_sections, timeline_events, skills tables ✅
 
 -- ============================================
 -- ENABLE EXTENSIONS
@@ -303,3 +303,108 @@ COMMENT ON COLUMN project_tech_stack.icon IS 'Lucide icon name (e.g., "react") o
 
 CREATE INDEX idx_project_tech_stack_project ON project_tech_stack(project_id);
 CREATE INDEX idx_project_tech_stack_order ON project_tech_stack(project_id, order_index);
+-- ============================================
+-- DOCS TOPICS TABLE (Documentation Categories)
+-- ============================================
+CREATE TABLE docs_topics (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  slug TEXT NOT NULL UNIQUE,
+  description TEXT,
+  icon TEXT, -- Lucide icon name (e.g., "book", "code")
+  color TEXT, -- Hex color for UI (e.g., #3178C6)
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW(),
+  updated_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+COMMENT ON TABLE docs_topics IS 'Documentation topic categories (Next.js, React, TypeScript, etc.)';
+COMMENT ON COLUMN docs_topics.icon IS 'Lucide icon name for visual representation';
+COMMENT ON COLUMN docs_topics.order_index IS 'Display order in docs navigation';
+
+-- Indexes
+CREATE INDEX idx_docs_topics_slug ON docs_topics(slug);
+CREATE INDEX idx_docs_topics_order ON docs_topics(order_index);
+
+-- ============================================
+-- ABOUT SECTIONS TABLE (Configurable About Page)
+-- ============================================
+CREATE TABLE about_sections (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  section_key TEXT NOT NULL, -- e.g., 'bio', 'education', 'experience', 'contact'
+  title TEXT NOT NULL,
+  content TEXT, -- MDX content
+  order_index INTEGER DEFAULT 0,
+  visible BOOLEAN DEFAULT TRUE,
+  locale TEXT NOT NULL DEFAULT 'vi',
+  updated_at TIMESTAMPTZ DEFAULT NOW(),
+  UNIQUE(section_key, locale)
+);
+
+COMMENT ON TABLE about_sections IS 'Configurable sections for about page';
+COMMENT ON COLUMN about_sections.section_key IS 'Unique identifier for section type';
+COMMENT ON COLUMN about_sections.content IS 'MDX content for flexible formatting';
+COMMENT ON COLUMN about_sections.visible IS 'Toggle section visibility without deleting';
+
+-- Indexes
+CREATE INDEX idx_about_sections_key ON about_sections(section_key);
+CREATE INDEX idx_about_sections_order ON about_sections(order_index);
+CREATE INDEX idx_about_sections_locale ON about_sections(locale);
+CREATE INDEX idx_about_sections_visible ON about_sections(visible) WHERE visible = TRUE;
+
+-- ============================================
+-- TIMELINE EVENTS TABLE (Career & Education)
+-- ============================================
+CREATE TABLE timeline_events (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  title TEXT NOT NULL,
+  subtitle TEXT, -- e.g., Company name, University name
+  description TEXT, -- MDX content for rich descriptions
+  event_type TEXT NOT NULL CHECK (event_type IN ('education', 'work', 'achievement', 'other')),
+  start_date DATE NOT NULL,
+  end_date DATE, -- NULL if is_current = TRUE
+  is_current BOOLEAN DEFAULT FALSE, -- Currently ongoing (e.g., current job)
+  icon TEXT, -- Lucide icon name (e.g., "briefcase", "graduation-cap")
+  media_id UUID REFERENCES media(id) ON DELETE SET NULL, -- Optional image/video
+  locale TEXT NOT NULL DEFAULT 'vi',
+  order_index INTEGER DEFAULT 0, -- Manual ordering override (lower = higher priority)
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+COMMENT ON TABLE timeline_events IS 'Career, education, and achievement timeline for about page';
+COMMENT ON COLUMN timeline_events.subtitle IS 'Organization name (company, university, etc.)';
+COMMENT ON COLUMN timeline_events.is_current IS 'TRUE for ongoing events (current job, etc.)';
+COMMENT ON COLUMN timeline_events.media_id IS 'Optional image/logo from Cloudinary';
+COMMENT ON COLUMN timeline_events.order_index IS 'Manual override for display order (default: sort by start_date DESC)';
+
+-- Indexes
+CREATE INDEX idx_timeline_events_date ON timeline_events(start_date DESC);
+CREATE INDEX idx_timeline_events_type ON timeline_events(event_type);
+CREATE INDEX idx_timeline_events_order ON timeline_events(order_index);
+CREATE INDEX idx_timeline_events_locale ON timeline_events(locale);
+CREATE INDEX idx_timeline_events_media ON timeline_events(media_id);
+CREATE INDEX idx_timeline_events_current ON timeline_events(is_current) WHERE is_current = TRUE;
+
+-- ============================================
+-- SKILLS TABLE (Technical & Soft Skills)
+-- ============================================
+CREATE TABLE skills (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  name TEXT NOT NULL,
+  category TEXT NOT NULL CHECK (category IN ('frontend', 'backend', 'tools', 'soft_skills', 'other')),
+  proficiency INTEGER CHECK (proficiency >= 0 AND proficiency <= 100), -- Percentage (0-100)
+  icon TEXT, -- Lucide icon name or custom icon identifier
+  color TEXT, -- Hex color for visual representation
+  order_index INTEGER DEFAULT 0,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
+COMMENT ON TABLE skills IS 'Technical and soft skills for about page and resume';
+COMMENT ON COLUMN skills.proficiency IS 'Skill proficiency as percentage (0-100)';
+COMMENT ON COLUMN skills.icon IS 'Lucide icon name (e.g., "react") or custom icon';
+COMMENT ON COLUMN skills.color IS 'Hex color for skill badge (e.g., #61DAFB for React)';
+
+-- Indexes
+CREATE INDEX idx_skills_category ON skills(category);
+CREATE INDEX idx_skills_order ON skills(order_index);
+CREATE INDEX idx_skills_proficiency ON skills(proficiency DESC);
