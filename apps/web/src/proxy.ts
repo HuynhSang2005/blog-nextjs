@@ -1,6 +1,3 @@
-import type { NextRequest } from 'next/server'
-import proxyImpl from '@/lib/core/proxy'
-
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import proxyImpl from '@/lib/core/proxy'
@@ -83,7 +80,9 @@ export default async function proxy(request: NextRequest) {
   if (isAdminRoute) {
     // Not authenticated -> redirect to login
     if (!session) {
-      const loginUrl = new URL('/login', request.url)
+      // Preserve locale in login redirect
+      const locale = pathname.split('/')[1] || 'vi'
+      const loginUrl = new URL(`/${locale}/login`, request.url)
       loginUrl.searchParams.set('redirectTo', pathname)
       return NextResponse.redirect(loginUrl)
     }

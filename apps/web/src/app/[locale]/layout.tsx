@@ -112,6 +112,9 @@ export default async function RootLayout(props: {
 
   setRequestLocale(locale)
 
+  // Load messages for client-side components
+  const messages = (await import(`@/i18n/locales/${locale}.json`)).default
+
   const fontSans = await getSansFont()
   return (
     <html lang={locale} suppressHydrationWarning>
@@ -127,7 +130,7 @@ export default async function RootLayout(props: {
       >
         <NextIntlClientProvider
           locale={params.locale || defaultLocale}
-          messages={{}}
+          messages={messages}
         >
           <ThemeProvider
             attribute="class"

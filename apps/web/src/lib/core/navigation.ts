@@ -6,7 +6,7 @@ import { defaultLocale, locales } from '@/config/i18n'
 export const routing = defineRouting({
   locales,
   defaultLocale,
-  localePrefix: 'as-needed',
+  localePrefix: 'always',  // Always include locale in URL
 })
 
 export const { Link, redirect, usePathname, useRouter } =

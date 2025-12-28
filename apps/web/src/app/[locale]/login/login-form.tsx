@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { useTranslations } from 'next-intl'
+import { useTranslations, useLocale } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import * as z from 'zod'
@@ -36,6 +36,7 @@ type LoginFormData = z.infer<typeof loginSchema>
 
 export function LoginForm() {
   const router = useRouter()
+  const locale = useLocale()
   const t = useTranslations('auth')
   const [error, setError] = useState<string>('')
   const [isLoading, setIsLoading] = useState(false)
@@ -58,10 +59,11 @@ export function LoginForm() {
       if (result.error) {
         setError(result.error)
       } else {
-        // Redirect to admin or redirectTo param
+        // Redirect to admin or redirectTo param (with locale prefix)
         const redirectTo = new URLSearchParams(window.location.search).get('redirectTo')
         const adminPath = process.env.NEXT_PUBLIC_ADMIN_PATH || '/admin'
-        router.push(redirectTo || adminPath)
+        const targetPath = redirectTo || `/${locale}${adminPath}`
+        router.push(targetPath)
         router.refresh()
       }
     } catch (err) {
