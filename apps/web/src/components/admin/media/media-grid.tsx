@@ -253,7 +253,7 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
               <Textarea
                 id="caption"
                 value={editForm.caption}
-                onChange={(e) => setEditForm({ ...editForm, caption: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditForm({ ...editForm, caption: e.target.value })}
                 placeholder="Chú thích chi tiết (tùy chọn)"
                 rows={3}
               />

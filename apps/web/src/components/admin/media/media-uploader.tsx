@@ -1,6 +1,17 @@
 /**
  * Media Uploader Component
  * Upload media to Cloudinary and save metadata to Supabase
+ * 
+ * @example
+ * ```tsx
+ * <MediaUploader
+ *   onUploadSuccess={() => refetch()}
+ *   folder="blog/covers"
+ *   multiple
+ *   maxFiles={5}
+ *   maxFileSize={20}
+ * />
+ * ```
  */
 
 'use client'
@@ -14,19 +25,42 @@ import { toast } from 'sonner'
 import { createMedia } from '@/app/actions/media'
 
 interface MediaUploaderProps {
+  /** Callback sau khi upload thành công */
   onUploadSuccess?: () => void
+  /** Cloudinary folder path (default: 'blog') */
   folder?: string
+  /** Cho phép upload nhiều files (default: true) */
   multiple?: boolean
+  /** Số lượng files tối đa (default: 10) */
+  maxFiles?: number
+  /** Kích thước file tối đa (MB) (default: 10) */
+  maxFileSize?: number
+  /** Các format files được phép (default: images + videos) */
+  allowedFormats?: string[]
 }
 
 export function MediaUploader({
   onUploadSuccess,
   folder = 'blog',
   multiple = true,
+  maxFiles = 10,
+  maxFileSize = 10,
+  allowedFormats = [
+    'jpg',
+    'jpeg',
+    'png',
+    'gif',
+    'webp',
+    'svg',
+    'mp4',
+    'webm',
+    'mov',
+  ],
 }: MediaUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
 
   const handleUpload = async (result: CloudinaryUploadWidgetResults) => {
+    // Type guard: ensure we have upload success with valid info
     if (result.event !== 'success' || !result.info || typeof result.info === 'string') {
       return
     }
@@ -44,7 +78,7 @@ export function MediaUploader({
         width: info.width,
         height: info.height,
         bytes: info.bytes,
-        duration: info.duration,
+        duration: typeof info.duration === 'number' ? info.duration : undefined,
         folder: folder,
         metadata: {
           colors: info.colors,
@@ -75,20 +109,10 @@ export function MediaUploader({
       options={{
         folder: folder,
         multiple: multiple,
-        maxFiles: multiple ? 10 : 1,
+        maxFiles: multiple ? maxFiles : 1,
         resourceType: 'auto',
-        clientAllowedFormats: [
-          'jpg',
-          'jpeg',
-          'png',
-          'gif',
-          'webp',
-          'svg',
-          'mp4',
-          'webm',
-          'mov',
-        ],
-        maxFileSize: 10 * 1024 * 1024, // 10MB
+        clientAllowedFormats: allowedFormats,
+        maxFileSize: maxFileSize * 1024 * 1024, // Convert MB to bytes
         sources: ['local', 'url', 'camera'],
         showPoweredBy: false,
       }}
