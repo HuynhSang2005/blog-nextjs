@@ -170,6 +170,77 @@
         "publish_success": "Đã xuất bản bài viết",
         "unpublish_success": "Đã hủy xuất bản bài viết"
       }
+    },
+    "projects": {
+      "title": "Quản lý Projects",
+      "description": "Tạo, chỉnh sửa và quản lý các dự án",
+      "list": {
+        "title": "Danh sách dự án",
+        "description": "Xem và quản lý tất cả dự án"
+      },
+      "actions": {
+        "create": "Tạo dự án mới",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa"
+      },
+      "form": {
+        "title": "Tiêu đề",
+        "slug": "Đường dẫn (slug)",
+        "description": "Mô tả ngắn",
+        "long_description": "Mô tả chi tiết",
+        "demo_url": "Link Demo",
+        "github_url": "Link GitHub",
+        "status": "Trạng thái",
+        "featured": "Dự án nổi bật",
+        "start_date": "Ngày bắt đầu",
+        "end_date": "Ngày kết thúc",
+        "tech_stack": "Công nghệ sử dụng",
+        "cover_image": "Ảnh bìa",
+        "gallery": "Thư viện ảnh",
+        "save": "Lưu",
+        "cancel": "Hủy",
+        "errors": {
+          "title_required": "Vui lòng nhập tiêu đề",
+          "title_max": "Tiêu đề không được quá 200 ký tự",
+          "slug_required": "Vui lòng nhập slug",
+          "slug_invalid": "Slug chỉ chứa chữ thường, số và dấu gạch ngang",
+          "description_max": "Mô tả không được quá 500 ký tự",
+          "demo_url_invalid": "URL không hợp lệ",
+          "github_url_invalid": "URL không hợp lệ"
+        }
+      },
+      "status": {
+        "in_progress": "Đang thực hiện",
+        "completed": "Hoàn thành",
+        "archived": "Đã lưu trữ"
+      },
+      "table": {
+        "title": "Tiêu đề",
+        "status": "Trạng thái",
+        "links": "Liên kết",
+        "created_at": "Ngày tạo",
+        "actions": "Thao tác",
+        "search_placeholder": "Tìm kiếm dự án...",
+        "filter_status": "Lọc theo trạng thái",
+        "all_status": "Tất cả",
+        "no_results": "Không tìm thấy dự án nào",
+        "previous": "Trước",
+        "next": "Tiếp"
+      },
+      "delete": {
+        "title": "Xóa dự án",
+        "description": "Bạn có chắc muốn xóa dự án này? Hành động này không thể hoàn tác.",
+        "cancel": "Hủy",
+        "confirm": "Xóa"
+      },
+      "messages": {
+        "create_success": "Đã tạo dự án thành công",
+        "create_error": "Không thể tạo dự án",
+        "update_success": "Đã cập nhật dự án thành công",
+        "update_error": "Không thể cập nhật dự án",
+        "delete_success": "Đã xóa dự án thành công",
+        "delete_error": "Không thể xóa dự án"
+      }
     }
   }
 }

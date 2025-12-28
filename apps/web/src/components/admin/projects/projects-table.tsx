@@ -1,0 +1,339 @@
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type SortingState,
+} from '@tanstack/react-table'
+import { format } from 'date-fns'
+import { vi } from 'date-fns/locale'
+import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+
+import { Badge } from '@/components/ui/badge'
+import { Button } from '@/components/ui/button'
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu'
+import { Input } from '@/components/ui/input'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
+import { useTranslations } from 'next-intl'
+import { deleteProject } from '@/app/actions/projects'
+import { toast } from 'sonner'
+
+type Project = {
+  id: string
+  title: string
+  slug: string
+  description: string | null
+  status: 'in_progress' | 'completed' | 'archived' | null
+  featured: boolean | null
+  demo_url: string | null
+  github_url: string | null
+  created_at: string | null
+  updated_at: string | null
+}
+
+interface ProjectsTableProps {
+  projects: Project[]
+}
+
+export function ProjectsTable({ projects }: ProjectsTableProps) {
+  const router = useRouter()
+  const t = useTranslations('admin.projects')
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
+  const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
+
+  const columns: ColumnDef<Project>[] = [
+    {
+      accessorKey: 'title',
+      header: t('table.title'),
+      cell: ({ row }) => {
+        const isFeatured = row.original.featured
+        return (
+          <div className="flex items-center gap-2">
+            <span className="font-medium">{row.getValue('title')}</span>
+            {isFeatured && (
+              <Badge variant="secondary" className="text-xs">
+                {t('form.featured')}
+              </Badge>
+            )}
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: 'status',
+      header: t('table.status'),
+      cell: ({ row }) => {
+        const status = row.getValue('status') as string
+        const statusVariant = {
+          in_progress: 'default',
+          completed: 'success',
+          archived: 'secondary',
+        }[status] as 'default' | 'success' | 'secondary'
+        
+        return (
+          <Badge variant={statusVariant}>
+            {t(`status.${status}`)}
+          </Badge>
+        )
+      },
+      filterFn: (row, id, value) => {
+        return value === 'all' || row.getValue(id) === value
+      },
+    },
+    {
+      accessorKey: 'demo_url',
+      header: t('table.links'),
+      cell: ({ row }) => {
+        const demoUrl = row.original.demo_url
+        const githubUrl = row.original.github_url
+        
+        return (
+          <div className="flex gap-2">
+            {demoUrl && (
+              <Badge variant="outline" className="text-xs">
+                Demo
+              </Badge>
+            )}
+            {githubUrl && (
+              <Badge variant="outline" className="text-xs">
+                GitHub
+              </Badge>
+            )}
+            {!demoUrl && !githubUrl && (
+              <span className="text-xs text-muted-foreground">-</span>
+            )}
+          </div>
+        )
+      },
+    },
+    {
+      accessorKey: 'created_at',
+      header: t('table.created_at'),
+      cell: ({ row }) => {
+        const date = row.getValue('created_at') as string
+        return date ? format(new Date(date), 'dd MMM yyyy', { locale: vi }) : '-'
+      },
+    },
+    {
+      id: 'actions',
+      cell: ({ row }) => {
+        const project = row.original
+
+        return (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" className="h-8 w-8 p-0">
+                <span className="sr-only">Mở menu</span>
+                <MoreHorizontal className="h-4 w-4" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuLabel>{t('table.actions')}</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem asChild>
+                <Link href={`/admin/projects/${project.id}`}>
+                  <Pencil className="mr-2 h-4 w-4" />
+                  {t('actions.edit')}
+                </Link>
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                className="text-destructive"
+                onClick={() => {
+                  setProjectToDelete(project.id)
+                  setDeleteDialogOpen(true)
+                }}
+              >
+                <Trash2 className="mr-2 h-4 w-4" />
+                {t('actions.delete')}
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )
+      },
+    },
+  ]
+
+  const table = useReactTable({
+    data: projects,
+    columns,
+    getCoreRowModel: getCoreRowModel(),
+    getPaginationRowModel: getPaginationRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    getFilteredRowModel: getFilteredRowModel(),
+    onSortingChange: setSorting,
+    onColumnFiltersChange: setColumnFilters,
+    state: {
+      sorting,
+      columnFilters,
+    },
+  })
+
+  const handleDelete = async () => {
+    if (!projectToDelete) return
+
+    try {
+      await deleteProject(projectToDelete)
+      toast.success(t('messages.delete_success'))
+      setDeleteDialogOpen(false)
+      setProjectToDelete(null)
+      router.refresh()
+    } catch (error) {
+      console.error('Error deleting project:', error)
+      toast.error(t('messages.delete_error'))
+    }
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="flex items-center justify-between gap-4">
+        <Input
+          placeholder={t('table.search_placeholder')}
+          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
+          onChange={(event) =>
+            table.getColumn('title')?.setFilterValue(event.target.value)
+          }
+          className="max-w-sm"
+        />
+        <Select
+          value={(table.getColumn('status')?.getFilterValue() as string) ?? 'all'}
+          onValueChange={(value) =>
+            table.getColumn('status')?.setFilterValue(value === 'all' ? '' : value)
+          }
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder={t('table.filter_status')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{t('table.all_status')}</SelectItem>
+            <SelectItem value="in_progress">{t('status.in_progress')}</SelectItem>
+            <SelectItem value="completed">{t('status.completed')}</SelectItem>
+            <SelectItem value="archived">{t('status.archived')}</SelectItem>
+          </SelectContent>
+        </Select>
+      </div>
+
+      <div className="rounded-md border">
+        <Table>
+          <TableHeader>
+            {table.getHeaderGroups().map((headerGroup) => (
+              <TableRow key={headerGroup.id}>
+                {headerGroup.headers.map((header) => {
+                  return (
+                    <TableHead key={header.id}>
+                      {header.isPlaceholder
+                        ? null
+                        : flexRender(
+                            header.column.columnDef.header,
+                            header.getContext()
+                          )}
+                    </TableHead>
+                  )
+                })}
+              </TableRow>
+            ))}
+          </TableHeader>
+          <TableBody>
+            {table.getRowModel().rows?.length ? (
+              table.getRowModel().rows.map((row) => (
+                <TableRow
+                  key={row.id}
+                  data-state={row.getIsSelected() && 'selected'}
+                >
+                  {row.getVisibleCells().map((cell) => (
+                    <TableCell key={cell.id}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            ) : (
+              <TableRow>
+                <TableCell colSpan={columns.length} className="h-24 text-center">
+                  {t('table.no_results')}
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      <div className="flex items-center justify-end space-x-2">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.previousPage()}
+          disabled={!table.getCanPreviousPage()}
+        >
+          {t('table.previous')}
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => table.nextPage()}
+          disabled={!table.getCanNextPage()}
+        >
+          {t('table.next')}
+        </Button>
+      </div>
+
+      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('delete.title')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t('delete.description')}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('delete.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+              {t('delete.confirm')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+    </div>
+  )
+}
