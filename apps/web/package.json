@@ -10,7 +10,8 @@
     "lint:fix": "biome check --write --no-errors-on-unmatched --assist-enabled=true .",
     "typecheck": "tsc --noEmit",
     "next:build": "next build",
-    "contentlayer:build": "contentlayer2 build"
+    "contentlayer:build": "contentlayer2 build",
+    "seed": "bun run scripts/seed.ts"
   },
   "dependencies": {
     "@emotion/is-prop-valid": "^1.4.0",
