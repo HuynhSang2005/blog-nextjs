@@ -99,5 +99,25 @@
       "go_to_previous_page": "Trang trước đó",
       "back_to_blog": "Quay lại Blog"
     }
+  },
+
+  "auth": {
+    "login": {
+      "title": "Đăng nhập",
+      "description": "Đăng nhập vào tài khoản quản trị",
+      "email": "Email",
+      "email_placeholder": "admin@example.com",
+      "password": "Mật khẩu",
+      "password_placeholder": "Nhập mật khẩu",
+      "submit": "Đăng nhập",
+      "logging_in": "Đang đăng nhập..."
+    },
+    "errors": {
+      "invalid_credentials": "Email hoặc mật khẩu không đúng",
+      "network_error": "Lỗi kết nối, vui lòng thử lại",
+      "unknown_error": "Đã xảy ra lỗi, vui lòng thử lại"
+    },
+    "logout": "Đăng xuất",
+    "admin_panel": "Bảng điều khiển"
   }
 }
