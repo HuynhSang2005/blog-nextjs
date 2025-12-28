@@ -119,5 +119,57 @@
     },
     "logout": "Đăng xuất",
     "admin_panel": "Bảng điều khiển"
+  },
+
+  "admin": {
+    "blog": {
+      "title": "Quản lý Blog Posts",
+      "description": "Tạo, chỉnh sửa và quản lý các bài viết blog",
+      "list": {
+        "title": "Danh sách bài viết",
+        "description": "Xem và quản lý tất cả bài viết blog",
+        "no_posts": "Chưa có bài viết nào",
+        "search_placeholder": "Tìm kiếm bài viết...",
+        "filter_by_status": "Lọc theo trạng thái"
+      },
+      "actions": {
+        "create": "Tạo bài viết mới",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "publish": "Xuất bản",
+        "unpublish": "Hủy xuất bản",
+        "save_draft": "Lưu nháp",
+        "copy_slug": "Sao chép slug"
+      },
+      "status": {
+        "all": "Tất cả",
+        "draft": "Bản nháp",
+        "published": "Đã xuất bản",
+        "archived": "Đã lưu trữ"
+      },
+      "columns": {
+        "title": "Tiêu đề",
+        "status": "Trạng thái",
+        "author": "Tác giả",
+        "created_at": "Ngày tạo",
+        "published_at": "Ngày xuất bản",
+        "actions": "Thao tác"
+      },
+      "pagination": {
+        "previous": "Trang trước",
+        "next": "Trang sau"
+      },
+      "messages": {
+        "delete_confirm": "Bạn có chắc muốn xóa bài viết này?",
+        "delete_confirm_description": "Hành động này không thể hoàn tác. Bài viết sẽ bị xóa vĩnh viễn.",
+        "delete_success": "Đã xóa bài viết thành công",
+        "delete_error": "Không thể xóa bài viết",
+        "slug_copied": "Đã sao chép slug",
+        "create_success": "Đã tạo bài viết thành công",
+        "update_success": "Đã cập nhật bài viết thành công",
+        "publish_success": "Đã xuất bản bài viết",
+        "unpublish_success": "Đã hủy xuất bản bài viết"
+      }
+    }
   }
 }
