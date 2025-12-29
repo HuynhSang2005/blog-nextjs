@@ -101,6 +101,52 @@
     }
   },
 
+  "about": {
+    "title": "Giới thiệu",
+    "description": "Tìm hiểu thêm về kinh nghiệm, kỹ năng và hành trình phát triển của tôi",
+    "heading": "Giới thiệu",
+    "subheading": "Full-stack Developer đam mê xây dựng các ứng dụng web hiện đại",
+    
+    "bio": {
+      "location": "Vị trí",
+      "role": "Vai trò",
+      "email": "Email",
+      "experience": "Kinh nghiệm"
+    },
+    
+    "timeline": {
+      "title": "Hành trình & Kinh nghiệm",
+      "description": "Các cột mốc quan trọng trong sự nghiệp và học tập của tôi",
+      "present": "Hiện tại",
+      "types": {
+        "work": "Công việc",
+        "education": "Học vấn",
+        "achievement": "Thành tựu",
+        "other": "Khác"
+      }
+    },
+    
+    "skills": {
+      "title": "Kỹ năng & Công nghệ",
+      "description": "Các công nghệ và kỹ năng tôi sử dụng hàng ngày",
+      "categories": {
+        "frontend": "Frontend",
+        "backend": "Backend",
+        "tools": "Công cụ & DevOps",
+        "soft_skills": "Kỹ năng mềm",
+        "other": "Khác"
+      },
+      "proficiency": "Độ thành thạo"
+    },
+    
+    "contact": {
+      "title": "Liên hệ",
+      "description": "Hãy kết nối với tôi qua các kênh sau",
+      "email_me": "Gửi email",
+      "follow_me": "Theo dõi tôi"
+    }
+  },
+
   "auth": {
     "login": {
       "title": "Đăng nhập",
