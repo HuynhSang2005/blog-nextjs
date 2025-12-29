@@ -1,4 +1,4 @@
-import Balancer from 'react-wrap-balancer'
+import { Balancer } from '@/components/ui/balancer'
 
 import { DocNotAvailableInThisLanguage } from './not-available'
 import type { LocaleOptions } from '@/lib/core/types/i18n'

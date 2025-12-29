@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import Balancer from 'react-wrap-balancer'
+import { Balancer } from '@/components/ui/balancer'
 import { compareDesc } from 'date-fns'
 import { useMemo } from 'react'
 

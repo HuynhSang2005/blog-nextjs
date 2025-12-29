@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from 'react'
-import Balance from 'react-wrap-balancer'
+import { Balancer as Balance } from '@/components/ui/balancer'
 
 import { cn } from '@/lib/utils'
 
