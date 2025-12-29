@@ -10,19 +10,62 @@ import type {
 } from '../types-helpers'
 
 /**
+ * Filter parameters cho blog posts query
+ */
+export interface FilterParams {
+  search?: string
+  sort?: 'newest' | 'oldest' | 'title' | 'views'
+  dateFrom?: string
+  dateTo?: string
+  tagSlug?: string
+}
+
+function isoDayStart(date: string): string {
+  return `${date}T00:00:00.000Z`
+}
+
+function isoNextDayStart(date: string): string {
+  const dayStart = new Date(`${date}T00:00:00.000Z`)
+  dayStart.setUTCDate(dayStart.getUTCDate() + 1)
+  return dayStart.toISOString()
+}
+
+/**
  * Lấy tất cả blog posts với pagination và filters
  * @param locale - Locale code (e.g., 'vi', 'en')
  * @param status - Post status filter (optional)
  * @param pagination - Pagination parameters (optional)
+ * @param filters - Filter parameters (search, sort, date range, tag)
  * @returns Paginated blog posts
  */
 export async function getBlogPosts(
   locale: string,
   status?: BlogPostStatus,
   pagination?: PaginationParams,
+  filters?: FilterParams,
 ): Promise<PaginatedResponse<BlogPostListItem>> {
   try {
     const supabase = await createClient()
+
+    // When filtering by tag, we must use an inner join so PostgREST can
+    // restrict blog_posts rows based on the related tag.
+    const tagsSelect = filters?.tagSlug
+      ? `tags:blog_post_tags!inner(
+          tag:tags!inner(
+            id,
+            name,
+            slug,
+            color
+          )
+        )`
+      : `tags:blog_post_tags(
+          tag:tags(
+            id,
+            name,
+            slug,
+            color
+          )
+        )`
 
     // Build query
     let query = supabase
@@ -39,14 +82,7 @@ export async function getBlogPosts(
           public_id,
           alt_text
         ),
-        tags:blog_post_tags(
-          tag:tags(
-            id,
-            name,
-            slug,
-            color
-          )
-        )
+        ${tagsSelect}
       `,
         { count: 'exact' },
       )
@@ -60,6 +96,47 @@ export async function getBlogPosts(
       query = query.eq('status', 'published')
     }
 
+    // Apply search filter (title + excerpt)
+    if (filters?.search) {
+      const searchTerm = filters.search.trim()
+      query = query.or(
+        `title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%`,
+      )
+    }
+
+    // Apply date range filters (inclusive)
+    if (filters?.dateFrom) {
+      query = query.gte('published_at', isoDayStart(filters.dateFrom))
+    }
+    if (filters?.dateTo) {
+      query = query.lt('published_at', isoNextDayStart(filters.dateTo))
+    }
+
+    // Apply tag filter
+    if (filters?.tagSlug) {
+      // Filter through embedded relation
+      query = query.eq('tags.tag.slug', filters.tagSlug)
+    }
+
+    // Apply sorting
+    const sortOption = filters?.sort || 'newest'
+    switch (sortOption) {
+      case 'newest':
+        query = query.order('published_at', { ascending: false })
+        break
+      case 'oldest':
+        query = query.order('published_at', { ascending: true })
+        break
+      case 'title':
+        query = query.order('title', { ascending: true })
+        break
+      case 'views':
+        query = query.order('view_count', { ascending: false, nullsFirst: false })
+        break
+      default:
+        query = query.order('published_at', { ascending: false })
+    }
+
     // Apply pagination
     if (pagination) {
       const { page, pageSize } = pagination
@@ -67,9 +144,6 @@ export async function getBlogPosts(
       const to = from + pageSize - 1
       query = query.range(from, to)
     }
-
-    // Order by published date
-    query = query.order('published_at', { ascending: false })
 
     const { data, error, count } = await query
 

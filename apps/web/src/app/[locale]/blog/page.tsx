@@ -5,6 +5,7 @@ import { redirect } from 'next/navigation'
 import { BlogPostList } from '@/components/blog/post-list'
 import { BlogPagination } from '@/components/blog/blog-pagination'
 import { RSSToggle } from '@/components/blog/rss-toggle'
+import { BlogFilters } from '@/components/blog/blog-filters'
 import type { LocaleOptions } from '@/lib/core/types/i18n'
 import { getBlogPosts } from '@/lib/supabase/queries/blog'
 import { absoluteUrl } from '@/lib/utils'
@@ -17,6 +18,10 @@ interface BlogPageProps {
   searchParams: Promise<{
     page?: string
     tag?: string
+    search?: string
+    sort?: string
+    from?: string
+    to?: string
   }>
 }
 
@@ -46,6 +51,11 @@ export default async function BlogPage(props: BlogPageProps) {
   const pageParam = searchParams.page || '1'
   const page = Number.parseInt(pageParam, 10)
 
+  const search = searchParams.search
+  const sort = searchParams.sort
+  const from = searchParams.from
+  const to = searchParams.to
+
   // Validate page number
   if (!Number.isInteger(page) || page < 1) {
     const validParams = new URLSearchParams()
@@ -66,6 +76,16 @@ export default async function BlogPage(props: BlogPageProps) {
     {
       page: 1,
       pageSize: 1,
+    },
+    {
+      search,
+      sort:
+        sort === 'newest' || sort === 'oldest' || sort === 'title' || sort === 'views'
+          ? sort
+          : undefined,
+      dateFrom: from,
+      dateTo: to,
+      tagSlug: searchParams.tag,
     }
   )
 
@@ -90,6 +110,16 @@ export default async function BlogPage(props: BlogPageProps) {
     {
       page,
       pageSize: POSTS_PER_PAGE,
+    },
+    {
+      search,
+      sort:
+        sort === 'newest' || sort === 'oldest' || sort === 'title' || sort === 'views'
+          ? sort
+          : undefined,
+      dateFrom: from,
+      dateTo: to,
+      tagSlug: searchParams.tag,
     }
   )
 
@@ -109,6 +139,22 @@ export default async function BlogPage(props: BlogPageProps) {
       <RSSToggle
         messages={{
           rss_feed: t('blog.rss_feed'),
+        }}
+      />
+
+      <BlogFilters
+        messages={{
+          search_placeholder: t('blog.filters.search_placeholder'),
+          sort_by: t('blog.filters.sort_by'),
+          sort_newest: t('blog.filters.sort_newest'),
+          sort_oldest: t('blog.filters.sort_oldest'),
+          sort_title: t('blog.filters.sort_title'),
+          sort_views: t('blog.filters.sort_views'),
+          date_range: t('blog.filters.date_range'),
+          date_from: t('blog.filters.date_from'),
+          date_to: t('blog.filters.date_to'),
+          clear_filters: t('blog.filters.clear_filters'),
+          apply_filters: t('blog.filters.apply_filters'),
         }}
       />
 

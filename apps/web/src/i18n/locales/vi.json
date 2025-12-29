@@ -86,6 +86,21 @@
     "previous": "Trước đó",
     "go_to_next_page": "Trang tiếp theo",
     "go_to_previous_page": "Trang trước đó",
+    
+    "filters": {
+      "search_placeholder": "Tìm kiếm bài viết...",
+      "sort_by": "Sắp xếp theo",
+      "sort_newest": "Mới nhất",
+      "sort_oldest": "Cũ nhất",
+      "sort_title": "Tiêu đề",
+      "sort_views": "Lượt xem",
+      "date_range": "Khoảng thời gian",
+      "date_from": "Từ ngày",
+      "date_to": "Đến ngày",
+      "clear_filters": "Xóa bộ lọc",
+      "apply_filters": "Áp dụng"
+    },
+    
     "words": {
       "posts": "Bài viết",
       "by": "bởi",
