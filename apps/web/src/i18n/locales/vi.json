@@ -327,5 +327,46 @@
       "saving": "Đang lưu...",
       "deleting": "Đang xóa..."
     }
+  },
+
+  "projects": {
+    "title": "Dự án",
+    "description": "Danh sách các dự án web, mobile và design system đã hoàn thành và đang phát triển",
+    "heading": "Dự án của tôi",
+    "subheading": "Tổng hợp các dự án web, mobile app và design system tôi đã và đang phát triển",
+    
+    "filters": {
+      "all": "Tất cả",
+      "in_progress": "Đang phát triển",
+      "completed": "Hoàn thành",
+      "archived": "Lưu trữ",
+      "featured": "Nổi bật"
+    },
+    
+    "sort": {
+      "latest": "Mới nhất",
+      "popular": "Phổ biến",
+      "featured": "Nổi bật",
+      "name": "Tên (A-Z)"
+    },
+    
+    "actions": {
+      "demo": "Xem demo",
+      "github": "Mã nguồn",
+      "view_project": "Xem chi tiết"
+    },
+    
+    "empty_state": "Chưa có dự án nào",
+    "empty_state_description": "Các dự án sẽ được hiển thị tại đây khi có dữ liệu",
+    "clear_filters": "Xóa bộ lọc",
+    
+    "tech_stack": {
+      "frontend": "Frontend",
+      "backend": "Backend",
+      "database": "Database",
+      "devops": "DevOps",
+      "tools": "Công cụ",
+      "other": "Khác"
+    }
   }
 }
