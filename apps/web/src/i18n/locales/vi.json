@@ -77,6 +77,15 @@
   },
 
   "blog": {
+    "rss_feed": "RSS Feed",
+    "no_posts_found": "Không có bài viết nào",
+    "by": "bởi",
+    "min_read": "phút đọc",
+    "read_more": "đọc thêm",
+    "next": "Tiếp theo",
+    "previous": "Trước đó",
+    "go_to_next_page": "Trang tiếp theo",
+    "go_to_previous_page": "Trang trước đó",
     "words": {
       "posts": "Bài viết",
       "by": "bởi",
