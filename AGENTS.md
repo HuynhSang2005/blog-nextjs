@@ -280,6 +280,57 @@ export function BlogCoverImage({ media }) {
 
 ---
 
+## 📝 MDX Content Strategy
+
+### Hybrid Approach
+
+**Documentation (Static)**: MDX files via Contentlayer
+- Location: `apps/content/docs/vi/*.mdx`
+- Processing: Build-time via Contentlayer2
+- Routing: Static routes in `/docs/[...slug]`
+- Library: Contentlayer (NOT next-mdx-remote)
+
+**Blog Posts (Dynamic)**: Database via Supabase
+- Storage: `blog_posts` table with HTML content
+- No MDX rendering needed
+
+**Projects (Dynamic with MDX)**: Database via Supabase with MDX descriptions
+- Storage: `projects.long_description` TEXT field (MDX format)
+- Rendering: Runtime via `next-mdx-remote-client`
+- Library: `next-mdx-remote-client@2.1.7` ✅ **MIGRATED December 29, 2025**
+
+### MDX Library Decision
+
+**✅ Use `next-mdx-remote-client` for:**
+- Database/CMS MDX content
+- Runtime rendering of MDX strings
+- Project descriptions, dynamic content
+- Current usage: `apps/web/src/app/[locale]/projects/[slug]/page.tsx`
+
+**❌ Do NOT use `@next/mdx` for:**
+- Database content (wrong tool - requires .mdx files)
+- Runtime rendering (build-time only)
+- Dynamic content from Supabase
+
+**Why `next-mdx-remote-client` is recommended:**
+- Designed specifically for database/CMS MDX
+- Runtime rendering from strings
+- No file structure requirements
+- Active maintenance (2024-2025)
+- Better error handling and import support
+- React 19 + Next.js 16 compatible
+- MDX v3 native support
+
+**Migration history:**
+- Original: `next-mdx-remote@5.0.0` (stable but slow updates)
+- Migrated: December 29, 2025 → `next-mdx-remote-client@2.1.7`
+- Reason: Better maintenance, recommended by Next.js docs
+- Impact: Zero breaking changes (1-line import change)
+
+**Full analysis:** [MDX-LIBRARY-ANALYSIS.md](docs/dev-v1/MDX-LIBRARY-ANALYSIS.md)
+
+---
+
 ## �📐 Conventions & Patterns
 
 ### File Naming

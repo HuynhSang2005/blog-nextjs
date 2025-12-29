@@ -168,7 +168,7 @@ export async function getSkills() {
  * @param skills - Skills array
  * @returns Object with skills grouped by category
  */
-export function groupSkillsByCategory(skills: any[]) {
+export async function groupSkillsByCategory(skills: any[]) {
   return skills.reduce((acc, skill) => {
     const category = skill.category || 'other'
     if (!acc[category]) {

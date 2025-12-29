@@ -1,6 +1,27 @@
 import { Metadata } from 'next'
 import { notFound } from 'next/navigation'
-import { MDXRemote } from 'next-mdx-remote/rsc'
+
+/**
+ * Using next-mdx-remote-client for runtime MDX rendering from database.
+ * 
+ * WHY NOT @next/mdx?
+ * - @next/mdx requires .mdx files in app/ directory (file-based routing)
+ * - Our content is stored in Supabase database (projects.long_description)
+ * - We need runtime rendering of dynamic database strings
+ * 
+ * next-mdx-remote-client is the RECOMMENDED tool for database/CMS content.
+ * - Better maintained (active development 2024-2025)
+ * - Recommended by Next.js official docs
+ * - Enhanced error handling via onError prop
+ * - MDX v3 native support
+ * - React 19 + Next.js 16 compatible
+ * 
+ * Analysis: docs/dev-v1/MDX-LIBRARY-ANALYSIS.md
+ * Last reviewed: December 2025
+ * Migrated: December 29, 2025
+ * Status: next-mdx-remote-client v2.1.7
+ */
+import { MDXRemote } from 'next-mdx-remote-client/rsc'
 import { getProjects, getProjectBySlug } from '@/app/actions/projects-queries'
 import { ProjectHeader } from '@/components/projects/project-header'
 import { ProjectGallery } from '@/components/projects/project-gallery'
