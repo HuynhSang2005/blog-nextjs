@@ -29,8 +29,8 @@ export const projectSchema = z.object({
     .optional()
     .or(z.literal('')),
   status: z.enum(['in_progress', 'completed', 'archived']),
-  locale: z.string().default('vi'),
-  featured: z.boolean().default(false),
+  locale: z.string(),
+  featured: z.boolean(),
   start_date: z.string().optional().or(z.literal('')),
   end_date: z.string().optional().or(z.literal('')),
   cover_media_id: z.string().uuid().nullable().optional(),

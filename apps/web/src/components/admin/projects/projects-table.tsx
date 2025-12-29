@@ -17,6 +17,7 @@ import {
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import type { Database } from '@/lib/supabase/database.types'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -58,21 +59,15 @@ import { useTranslations } from 'next-intl'
 import { deleteProject } from '@/app/actions/projects'
 import { toast } from 'sonner'
 
-type Project = {
-  id: string
-  title: string
-  slug: string
-  description: string | null
-  status: 'in_progress' | 'completed' | 'archived' | null
-  featured: boolean | null
-  demo_url: string | null
-  github_url: string | null
-  created_at: string | null
-  updated_at: string | null
+type Media = Database['public']['Tables']['media']['Row']
+type Project = Database['public']['Tables']['projects']['Row']
+type ProjectWithRelations = Project & {
+  cover_media: Media | null
+  og_media: Media | null
 }
 
 interface ProjectsTableProps {
-  projects: Project[]
+  projects: ProjectWithRelations[]
 }
 
 export function ProjectsTable({ projects }: ProjectsTableProps) {
@@ -83,7 +78,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
 
-  const columns: ColumnDef<Project>[] = [
+  const columns: ColumnDef<ProjectWithRelations>[] = [
     {
       accessorKey: 'title',
       header: t('table.title'),
@@ -107,10 +102,10 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
       cell: ({ row }) => {
         const status = row.getValue('status') as string
         const statusVariant = {
-          in_progress: 'default',
-          completed: 'success',
-          archived: 'secondary',
-        }[status] as 'default' | 'success' | 'secondary'
+          in_progress: 'secondary',
+          completed: 'default',
+          archived: 'outline',
+        }[status] as 'default' | 'secondary' | 'outline'
         
         return (
           <Badge variant={statusVariant}>

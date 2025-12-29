@@ -26,12 +26,12 @@ const supabase = createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
 /**
  * Helper function để check xem record đã tồn tại chưa
  */
-async function recordExists<T extends keyof Database['public']['Tables']>(
-  table: T,
+async function recordExists(
+  table: string,
   column: string,
   value: string,
 ): Promise<boolean> {
-  const { data, error } = await supabase.from(table).select('id').eq(column, value).single()
+  const { data, error } = await supabase.from(table as any).select('id').eq(column, value).single()
 
   return !error && !!data
 }

@@ -23,7 +23,7 @@ const createMediaSchema = z.object({
   caption: z.string().optional(),
   folder: z.string().optional(),
   tags: z.array(z.string()).optional(),
-  metadata: z.record(z.any()).optional(),
+  metadata: z.record(z.string(), z.any()).optional(),
 })
 
 // Validation schema for updating media
@@ -88,7 +88,7 @@ export async function createMedia(data: CreateMediaInput) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: error.errors[0].message,
+        error: error.issues[0]?.message || 'Đã xảy ra lỗi validation',
       }
     }
 
@@ -152,7 +152,7 @@ export async function updateMedia(id: string, data: UpdateMediaInput) {
     if (error instanceof z.ZodError) {
       return {
         success: false,
-        error: error.errors[0].message,
+        error: error.issues[0]?.message || 'Đã xảy ra lỗi validation',
       }
     }
 

@@ -58,7 +58,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
   const t = useTranslations('admin.projects')
   const [isCreating, setIsCreating] = useState(false)
 
-  const form = useForm<ProjectFormData>({
+  const form = useForm<ProjectFormData, unknown, ProjectFormData>({
     resolver: zodResolver(projectSchema),
     defaultValues: project
       ? {

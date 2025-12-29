@@ -17,14 +17,14 @@ export const blogPostSchema = z.object({
   content: z.string().min(1, 'Nội dung không được để trống'),
   
   status: z.enum(['draft', 'published', 'archived'], {
-    required_error: 'Vui lòng chọn trạng thái',
+    message: 'Vui lòng chọn trạng thái',
   }),
   
-  locale: z.string().default('vi'),
+  locale: z.string(),
   
-  featured: z.boolean().default(false),
+  featured: z.boolean(),
   
-  allow_comments: z.boolean().default(true),
+  allow_comments: z.boolean(),
   
   meta_description: z.string().max(160).optional().nullable(),
   
@@ -32,7 +32,7 @@ export const blogPostSchema = z.object({
   
   og_media_id: z.string().uuid().optional().nullable(),
   
-  tag_ids: z.array(z.string().uuid()).default([]),
+  tag_ids: z.array(z.string().uuid()),
   
   series_id: z.string().uuid().optional().nullable(),
   

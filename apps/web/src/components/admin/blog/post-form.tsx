@@ -47,14 +47,14 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
   const [isSaving, setIsSaving] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
 
-  const form = useForm<BlogPostFormData>({
+  const form = useForm<BlogPostFormData, unknown, BlogPostFormData>({
     resolver: zodResolver(blogPostSchema),
     defaultValues: {
       title: post?.title || '',
       slug: post?.slug || '',
       excerpt: post?.excerpt || '',
       content: post?.content || '',
-      status: post?.status || 'draft',
+      status: (post?.status || 'draft') as 'draft' | 'published' | 'archived',
       locale: post?.locale || 'vi',
       featured: post?.featured || false,
       allow_comments: post?.allow_comments !== false, // Default true
