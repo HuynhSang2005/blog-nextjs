@@ -367,6 +367,27 @@
       "devops": "DevOps",
       "tools": "Công cụ",
       "other": "Khác"
+    },
+    
+    "detail": {
+      "breadcrumb_home": "Trang chủ",
+      "breadcrumb_projects": "Dự án",
+      "view_demo": "Xem demo",
+      "view_code": "Xem mã nguồn",
+      "status_label": "Trạng thái",
+      "duration_label": "Thời gian",
+      "role_label": "Vai trò",
+      "team_label": "Quy mô nhóm",
+      "present": "Hiện tại",
+      "tech_heading": "Công nghệ sử dụng",
+      "links_heading": "Liên kết",
+      "demo_link": "Xem demo trực tiếp",
+      "github_link": "Xem mã nguồn trên GitHub",
+      "gallery_view_larger": "Xem lớn hơn",
+      "gallery_close": "Đóng",
+      "gallery_previous": "Ảnh trước",
+      "gallery_next": "Ảnh tiếp theo",
+      "gallery_of": "trong"
     }
   }
 }

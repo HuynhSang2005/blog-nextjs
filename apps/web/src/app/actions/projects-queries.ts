@@ -165,10 +165,11 @@ export const getProjectTags = cache(async (locale: string) => {
   }
 
   // Extract unique tags
-  const uniqueTags = new Map()
-  data?.forEach((item) => {
-    if (item.tag) {
-      uniqueTags.set(item.tag.id, item.tag)
+  const uniqueTags = new Map<string, { id: string; name: string; slug: string; color: string | null }>()
+  data?.forEach((item: any) => {
+    if (item.tag && typeof item.tag === 'object' && 'id' in item.tag) {
+      const tag = item.tag as { id: string; name: string; slug: string; color: string | null }
+      uniqueTags.set(tag.id, tag)
     }
   })
 

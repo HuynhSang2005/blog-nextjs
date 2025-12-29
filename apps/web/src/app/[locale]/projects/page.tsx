@@ -1,7 +1,7 @@
 import { type Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getProjects, getProjectStats } from '@/app/actions/projects-queries'
-import { PageHeader } from '@/components/page-header'
+import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header'
 import { ProjectsGrid } from '@/components/projects/projects-grid'
 import { ProjectFilters } from '@/components/projects/project-filters'
 
@@ -49,11 +49,10 @@ export default async function ProjectsPage({
   return (
     <div className="container relative">
       {/* Header Section */}
-      <PageHeader
-        heading={t('heading')}
-        text={t('subheading')}
-        className="pb-8 pt-6 md:pb-12 md:pt-10 lg:py-16"
-      />
+      <PageHeader className="pb-8 pt-6 md:pb-12 md:pt-10 lg:py-16">
+        <PageHeaderHeading>{t('heading')}</PageHeaderHeading>
+        <PageHeaderDescription>{t('subheading')}</PageHeaderDescription>
+      </PageHeader>
 
       {/* Filter Bar */}
       <ProjectFilters stats={stats} />
