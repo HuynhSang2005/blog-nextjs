@@ -13,7 +13,7 @@ import {
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
+import { ArrowUpDown, MoreHorizontal, Pencil, Trash2, FileText } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { format } from 'date-fns'
@@ -45,29 +45,30 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { BlogPost } from '@/lib/queries/blog'
-import { deleteBlogPost } from '@/app/actions/blog'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from '@/components/ui/alert-dialog'
+import type { DocListItem } from '@/lib/supabase/queries/docs'
+import { deleteDoc } from '@/app/actions/docs'
 import { toast } from 'sonner'
 
-const statusConfig = {
-  draft: { label: 'Nháp', variant: 'secondary' as const },
-  published: { label: 'Đã xuất bản', variant: 'default' as const },
-  archived: { label: 'Đã lưu trữ', variant: 'outline' as const },
-}
-
-interface BlogPostsTableProps {
-  data: BlogPost[]
-  locale: string
-}
-
-export function BlogPostsTable({ data, locale }: BlogPostsTableProps) {
+export function DocsTable({ data, locale }: { data: DocListItem[]; locale: string }) {
   const router = useRouter()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+  const [isDeleting, setIsDeleting] = useState(false)
 
-  const columns: ColumnDef<BlogPost>[] = [
+  const columns: ColumnDef<DocListItem>[] = [
     {
       accessorKey: 'title',
       header: ({ column }) => {
@@ -82,18 +83,19 @@ export function BlogPostsTable({ data, locale }: BlogPostsTableProps) {
         )
       },
       cell: ({ row }) => {
-        const post = row.original
+        const doc = row.original
         return (
           <div className="flex flex-col gap-1">
             <Link
-              href={`/${locale}/admin/blog/${post.id}`}
-              className="font-medium hover:underline"
+              href={`/${locale}/admin/docs/${doc.id}`}
+              className="font-medium hover:underline inline-flex items-center gap-2"
             >
-              {post.title}
+              <FileText className="h-4 w-4" />
+              {doc.title}
             </Link>
-            {post.excerpt && (
+            {doc.description && (
               <p className="text-sm text-muted-foreground line-clamp-1">
-                {post.excerpt}
+                {doc.description}
               </p>
             )}
           </div>
@@ -101,48 +103,82 @@ export function BlogPostsTable({ data, locale }: BlogPostsTableProps) {
       },
     },
     {
-      accessorKey: 'status',
-      header: 'Trạng thái',
+      accessorKey: 'topic',
+      header: 'Chủ đề',
       cell: ({ row }) => {
-        const status = row.getValue('status') as keyof typeof statusConfig
-        const config = statusConfig[status]
-        return <Badge variant={config.variant}>{config.label}</Badge>
+        const topic = row.original.topic
+        return (
+          <Badge variant="secondary" className="gap-1">
+            {topic.icon && <span>{topic.icon}</span>}
+            {topic.name}
+          </Badge>
+        )
       },
       filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id))
+        const topic = row.original.topic
+        return value.includes(topic.slug)
       },
     },
     {
-      accessorKey: 'author',
-      header: 'Tác giả',
+      accessorKey: 'parent',
+      header: 'Trang cha',
       cell: ({ row }) => {
-        const author = row.original.author
-        return author?.full_name || 'Không rõ'
+        const parent = row.original.parent
+        if (!parent) {
+          return <Badge variant="outline">Trang gốc</Badge>
+        }
+        return (
+          <span className="text-sm text-muted-foreground">
+            {parent.title}
+          </span>
+        )
       },
     },
     {
-      accessorKey: 'created_at',
+      accessorKey: 'order_index',
       header: ({ column }) => {
         return (
           <Button
             variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
           >
-            Ngày tạo
+            Thứ tự
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
       },
       cell: ({ row }) => {
-        const date = row.getValue('created_at') as string
-        return format(new Date(date), 'dd MMM yyyy', { locale: vi })
+        const order = row.getValue('order_index') as number | null
+        return order ?? '-'
       },
     },
     {
-      accessorKey: 'published_at',
-      header: 'Ngày xuất bản',
+      accessorKey: 'locale',
+      header: 'Ngôn ngữ',
       cell: ({ row }) => {
-        const date = row.getValue('published_at') as string | null
+        const locale = row.getValue('locale') as string
+        return (
+          <Badge variant="outline">
+            {locale === 'vi' ? 'Tiếng Việt' : 'English'}
+          </Badge>
+        )
+      },
+    },
+    {
+      accessorKey: 'updated_at',
+      header: ({ column }) => {
+        return (
+          <Button
+            variant="ghost"
+            onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+          >
+            Cập nhật
+            <ArrowUpDown className="ml-2 h-4 w-4" />
+          </Button>
+        )
+      },
+      cell: ({ row }) => {
+        const date = row.getValue('updated_at') as string | null
         if (!date) return <span className="text-muted-foreground">-</span>
         return format(new Date(date), 'dd MMM yyyy', { locale: vi })
       },
@@ -151,20 +187,7 @@ export function BlogPostsTable({ data, locale }: BlogPostsTableProps) {
       id: 'actions',
       enableHiding: false,
       cell: ({ row }) => {
-        const post = row.original
-
-        const handleDelete = async () => {
-          if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return
-
-          try {
-            await deleteBlogPost(post.id)
-            toast.success('Đã xóa bài viết')
-            router.refresh()
-          } catch (error) {
-            console.error('Error deleting post:', error)
-            toast.error('Không thể xóa bài viết')
-          }
-        }
+        const doc = row.original
 
         return (
           <DropdownMenu>
@@ -175,26 +198,66 @@ export function BlogPostsTable({ data, locale }: BlogPostsTableProps) {
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Thao tác</DropdownMenuLabel>
+              <DropdownMenuLabel>Hành động</DropdownMenuLabel>
               <DropdownMenuItem
-                onClick={() => navigator.clipboard.writeText(post.slug)}
+                onClick={() => navigator.clipboard.writeText(doc.id)}
               >
-                Sao chép slug
+                Sao chép ID
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/${locale}/admin/blog/${post.id}`}>
+                <Link href={`/${locale}/admin/docs/${doc.id}`}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Chỉnh sửa
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem
-                onClick={handleDelete}
-                className="text-destructive"
-              >
-                <Trash2 className="mr-2 h-4 w-4" />
-                Xóa
-              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                  <DropdownMenuItem
+                    onSelect={(e) => e.preventDefault()}
+                    className="text-destructive"
+                  >
+                    <Trash2 className="mr-2 h-4 w-4" />
+                    Xóa
+                  </DropdownMenuItem>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>Xác nhận xóa</AlertDialogTitle>
+                    <AlertDialogDescription>
+                      Bạn có chắc muốn xóa tài liệu "{doc.title}"? Hành động này không thể hoàn tác.
+                      {doc.parent === null && (
+                        <span className="block mt-2 text-destructive font-medium">
+                          ⚠️ Tài liệu này là trang gốc và có thể có các trang con. Tất cả sẽ bị xóa.
+                        </span>
+                      )}
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Hủy</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={async () => {
+                        setIsDeleting(true)
+                        try {
+                          await deleteDoc(doc.id, locale)
+                          toast.success('Đã xóa tài liệu thành công')
+                          router.refresh()
+                        } catch (error) {
+                          toast.error('Lỗi khi xóa tài liệu')
+                          console.error(error)
+                        } finally {
+                          setIsDeleting(false)
+                        }
+                      }}
+                      disabled={isDeleting}
+                      className="bg-destructive hover:bg-destructive/90"
+                    >
+                      {isDeleting ? 'Đang xóa...' : 'Xóa'}
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
             </DropdownMenuContent>
           </DropdownMenu>
         )
@@ -221,12 +284,16 @@ export function BlogPostsTable({ data, locale }: BlogPostsTableProps) {
     },
   })
 
+  // Get unique topics for filter
+  const uniqueTopics = Array.from(new Set(data.map((doc) => doc.topic.slug)))
+    .map((slug) => data.find((d) => d.topic.slug === slug)?.topic)
+    .filter((topic): topic is DocListItem['topic'] => Boolean(topic))
+
   return (
-    <div className="w-full space-y-4">
-      {/* Filters */}
-      <div className="flex items-center gap-2">
+    <div className="w-full">
+      <div className="flex items-center gap-2 py-4">
         <Input
-          placeholder="Tìm kiếm bài viết..."
+          placeholder="Tìm kiếm tài liệu..."
           value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
           onChange={(event) =>
             table.getColumn('title')?.setFilterValue(event.target.value)
@@ -234,24 +301,25 @@ export function BlogPostsTable({ data, locale }: BlogPostsTableProps) {
           className="max-w-sm"
         />
         <Select
-          value={(table.getColumn('status')?.getFilterValue() as string) ?? 'all'}
+          value={(table.getColumn('topic')?.getFilterValue() as string) ?? 'all'}
           onValueChange={(value) =>
-            table.getColumn('status')?.setFilterValue(value === 'all' ? '' : value)
+            table.getColumn('topic')?.setFilterValue(value === 'all' ? '' : [value])
           }
         >
           <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Lọc theo trạng thái" />
+            <SelectValue placeholder="Chọn chủ đề" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="draft">Nháp</SelectItem>
-            <SelectItem value="published">Đã xuất bản</SelectItem>
-            <SelectItem value="archived">Đã lưu trữ</SelectItem>
+            <SelectItem value="all">Tất cả chủ đề</SelectItem>
+            {uniqueTopics.map((topic) => (
+              <SelectItem key={topic.slug} value={topic.slug}>
+                {topic.icon && <span className="mr-1">{topic.icon}</span>}
+                {topic.name}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
-
-      {/* Table */}
       <div className="rounded-md border">
         <Table>
           <TableHeader>
@@ -295,18 +363,16 @@ export function BlogPostsTable({ data, locale }: BlogPostsTableProps) {
                   colSpan={columns.length}
                   className="h-24 text-center"
                 >
-                  Không có bài viết nào.
+                  Không có tài liệu nào.
                 </TableCell>
               </TableRow>
             )}
           </TableBody>
         </Table>
       </div>
-
-      {/* Pagination */}
-      <div className="flex items-center justify-end space-x-2">
+      <div className="flex items-center justify-end space-x-2 py-4">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length} bài viết
+          {table.getFilteredRowModel().rows.length} tài liệu
         </div>
         <div className="space-x-2">
           <Button

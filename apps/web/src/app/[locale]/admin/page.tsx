@@ -1,6 +1,8 @@
 import { createClient } from '@/lib/supabase/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { FileText, FolderKanban, Image, Tags } from 'lucide-react'
+import { cn } from '@/lib/utils'
+import { adminDesignSystem as ds, adminPatterns } from '@/lib/admin-design-system'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -46,16 +48,25 @@ export default async function AdminDashboardPage() {
   ]
 
   return (
-    <div className="space-y-4">
+    <div className={cn('space-y-6', ds.layout.maxWidth)}>
       <div className="flex items-center justify-between">
-        <h1 className="text-3xl font-bold tracking-tight">Dashboard</h1>
+        <h1 className={cn('font-bold tracking-tight', ds.typography.h1)}>
+          Dashboard
+        </h1>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+      {/* Stats Grid with design system tokens */}
+      <div className={cn('grid', ds.spacing.grid.loose, ds.grid.dashboard.stats)}>
         {stats.map((stat) => {
           const Icon = stat.icon
           return (
-            <Card key={stat.title}>
+            <Card
+              key={stat.title}
+              className={cn(
+                adminPatterns.statCard,
+                'hover:border-primary/50'
+              )}
+            >
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle className="text-sm font-medium">
                   {stat.title}
@@ -73,8 +84,9 @@ export default async function AdminDashboardPage() {
         })}
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
-        <Card className="col-span-4">
+      {/* Activity Grid with design system tokens */}
+      <div className={cn('grid', ds.spacing.grid.normal, 'md:grid-cols-2 lg:grid-cols-7')}>
+        <Card className={cn('col-span-4', ds.spacing.card.padding)}>
           <CardHeader>
             <CardTitle>Hoạt động gần đây</CardTitle>
           </CardHeader>
@@ -85,7 +97,7 @@ export default async function AdminDashboardPage() {
           </CardContent>
         </Card>
 
-        <Card className="col-span-3">
+        <Card className={cn('col-span-3', ds.spacing.card.padding)}>
           <CardHeader>
             <CardTitle>Thao tác nhanh</CardTitle>
           </CardHeader>

@@ -4,6 +4,9 @@
 
 @custom-variant dark (&:is(.dark *));
 
+/* MDX Editor custom styles */
+@import "./mdx-editor.css";
+
 :root {
   --background: hsl(0 0% 100%);
   --foreground: hsl(240 10% 3.9%);

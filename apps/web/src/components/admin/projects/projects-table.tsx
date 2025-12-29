@@ -68,9 +68,10 @@ type ProjectWithRelations = Project & {
 
 interface ProjectsTableProps {
   projects: ProjectWithRelations[]
+  locale: string
 }
 
-export function ProjectsTable({ projects }: ProjectsTableProps) {
+export function ProjectsTable({ projects, locale }: ProjectsTableProps) {
   const router = useRouter()
   const t = useTranslations('admin.projects')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -168,7 +169,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
               <DropdownMenuLabel>{t('table.actions')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/admin/projects/${project.id}`}>
+                <Link href={`/${locale}/admin/projects/${project.id}`}>
                   <Pencil className="mr-2 h-4 w-4" />
                   {t('actions.edit')}
                 </Link>

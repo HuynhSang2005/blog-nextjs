@@ -1,43 +1,39 @@
 import { Suspense } from 'react'
-import Link from 'next/link'
-import { Plus } from 'lucide-react'
 import { getTranslations } from 'next-intl/server'
+import { Plus } from 'lucide-react'
+import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
-import { ProjectsTable } from '@/components/admin/projects/projects-table'
 import { TableSkeleton } from '@/components/admin/table-skeleton'
-import { getProjects } from '@/lib/queries/projects'
+import { DocsTable } from '@/components/admin/docs/docs-table'
+import { getAllDocs } from '@/lib/supabase/queries/docs'
 
-async function ProjectsTableWrapper({ locale }: { locale: string }) {
-  const projects = await getProjects(locale)
-
-  return <ProjectsTable projects={projects} locale={locale} />
-}
-
-export default async function ProjectsPage({
+export default async function DocsPage({
   params,
 }: {
   params: Promise<{ locale: string }>
 }) {
   const { locale } = await params
-  const t = await getTranslations('admin.projects')
-  
+  const t = await getTranslations('admin.docs')
+
   return (
-    <div className="space-y-6">
+    <div className="flex flex-col gap-6">
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
           <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <Button asChild>
-          <Link href={`/${locale}/admin/projects/new`}>
+          <Link href={`/${locale}/admin/docs/new`}>
             <Plus className="mr-2 h-4 w-4" />
             {t('actions.create')}
           </Link>
         </Button>
       </div>
 
+      {/* Docs Table */}
       <Card>
         <CardHeader>
           <CardTitle>{t('list.title')}</CardTitle>
@@ -45,10 +41,15 @@ export default async function ProjectsPage({
         </CardHeader>
         <CardContent>
           <Suspense fallback={<TableSkeleton />}>
-            <ProjectsTableWrapper locale={locale} />
+            <DocsTableWrapper locale={locale} />
           </Suspense>
         </CardContent>
       </Card>
     </div>
   )
+}
+
+async function DocsTableWrapper({ locale }: { locale: string }) {
+  const { data: docs } = await getAllDocs(locale, undefined, { page: 1, pageSize: 100 })
+  return <DocsTable data={docs || []} locale={locale} />
 }
