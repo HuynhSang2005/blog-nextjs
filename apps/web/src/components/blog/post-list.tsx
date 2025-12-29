@@ -7,6 +7,7 @@ import type { BlogPostListItem } from '@/lib/supabase/types-helpers'
 import type { LocaleOptions } from '@/lib/core/types/i18n'
 import { dateLocales } from '@/config/i18n'
 import { ReadTime } from './read-time'
+import { SeriesBadge } from './series-badge'
 import { Balancer } from '@/components/ui/balancer'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
@@ -61,6 +62,13 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
               <h2 className="text-2xl font-bold mb-2 line-clamp-2">
                 <Balancer>{post.title}</Balancer>
               </h2>
+
+              {/* Series Badge */}
+              {post.series_order && (
+                <div className="mb-3">
+                  <SeriesBadge seriesOrder={post.series_order} />
+                </div>
+              )}
 
               {/* Meta info */}
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
