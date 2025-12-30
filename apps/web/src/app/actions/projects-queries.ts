@@ -1,5 +1,13 @@
 import { createClient } from '@/lib/supabase/server'
 import { cache } from 'react'
+import type { Tables } from '@/lib/supabase/database.types'
+
+/**
+ * Response type for project tags query
+ */
+interface ProjectTagResponse {
+  tag: Pick<Tables<'tags'>, 'id' | 'name' | 'slug' | 'color'>
+}
 
 /**
  * Lấy tất cả projects theo locale và filter options.
@@ -165,11 +173,10 @@ export const getProjectTags = cache(async (locale: string) => {
   }
 
   // Extract unique tags
-  const uniqueTags = new Map<string, { id: string; name: string; slug: string; color: string | null }>()
-  data?.forEach((item: any) => {
-    if (item.tag && typeof item.tag === 'object' && 'id' in item.tag) {
-      const tag = item.tag as { id: string; name: string; slug: string; color: string | null }
-      uniqueTags.set(tag.id, tag)
+  const uniqueTags = new Map<string, Pick<Tables<'tags'>, 'id' | 'name' | 'slug' | 'color'>>()
+  data?.forEach((item: ProjectTagResponse) => {
+    if (item.tag) {
+      uniqueTags.set(item.tag.id, item.tag)
     }
   })
 
