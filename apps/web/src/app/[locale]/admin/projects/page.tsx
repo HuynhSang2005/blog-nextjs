@@ -1,27 +1,22 @@
 import { Suspense } from 'react'
 import Link from 'next/link'
 import { Plus } from 'lucide-react'
-import { getTranslations } from 'next-intl/server'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { ProjectsTable } from '@/components/admin/projects/projects-table'
 import { TableSkeleton } from '@/components/admin/table-skeleton'
 import { getProjects } from '@/lib/queries/projects'
+import { useTranslations } from 'next-intl'
 
-async function ProjectsTableWrapper({ locale }: { locale: string }) {
-  const projects = await getProjects(locale)
-
-  return <ProjectsTable projects={projects} locale={locale} />
+async function ProjectsTableWrapper() {
+  const projects = await getProjects('vi')
+  
+  return <ProjectsTable projects={projects} />
 }
 
-export default async function ProjectsPage({
-  params,
-}: {
-  params: Promise<{ locale: string }>
-}) {
-  const { locale } = await params
-  const t = await getTranslations('admin.projects')
+export default async function ProjectsPage() {
+  const t = await useTranslations('admin.projects')
   
   return (
     <div className="space-y-6">
@@ -31,7 +26,7 @@ export default async function ProjectsPage({
           <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <Button asChild>
-          <Link href={`/${locale}/admin/projects/new`}>
+          <Link href="/admin/projects/new">
             <Plus className="mr-2 h-4 w-4" />
             {t('actions.create')}
           </Link>
@@ -45,7 +40,7 @@ export default async function ProjectsPage({
         </CardHeader>
         <CardContent>
           <Suspense fallback={<TableSkeleton />}>
-            <ProjectsTableWrapper locale={locale} />
+            <ProjectsTableWrapper />
           </Suspense>
         </CardContent>
       </Card>

@@ -8,41 +8,6 @@ import type {
   PaginatedResponse,
   PaginationParams,
 } from '../types-helpers'
-import type { Tables } from '../database.types'
-
-/**
- * Raw Supabase response types for projects với nested relations
- */
-interface RawProjectWithTags extends Omit<Tables<'projects'>, 'tags'> {
-  cover_media: Pick<Tables<'media'>, 'id' | 'public_id' | 'alt_text'> | null
-  tags: Array<{
-    tag: Pick<Tables<'tags'>, 'id' | 'name' | 'slug' | 'color'>
-  }>
-}
-
-interface RawProjectFull extends Omit<Tables<'projects'>, 'tags' | 'tech_stack' | 'gallery'> {
-  cover_media: Tables<'media'> | null
-  og_media: Tables<'media'> | null
-  tags: Array<{
-    tag: Tables<'tags'>
-  }>
-  tech_stack: RawProjectTechStackItem[]
-  gallery: Array<{
-    order_index: number | null
-    media: Tables<'media'>
-  }>
-}
-
-interface RawProjectMediaItem {
-  order_index: number | null
-  media: Tables<'media'>
-}
-
-interface RawProjectTechStackItem {
-  order_index: number | null
-  name: string
-  icon: string | null
-}
 
 /**
  * Lấy tất cả projects với pagination và filters
@@ -107,9 +72,9 @@ export async function getProjects(
     }
 
     // Transform tags structure
-    const projects = (data || []).map((project: RawProjectWithTags) => ({
+    const projects = (data || []).map((project) => ({
       ...project,
-      tags: project.tags?.map((t) => t.tag).filter(Boolean) || [],
+      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     })) as ProjectListItem[]
 
     // Calculate pagination
@@ -177,15 +142,14 @@ export async function getProject(
     }
 
     // Transform nested structures
-    const rawData = data as unknown as RawProjectFull
     const project = {
-      ...rawData,
-      tags: rawData.tags?.map((t) => t.tag).filter(Boolean) || [],
-      tech_stack: (rawData.tech_stack || []).sort(
-        (a: RawProjectTechStackItem, b: RawProjectTechStackItem) => (a.order_index || 0) - (b.order_index || 0),
+      ...data,
+      tags: data.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tech_stack: (data.tech_stack || []).sort(
+        (a: any, b: any) => (a.order_index || 0) - (b.order_index || 0),
       ),
-      gallery: (rawData.gallery || []).sort(
-        (a: RawProjectMediaItem, b: RawProjectMediaItem) => (a.order_index || 0) - (b.order_index || 0),
+      gallery: (data.gallery || []).sort(
+        (a: any, b: any) => (a.order_index || 0) - (b.order_index || 0),
       ),
     } as ProjectWithRelations
 
@@ -240,9 +204,9 @@ export async function getFeaturedProjects(
     }
 
     // Transform tags structure
-    const projects = (data || []).map((project: RawProjectWithTags) => ({
+    const projects = (data || []).map((project) => ({
       ...project,
-      tags: project.tags?.map((t) => t.tag).filter(Boolean) || [],
+      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     })) as ProjectListItem[]
 
     return { data: projects, error: null }
@@ -354,9 +318,9 @@ export async function getProjectsByTag(
     }
 
     // Transform tags structure
-    const transformedProjects = (projects || []).map((project: RawProjectWithTags) => ({
+    const transformedProjects = (projects || []).map((project) => ({
       ...project,
-      tags: project.tags?.map((t) => t.tag).filter(Boolean) || [],
+      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     })) as ProjectListItem[]
 
     // Calculate pagination
@@ -424,9 +388,9 @@ export async function getProjectsByStatus(
     }
 
     // Transform tags structure
-    const projects = (data || []).map((project: RawProjectWithTags) => ({
+    const projects = (data || []).map((project) => ({
       ...project,
-      tags: project.tags?.map((t) => t.tag).filter(Boolean) || [],
+      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     })) as ProjectListItem[]
 
     return { data: projects, error: null }

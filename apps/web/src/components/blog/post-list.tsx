@@ -11,7 +11,6 @@ import { SeriesBadge } from './series-badge'
 import { Balancer } from '@/components/ui/balancer'
 import { cn } from '@/lib/utils'
 import { buttonVariants } from '@/components/ui/button'
-import { getContrastTextClass } from '@/lib/color-contrast'
 
 interface BlogPostListProps {
   posts: BlogPostListItem[]
@@ -34,31 +33,26 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
 
   return (
     <div
-      className={cn('grid gap-6 grid-cols-1', {
+      className={cn('grid gap-4 grid-cols-1', {
         'md:grid-cols-2': posts.length >= 2,
-        'lg:grid-cols-3': posts.length >= 3,
         'md:grid-cols-1': posts.length < 2,
       })}
     >
       {posts.map((post) => (
-        <Card
-          key={post.id}
-          className="group overflow-hidden hover:shadow-lg hover:border-primary/50 transition-all duration-300"
-        >
+        <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
           <Link href={`/${locale}/blog/${post.slug}`}>
             {/* Cover Image */}
             {post.cover_media && (
-              <div className="relative aspect-[4/3] overflow-hidden">
+              <div className="relative aspect-video overflow-hidden">
                 <CldImage
                   src={post.cover_media.public_id}
                   alt={post.cover_media.alt_text || post.title}
-                  width={640}
-                  height={480}
+                  width={800}
+                  height={450}
                   crop="fill"
                   gravity="auto"
-                  quality="auto:best"
-                  className="object-cover w-full h-full transition-transform duration-300 group-hover:scale-105"
-                  sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                  className="object-cover w-full h-full transition-transform hover:scale-105"
+                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
                 />
               </div>
             )}
@@ -105,17 +99,13 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
                 </p>
               )}
 
-              {/* Tags - Limit to 3 + counter */}
+              {/* Tags */}
               {post.tags && post.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {post.tags.slice(0, 3).map((tag) => (
+                  {post.tags.map((tag) => (
                     <Badge
                       key={tag.id}
                       variant="secondary"
-                      className={cn(
-                        'transition-colors',
-                        tag.color && getContrastTextClass(tag.color)
-                      )}
                       style={{
                         backgroundColor: tag.color || undefined,
                       }}
@@ -123,11 +113,6 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
                       {tag.name}
                     </Badge>
                   ))}
-                  {post.tags.length > 3 && (
-                    <Badge variant="outline" className="text-muted-foreground">
-                      +{post.tags.length - 3}
-                    </Badge>
-                  )}
                 </div>
               )}
 

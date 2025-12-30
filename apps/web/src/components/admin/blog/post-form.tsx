@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { Loader2, Save, Send } from 'lucide-react'
+import { Check, ChevronsUpDown, Loader2, Save, Send } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -29,9 +29,24 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Card, CardContent } from '@/components/ui/card'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
 import { blogPostSchema, type BlogPostFormData } from '@/lib/validations/blog'
-import { createBlogPost, updateBlogPost, publishBlogPost } from '@/app/actions/blog'
+import {
+  createBlogPost,
+  publishBlogPost,
+  updateBlogPost,
+  updateBlogPostTags,
+} from '@/app/actions/blog'
 import type { Database } from '@/lib/supabase/database.types'
+import { cn } from '@/lib/utils'
 
 type BlogPost = Database['public']['Tables']['blog_posts']['Row']
 type Tag = Database['public']['Tables']['tags']['Row']
@@ -88,15 +103,18 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
   const onSaveDraft = async (data: BlogPostFormData) => {
     try {
       setIsSaving(true)
-      
-      const postData = { ...data, status: 'draft' as const }
+
+      const { tag_ids, ...rest } = data
+      const postData = { ...rest, status: 'draft' as const }
       
       if (mode === 'create') {
         const result = await createBlogPost(postData)
+        await updateBlogPostTags(result.id, tag_ids)
         toast.success('Đã lưu nháp thành công')
         router.push(`/admin/blog/${result.id}`)
       } else if (post) {
         await updateBlogPost(post.id, postData)
+        await updateBlogPostTags(post.id, tag_ids)
         toast.success('Đã cập nhật bài viết')
         router.refresh()
       }
@@ -111,16 +129,19 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
   const onPublish = async (data: BlogPostFormData) => {
     try {
       setIsPublishing(true)
-      
-      const postData = { ...data, status: 'published' as const }
+
+      const { tag_ids, ...rest } = data
+      const postData = { ...rest, status: 'published' as const }
       
       if (mode === 'create') {
         const result = await createBlogPost(postData)
+        await updateBlogPostTags(result.id, tag_ids)
         await publishBlogPost(result.id)
         toast.success('Đã xuất bản bài viết')
         router.push('/admin/blog')
       } else if (post) {
         await updateBlogPost(post.id, postData)
+        await updateBlogPostTags(post.id, tag_ids)
         await publishBlogPost(post.id)
         toast.success('Đã xuất bản bài viết')
         router.push('/admin/blog')
@@ -397,24 +418,143 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
               </CardContent>
             </Card>
 
-            {/* Tags Card - Simplified for now */}
+            {/* Tags Card */}
             <Card>
               <CardContent className="pt-6">
-                <div>
-                  <h3 className="text-lg font-medium">Tags</h3>
-                  <p className="text-sm text-muted-foreground">
-                    Chọn tags cho bài viết
-                  </p>
-                </div>
+                <FormField
+                  control={form.control}
+                  name="tag_ids"
+                  render={({ field }) => {
+                    const selectedIds = field.value || []
+                    const selectedCount = selectedIds.length
 
-                <Separator className="my-4" />
+                    return (
+                      <FormItem>
+                        <div>
+                          <h3 className="text-lg font-medium">Thẻ</h3>
+                          <p className="text-sm text-muted-foreground">
+                            Chọn thẻ cho bài viết
+                          </p>
+                        </div>
 
-                <p className="text-sm text-muted-foreground">
-                  Tag selection UI sẽ được implement sau (Phase 2.2.2)
-                </p>
+                        <Separator className="my-4" />
+
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <FormControl>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                role="combobox"
+                                className="w-full justify-between"
+                              >
+                                {selectedCount === 0
+                                  ? 'Chọn thẻ'
+                                  : `Đã chọn ${selectedCount} thẻ`}
+                                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                              </Button>
+                            </FormControl>
+                          </PopoverTrigger>
+
+                          <PopoverContent className="w-full p-0" align="start">
+                            <Command>
+                              <CommandInput placeholder="Tìm thẻ..." />
+                              <CommandList>
+                                <CommandEmpty>Không tìm thấy thẻ</CommandEmpty>
+                                <CommandGroup>
+                                  {tags.map((tag) => {
+                                    const isSelected = selectedIds.includes(tag.id)
+
+                                    return (
+                                      <CommandItem
+                                        key={tag.id}
+                                        value={tag.name}
+                                        onSelect={() => {
+                                          const next = isSelected
+                                            ? selectedIds.filter((id) => id !== tag.id)
+                                            : [...selectedIds, tag.id]
+
+                                          field.onChange(next)
+                                        }}
+                                      >
+                                        <Check
+                                          className={cn(
+                                            'mr-2 h-4 w-4',
+                                            isSelected ? 'opacity-100' : 'opacity-0',
+                                          )}
+                                        />
+                                        <span className="flex-1">{tag.name}</span>
+                                        {tag.slug ? (
+                                          <span className="text-muted-foreground text-xs">
+                                            {tag.slug}
+                                          </span>
+                                        ) : null}
+                                      </CommandItem>
+                                    )
+                                  })}
+                                </CommandGroup>
+                              </CommandList>
+                            </Command>
+                          </PopoverContent>
+                        </Popover>
+
+                        <FormDescription>
+                          Bạn có thể chọn nhiều thẻ.
+                        </FormDescription>
+                        <FormMessage />
+                      </FormItem>
+                    )
+                  }}
+                />
               </CardContent>
             </Card>
           </div>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="flex justify-end gap-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => router.back()}
+          >
+            Hủy
+          </Button>
+          <Button
+            type="button"
+            variant="secondary"
+            disabled={isSaving || isPublishing}
+            onClick={form.handleSubmit(onSaveDraft)}
+          >
+            {isSaving ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang lưu...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Lưu nháp
+              </>
+            )}
+          </Button>
+          <Button
+            type="button"
+            disabled={isSaving || isPublishing}
+            onClick={form.handleSubmit(onPublish)}
+          >
+            {isPublishing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang xuất bản...
+              </>
+            ) : (
+              <>
+                <Send className="mr-2 h-4 w-4" />
+                Xuất bản
+              </>
+            )}
+          </Button>
         </div>
       </form>
     </Form>

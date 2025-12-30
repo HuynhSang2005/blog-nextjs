@@ -42,13 +42,15 @@ function PageHeaderDescription({
   ...props
 }: HTMLAttributes<HTMLParagraphElement>) {
   return (
-    <Balance
+    <p
       className={cn(
         'text-muted-foreground max-w-[750px] text-center text-lg sm:text-xl mt-6 md:mt-5',
         className
       )}
       {...props}
-    />
+    >
+      <Balance>{props.children}</Balance>
+    </p>
   )
 }
 

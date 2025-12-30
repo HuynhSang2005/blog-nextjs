@@ -1,7 +1,5 @@
-'use client'
-
 import dynamic from 'next/dynamic'
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 
 import { Icons } from '@/components/icons'
 import { MainNav } from '@/components/main-nav'
@@ -19,8 +17,8 @@ const CommandMenu = dynamic(() =>
   import('@/components/command-menu').then(mod => mod.CommandMenu)
 )
 
-export function SiteHeader() {
-  const t = useTranslations('site')
+export async function SiteHeader() {
+  const t = await getTranslations('site')
 
   return (
     <header className="sticky top-0 z-50 w-full backdrop-blur">

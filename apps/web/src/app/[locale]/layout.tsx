@@ -7,7 +7,8 @@ import '@/styles/globals.css'
 import { getObjectValueByLocale } from '@/lib/core/utils/locale'
 import type { LocaleOptions } from '@/lib/core/types/i18n'
 import { ThemeProvider } from '@/components/theme-provider'
-import { ConditionalLayout } from '@/components/conditional-layout'
+import { SiteFooter } from '@/components/site-footer'
+import { SiteHeader } from '@/components/site-header'
 import { defaultLocale } from '@/config/i18n'
 import { siteConfig } from '@/config/site'
 import { getSansFont } from '@/lib/fonts'
@@ -117,7 +118,6 @@ export default async function RootLayout(props: {
   const messages = (await import(`@/i18n/locales/${locale}.json`)).default
 
   const fontSans = await getSansFont()
-
   return (
     <html lang={locale} suppressHydrationWarning>
       <head>
@@ -141,7 +141,17 @@ export default async function RootLayout(props: {
             enableSystem
           >
             <QueryProvider>
-              <ConditionalLayout>{children}</ConditionalLayout>
+              <div>
+                <div className="relative z-10 flex min-h-screen flex-col">
+                  <SiteHeader />
+
+                  <main className="flex-1">{children}</main>
+
+                  <SiteFooter />
+                </div>
+
+                <div className="fixed left-0 top-0 size-full bg-gradient-to-b from-[#a277ff] via-transparent to-transparent opacity-10" />
+              </div>
               <Toaster />
             </QueryProvider>
           </ThemeProvider>

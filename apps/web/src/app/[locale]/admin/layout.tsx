@@ -1,13 +1,17 @@
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { SidebarProvider } from '@/components/ui/sidebar'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
 import { AdminSidebar } from '@/components/admin/layout/admin-sidebar'
-import { AdminHeader } from '@/components/admin/layout/admin-header'
+import { Separator } from '@/components/ui/separator'
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from '@/components/ui/breadcrumb'
 
-/**
- * Admin Dashboard Layout - Isolated from main site
- * No main site header/footer
- */
 export default async function AdminLayout({
   children,
 }: {
@@ -24,20 +28,10 @@ export default async function AdminLayout({
     redirect('/vi/login')
   }
 
-  // Check if user is admin and fetch avatar
+  // Check if user is admin
   const { data: profile } = await supabase
     .from('profiles')
-    .select(
-      `
-      role,
-      full_name,
-      email,
-      avatar_media:media!avatar_media_id (
-        public_id,
-        alt_text
-      )
-    `
-    )
+    .select('role, full_name, email')
     .eq('id', user.id)
     .single()
 
@@ -46,26 +40,33 @@ export default async function AdminLayout({
   }
 
   return (
-    <div className="relative flex min-h-screen">
-      <SidebarProvider>
-        <AdminSidebar
-          user={{
-            name: profile.full_name || 'Admin',
-            email: profile.email,
-            avatar: profile.avatar_media && typeof profile.avatar_media === 'object' && 'public_id' in profile.avatar_media 
-              ? String(profile.avatar_media.public_id)
-              : undefined,
-          }}
-        />
-        <div className="flex w-full flex-1 flex-col">
-          <AdminHeader />
-          <main className="flex-1 p-6 lg:p-8">
-            <div className="mx-auto max-w-7xl space-y-6">
-              {children}
-            </div>
-          </main>
+    <SidebarProvider>
+      <AdminSidebar
+        user={{
+          name: profile.full_name || 'Admin',
+          email: profile.email,
+          avatar: undefined,
+        }}
+      />
+      <main className="flex w-full flex-1 flex-col">
+        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+          <SidebarTrigger className="-ml-1" />
+          <Separator orientation="vertical" className="mr-2 h-4" />
+          <Breadcrumb>
+            <BreadcrumbList>
+              <BreadcrumbItem className="hidden md:block">
+                <BreadcrumbLink href="/vi/admin">
+                  Dashboard
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator className="hidden md:block" />
+            </BreadcrumbList>
+          </Breadcrumb>
+        </header>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
+          {children}
         </div>
-      </SidebarProvider>
-    </div>
+      </main>
+    </SidebarProvider>
   )
 }

@@ -1,8 +1,7 @@
 'use client'
 
 import { ChevronsUpDown, LogOut, Settings } from 'lucide-react'
-import { Avatar, AvatarFallback } from '@/components/ui/avatar'
-import { CldImage } from '@/components/ui/cld-image'
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +24,7 @@ type NavUserProps = {
   user: {
     name: string
     email: string
-    avatar?: string // Cloudinary public_id
+    avatar?: string
   }
 }
 
@@ -55,25 +54,14 @@ export function NavUser({ user }: NavUserProps) {
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                {user.avatar ? (
-                  <CldImage
-                    src={user.avatar}
-                    alt={user.name}
-                    width={32}
-                    height={32}
-                    crop="fill"
-                    gravity="face"
-                    className="rounded-lg"
-                  />
-                ) : (
-                  <AvatarFallback className="rounded-lg">
-                    {user.name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')
-                      .toUpperCase()}
-                  </AvatarFallback>
-                )}
+                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarFallback className="rounded-lg">
+                  {user.name
+                    .split(' ')
+                    .map((n) => n[0])
+                    .join('')
+                    .toUpperCase()}
+                </AvatarFallback>
               </Avatar>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-semibold">{user.name}</span>
@@ -91,25 +79,14 @@ export function NavUser({ user }: NavUserProps) {
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  {user.avatar ? (
-                    <CldImage
-                      src={user.avatar}
-                      alt={user.name}
-                      width={32}
-                      height={32}
-                      crop="fill"
-                      gravity="face"
-                      className="rounded-lg"
-                    />
-                  ) : (
-                    <AvatarFallback className="rounded-lg">
-                      {user.name
-                        .split(' ')
-                        .map((n) => n[0])
-                        .join('')
-                        .toUpperCase()}
-                    </AvatarFallback>
-                  )}
+                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarFallback className="rounded-lg">
+                    {user.name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')
+                      .toUpperCase()}
+                  </AvatarFallback>
                 </Avatar>
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-semibold">{user.name}</span>

@@ -1,10 +1,9 @@
-'use client'
+import { getTranslations } from 'next-intl/server'
 
-import { useTranslations } from 'next-intl'
 import { siteConfig } from '@/config/site'
 
-export function SiteFooter() {
-  const t = useTranslations('site.footer')
+export async function SiteFooter() {
+  const t = await getTranslations('site.footer')
 
   return (
     <footer className="py-6 md:px-8 md:py-0">

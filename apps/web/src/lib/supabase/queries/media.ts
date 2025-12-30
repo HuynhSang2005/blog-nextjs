@@ -1,5 +1,4 @@
 import { createClient } from '@/lib/supabase/server'
-import { loggers } from '@/lib/logger'
 import type {
   MediaWithCreator,
   MediaResourceType,
@@ -42,7 +41,7 @@ export async function getMedia(id: string): Promise<QueryResult<MediaWithCreator
 
     return { data: data as MediaWithCreator, error: null }
   } catch (error) {
-    loggers.media.error({ error, function: 'getMedia', id }, 'Failed to fetch media')
+    console.error('Error fetching media:', error)
     return { data: null, error: error as Error }
   }
 }

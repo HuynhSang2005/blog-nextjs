@@ -8,27 +8,6 @@ import type {
   PaginatedResponse,
   PaginationParams,
 } from '../types-helpers'
-import type { Tables } from '../database.types'
-
-/**
- * Raw Supabase response type for blog posts với nested tag relations
- */
-interface RawBlogPostWithTags extends Omit<Tables<'blog_posts'>, 'tags'> {
-  author: Pick<Tables<'profiles'>, 'id' | 'full_name'> | null
-  cover_media: Pick<Tables<'media'>, 'id' | 'public_id' | 'alt_text'> | null
-  tags: Array<{
-    tag: Pick<Tables<'tags'>, 'id' | 'name' | 'slug' | 'color'>
-  }>
-}
-
-interface RawBlogPostFull extends Omit<Tables<'blog_posts'>, 'tags'> {
-  author: Tables<'profiles'> | null
-  cover_media: Tables<'media'> | null
-  og_media: Tables<'media'> | null
-  tags: Array<{
-    tag: Tables<'tags'>
-  }>
-}
 
 /**
  * Filter parameters cho blog posts query
@@ -173,9 +152,9 @@ export async function getBlogPosts(
     }
 
     // Transform tags structure (flatten nested array)
-    const posts = (data || []).map((post: RawBlogPostWithTags) => ({
+    const posts = (data || []).map((post) => ({
       ...post,
-      tags: post.tags?.map((t) => t.tag).filter(Boolean) || [],
+      tags: post.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     })) as BlogPostListItem[]
 
     // Calculate pagination
@@ -240,10 +219,9 @@ export async function getBlogPost(
     }
 
     // Transform tags structure
-    const rawData = data as unknown as RawBlogPostFull
     const post = {
-      ...rawData,
-      tags: rawData.tags?.map((t) => t.tag).filter(Boolean) || [],
+      ...data,
+      tags: data.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     } as BlogPostWithRelations
 
     return { data: post, error: null }
@@ -359,9 +337,9 @@ export async function getBlogPostsByTag(
     }
 
     // Transform tags structure
-    const transformedPosts = (posts || []).map((post: RawBlogPostWithTags) => ({
+    const transformedPosts = (posts || []).map((post) => ({
       ...post,
-      tags: post.tags?.map((t) => t.tag).filter(Boolean) || [],
+      tags: post.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     })) as BlogPostListItem[]
 
     // Calculate pagination
@@ -434,9 +412,9 @@ export async function getFeaturedBlogPosts(
     }
 
     // Transform tags structure
-    const posts = (data || []).map((post: RawBlogPostWithTags) => ({
+    const posts = (data || []).map((post) => ({
       ...post,
-      tags: post.tags?.map((t) => t.tag).filter(Boolean) || [],
+      tags: post.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     })) as BlogPostListItem[]
 
     return { data: posts, error: null }
@@ -522,9 +500,9 @@ export async function getRelatedBlogPosts(
     }
 
     // Transform tags structure
-    const posts = (data || []).map((post: RawBlogPostWithTags) => ({
+    const posts = (data || []).map((post) => ({
       ...post,
-      tags: post.tags?.map((t) => t.tag).filter(Boolean) || [],
+      tags: post.tags?.map((t: any) => t.tag).filter(Boolean) || [],
     })) as BlogPostListItem[]
 
     return { data: posts, error: null }
