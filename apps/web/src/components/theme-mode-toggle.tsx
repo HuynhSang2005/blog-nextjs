@@ -17,6 +17,7 @@ import {
 
 interface ThemeModeToggleProps {
   messages: {
+    theme: string
     dark: string
     light: string
     system: string
@@ -63,7 +64,7 @@ export function ThemeModeToggle({ messages }: ThemeModeToggleProps) {
           <MoonIcon className="hidden size-[1.2rem] rotate-90 scale-0 transition-all dark:flex dark:rotate-0 dark:scale-100" />
           <ChevronDown className="size-3 transition duration-300 group-aria-expanded:rotate-180" />
 
-          <span className="sr-only">Toggle theme</span>
+          <span className="sr-only">{messages.theme}</span>
           <span className="pointer-events-auto absolute z-10 block h-14 w-full" />
         </Button>
       </DropdownMenuTrigger>

@@ -76,6 +76,12 @@
     }
   },
 
+  "not_found": {
+    "title": "Không tìm thấy",
+    "description": "Trang bạn tìm kiếm không tồn tại hoặc đã bị gỡ.",
+    "back_home": "Về trang chủ"
+  },
+
   "blog": {
     "rss_feed": "RSS Feed",
     "no_posts_found": "Không có bài viết nào",
@@ -86,7 +92,7 @@
     "previous": "Trước đó",
     "go_to_next_page": "Trang tiếp theo",
     "go_to_previous_page": "Trang trước đó",
-    
+
     "filters": {
       "search_placeholder": "Tìm kiếm bài viết...",
       "sort_by": "Sắp xếp theo",
@@ -100,7 +106,7 @@
       "clear_filters": "Xóa bộ lọc",
       "apply_filters": "Áp dụng"
     },
-    
+
     "words": {
       "posts": "Bài viết",
       "by": "bởi",
@@ -130,14 +136,15 @@
     "description": "Tìm hiểu thêm về kinh nghiệm, kỹ năng và hành trình phát triển của tôi",
     "heading": "Giới thiệu",
     "subheading": "Full-stack Developer đam mê xây dựng các ứng dụng web hiện đại",
-    
+
     "bio": {
       "location": "Vị trí",
       "role": "Vai trò",
       "email": "Email",
-      "experience": "Kinh nghiệm"
+      "experience": "Kinh nghiệm",
+      "avatar_alt": "Ảnh đại diện"
     },
-    
+
     "timeline": {
       "title": "Hành trình & Kinh nghiệm",
       "description": "Các cột mốc quan trọng trong sự nghiệp và học tập của tôi",
@@ -149,7 +156,7 @@
         "other": "Khác"
       }
     },
-    
+
     "skills": {
       "title": "Kỹ năng & Công nghệ",
       "description": "Các công nghệ và kỹ năng tôi sử dụng hàng ngày",
@@ -162,7 +169,7 @@
       },
       "proficiency": "Độ thành thạo"
     },
-    
+
     "contact": {
       "title": "Liên hệ",
       "description": "Hãy kết nối với tôi qua các kênh sau",
@@ -358,7 +365,7 @@
     "description": "Danh sách các dự án web, mobile và design system đã hoàn thành và đang phát triển",
     "heading": "Dự án của tôi",
     "subheading": "Tổng hợp các dự án web, mobile app và design system tôi đã và đang phát triển",
-    
+
     "filters": {
       "all": "Tất cả",
       "in_progress": "Đang phát triển",
@@ -366,24 +373,29 @@
       "archived": "Lưu trữ",
       "featured": "Nổi bật"
     },
-    
+
     "sort": {
       "latest": "Mới nhất",
       "popular": "Phổ biến",
       "featured": "Nổi bật",
       "name": "Tên (A-Z)"
     },
-    
+
     "actions": {
       "demo": "Xem demo",
       "github": "Mã nguồn",
       "view_project": "Xem chi tiết"
     },
-    
+
+    "not_found": {
+      "title": "Không tìm thấy dự án",
+      "description": "Dự án bạn tìm kiếm không tồn tại hoặc đã bị gỡ."
+    },
+
     "empty_state": "Chưa có dự án nào",
     "empty_state_description": "Các dự án sẽ được hiển thị tại đây khi có dữ liệu",
     "clear_filters": "Xóa bộ lọc",
-    
+
     "tech_stack": {
       "frontend": "Frontend",
       "backend": "Backend",
@@ -392,7 +404,7 @@
       "tools": "Công cụ",
       "other": "Khác"
     },
-    
+
     "detail": {
       "breadcrumb_home": "Trang chủ",
       "breadcrumb_projects": "Dự án",

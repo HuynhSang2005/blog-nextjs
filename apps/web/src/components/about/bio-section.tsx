@@ -59,7 +59,8 @@ export function BioSection({ content, profile }: BioSectionProps) {
   const createdDate = new Date(profile.created_at)
   const currentDate = new Date()
   const yearsOfExperience = Math.floor(
-    (currentDate.getTime() - createdDate.getTime()) / (1000 * 60 * 60 * 24 * 365)
+    (currentDate.getTime() - createdDate.getTime()) /
+      (1000 * 60 * 60 * 24 * 365)
   )
 
   return (
@@ -71,11 +72,15 @@ export function BioSection({ content, profile }: BioSectionProps) {
             <div className="relative aspect-square">
               {profile.avatar_media ? (
                 <CldImage
-                  src={profile.avatar_media.public_id}
-                  alt={profile.avatar_media.alt_text || profile.full_name || 'Avatar'}
-                  fill
+                  alt={
+                    profile.avatar_media.alt_text ||
+                    profile.full_name ||
+                    t('avatar_alt')
+                  }
                   className="object-cover"
+                  fill
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 400px"
+                  src={profile.avatar_media.public_id}
                 />
               ) : (
                 <div className="flex h-full items-center justify-center bg-muted">
@@ -87,14 +92,16 @@ export function BioSection({ content, profile }: BioSectionProps) {
             </div>
 
             {/* Quick links overlay */}
-            {(profile.github_username || profile.twitter_username || profile.website) && (
+            {(profile.github_username ||
+              profile.twitter_username ||
+              profile.website) && (
               <div className="space-y-2 p-4">
                 {profile.github_username && (
                   <a
-                    href={`https://github.com/${profile.github_username}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    href={`https://github.com/${profile.github_username}`}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     <Badge variant="secondary">GitHub</Badge>
                     <span>@{profile.github_username}</span>
@@ -102,10 +109,10 @@ export function BioSection({ content, profile }: BioSectionProps) {
                 )}
                 {profile.twitter_username && (
                   <a
-                    href={`https://twitter.com/${profile.twitter_username}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    href={`https://twitter.com/${profile.twitter_username}`}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     <Badge variant="secondary">Twitter</Badge>
                     <span>@{profile.twitter_username}</span>
@@ -113,10 +120,10 @@ export function BioSection({ content, profile }: BioSectionProps) {
                 )}
                 {profile.website && (
                   <a
-                    href={profile.website}
-                    target="_blank"
-                    rel="noopener noreferrer"
                     className="flex items-center gap-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                    href={profile.website}
+                    rel="noopener noreferrer"
+                    target="_blank"
                   >
                     <Badge variant="secondary">Website</Badge>
                     <span className="truncate">{profile.website}</span>
@@ -161,15 +168,15 @@ export function BioSection({ content, profile }: BioSectionProps) {
               label={t('role')}
               value="Full-stack Developer" // Có thể thêm vào database
             />
-            <InfoCard
-              icon={Mail}
-              label={t('email')}
-              value={profile.email}
-            />
+            <InfoCard icon={Mail} label={t('email')} value={profile.email} />
             <InfoCard
               icon={Calendar}
               label={t('experience')}
-              value={yearsOfExperience > 0 ? `${yearsOfExperience}+ năm` : 'Mới bắt đầu'}
+              value={
+                yearsOfExperience > 0
+                  ? `${yearsOfExperience}+ năm`
+                  : 'Mới bắt đầu'
+              }
             />
           </div>
         </div>

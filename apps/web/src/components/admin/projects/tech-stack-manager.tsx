@@ -49,9 +49,9 @@ export function TechStackManager({
   onTechStackChange,
 }: TechStackManagerProps) {
   const [techStack, setTechStack] = useState<TechItem[]>(initialTechStack)
-  const [newTech, setNewTech] = useState({
+  const [newTech, setNewTech] = useState<{ name: string; category: TechItem['category'] }>({
     name: '',
-    category: 'frontend' as const,
+    category: 'frontend',
   })
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
 
@@ -79,7 +79,8 @@ export function TechStackManager({
   }
 
   const handleRemove = (index: number) => {
-    const removedName = techStack[index].name
+    const removedName = techStack[index]?.name
+    if (!removedName) return
     setTechStack((prev) => {
       const updated = prev.filter((_, i) => i !== index)
       // Reorder indices
@@ -98,6 +99,7 @@ export function TechStackManager({
 
     const newTechStack = [...techStack]
     const draggedItem = newTechStack[draggedIndex]
+    if (!draggedItem) return
     newTechStack.splice(draggedIndex, 1)
     newTechStack.splice(index, 0, draggedItem)
 

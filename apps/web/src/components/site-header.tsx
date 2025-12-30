@@ -74,6 +74,7 @@ export async function SiteHeader() {
 
             <ThemeModeToggle
               messages={{
+                theme: t('themes.theme'),
                 dark: t('themes.dark'),
                 light: t('themes.light'),
                 system: t('themes.system'),

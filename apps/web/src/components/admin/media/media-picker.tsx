@@ -62,11 +62,10 @@ export function MediaPicker({
     setLoading(true)
     try {
       const result = await getAllMedia()
-      if (result.success && result.data) {
-        // Filter chỉ images
-        const images = result.data.filter((m) => m.resource_type === 'image')
-        setMedia(images)
-      }
+
+      // Filter chỉ images
+      const images = result.filter((m) => m.resource_type === 'image')
+      setMedia(images)
     } catch (error) {
       console.error('Failed to load media:', error)
     } finally {

@@ -183,7 +183,6 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
         toast.success('Đã xuất bản bài viết')
         router.push('/admin/blog')
       }
-      }
     } catch (error) {
       console.error('Error publishing:', error)
       toast.error('Không thể xuất bản bài viết')

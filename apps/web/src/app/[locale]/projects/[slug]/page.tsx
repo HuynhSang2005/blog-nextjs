@@ -1,28 +1,29 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { notFound } from 'next/navigation'
+import { getTranslations } from 'next-intl/server'
 
 /**
  * Using next-mdx-remote-client for runtime MDX rendering from database.
- * 
+ *
  * WHY NOT @next/mdx?
  * - @next/mdx requires .mdx files in app/ directory (file-based routing)
  * - Our content is stored in Supabase database (projects.long_description)
  * - We need runtime rendering of dynamic database strings
- * 
+ *
  * next-mdx-remote-client is the RECOMMENDED tool for database/CMS content.
  * - Better maintained (active development 2024-2025)
  * - Recommended by Next.js official docs
  * - Enhanced error handling via onError prop
  * - MDX v3 native support
  * - React 19 + Next.js 16 compatible
- * 
+ *
  * Analysis: docs/dev-v1/MDX-LIBRARY-ANALYSIS.md
  * Last reviewed: December 2025
  * Migrated: December 29, 2025
  * Status: next-mdx-remote-client v2.1.7
  */
 import { MDXRemote } from 'next-mdx-remote-client/rsc'
-import { getProjects, getProjectBySlug } from '@/app/actions/projects-queries'
+import { getProjectBySlug } from '@/app/actions/projects-queries'
 import { ProjectHeader } from '@/components/projects/project-header'
 import { ProjectGallery } from '@/components/projects/project-gallery'
 import { ProjectInfo } from '@/components/projects/project-info'
@@ -38,15 +39,13 @@ interface ProjectPageProps {
  * Generate static params for all projects (SSG)
  */
 export async function generateStaticParams() {
-  try {
-    const projects = await getProjects('vi')
-    return projects.map((project) => ({
-      slug: project.slug,
-    }))
-  } catch (error) {
-    console.error('Error generating static params:', error)
-    return []
-  }
+  // NOTE:
+  // This route reads projects from Supabase using a cookie-scoped server client.
+  // `generateStaticParams()` runs outside a request scope, so Next.js APIs like
+  // `cookies()` are not available, which would cause runtime errors.
+  // Returning an empty list keeps the route dynamic while avoiding noisy failures
+  // in dev/build.
+  return []
 }
 
 /**
@@ -56,12 +55,13 @@ export async function generateMetadata({
   params,
 }: ProjectPageProps): Promise<Metadata> {
   const { locale, slug } = await params
+  const t = await getTranslations({ locale, namespace: 'projects' })
   const project = await getProjectBySlug(slug, locale)
 
   if (!project) {
     return {
-      title: 'Project Not Found',
-      description: 'The requested project could not be found.',
+      title: t('not_found.title'),
+      description: t('not_found.description'),
     }
   }
 
@@ -69,8 +69,8 @@ export async function generateMetadata({
   const ogImage = project.og_media?.public_id
     ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${project.og_media.public_id}`
     : project.cover_media?.public_id
-    ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${project.cover_media.public_id}`
-    : undefined
+      ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/${project.cover_media.public_id}`
+      : undefined
 
   return {
     title: project.title,

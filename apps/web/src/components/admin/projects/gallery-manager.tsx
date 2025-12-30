@@ -98,6 +98,7 @@ export function GalleryManager({
 
     const newGallery = [...gallery]
     const draggedItem = newGallery[draggedIndex]
+    if (!draggedItem) return
     newGallery.splice(draggedIndex, 1)
     newGallery.splice(index, 0, draggedItem)
 
