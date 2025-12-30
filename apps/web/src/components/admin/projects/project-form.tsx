@@ -32,6 +32,7 @@ import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
 import { MediaPicker } from '@/components/admin/media/media-picker'
 import { GalleryManager } from '@/components/admin/projects/gallery-manager'
+import { TechStackManager } from '@/components/admin/projects/tech-stack-manager'
 
 interface ProjectFormProps {
   project?: any
@@ -343,6 +344,18 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
             projectId={project?.id}
             initialGallery={project?.gallery || []}
             maxImages={10}
+          />
+        </div>
+
+        {/* Tech Stack Manager */}
+        <div className="space-y-2">
+          <FormLabel className="text-base">Công nghệ sử dụng</FormLabel>
+          <FormDescription>
+            Thêm các công nghệ, framework, tools được sử dụng trong dự án. Kéo thả để sắp xếp thứ tự.
+          </FormDescription>
+          <TechStackManager
+            projectId={project?.id}
+            initialTechStack={project?.tech_stack || []}
           />
         </div>
 
