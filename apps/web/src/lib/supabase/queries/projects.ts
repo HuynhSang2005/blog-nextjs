@@ -240,9 +240,9 @@ export async function getFeaturedProjects(
     }
 
     // Transform tags structure
-    const projects = (data || []).map((project) => ({
+    const projects = (data || []).map((project: RawProjectWithTags) => ({
       ...project,
-      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: project.tags?.map((t) => t.tag).filter(Boolean) || [],
     })) as ProjectListItem[]
 
     return { data: projects, error: null }

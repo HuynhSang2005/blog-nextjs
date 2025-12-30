@@ -30,9 +30,10 @@ import { projectSchema, type ProjectFormData } from '@/lib/validations/project'
 import { createProject, updateProject } from '@/app/actions/projects'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import type { Tables } from '@/lib/supabase/database.types'
 
 interface ProjectFormProps {
-  project?: any
+  project?: Tables<'projects'>
   mode: 'create' | 'edit'
 }
 
@@ -68,7 +69,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
           long_description: project.long_description || '',
           demo_url: project.demo_url || '',
           github_url: project.github_url || '',
-          status: project.status || 'completed',
+          status: (project.status as 'in_progress' | 'completed' | 'archived') || 'in_progress',
           featured: project.featured || false,
           start_date: project.start_date || '',
           end_date: project.end_date || '',
@@ -81,7 +82,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
           long_description: '',
           demo_url: '',
           github_url: '',
-          status: 'completed',
+          status: 'completed' as const,
           featured: false,
           start_date: '',
           end_date: '',
@@ -105,6 +106,10 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
         await createProject(data)
         toast.success(t('messages.create_success'))
       } else {
+        if (!project?.id) {
+          toast.error('Project ID is missing')
+          return
+        }
         await updateProject(project.id, data)
         toast.success(t('messages.update_success'))
       }

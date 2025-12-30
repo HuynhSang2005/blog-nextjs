@@ -1,10 +1,21 @@
 import { createClient } from '@/lib/supabase/server'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database, Tables } from '@/lib/supabase/database.types'
 
-export type BlogPost = Database['public']['Tables']['blog_posts']['Row'] & {
-  cover_media?: Database['public']['Tables']['media']['Row'] | null
-  author?: Database['public']['Tables']['profiles']['Row'] | null
-  tags?: Array<Database['public']['Tables']['tags']['Row']>
+export type BlogPost = Tables<'blog_posts'> & {
+  cover_media?: Tables<'media'> | null
+  author?: Tables<'profiles'> | null
+  tags?: Array<Tables<'tags'>>
+}
+
+/**
+ * Raw response with nested blog_post_tags relation
+ */
+interface RawBlogPostResponse extends Tables<'blog_posts'> {
+  cover_media?: Tables<'media'> | null
+  author?: Tables<'profiles'> | null
+  blog_post_tags?: Array<{
+    tag: Tables<'tags'>
+  }>
 }
 
 /**
@@ -97,11 +108,13 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
   }
 
   // Transform blog_post_tags to tags array
-  const post = data as any
-  const tags = post.blog_post_tags?.map((bpt: any) => bpt.tag) || []
-  delete post.blog_post_tags
-
-  return { ...post, tags } as BlogPost
+  const rawPost = data as RawBlogPostResponse
+  const tags = rawPost.blog_post_tags?.map((bpt) => bpt.tag) || []
+  
+  // Remove blog_post_tags and add transformed tags
+  const { blog_post_tags, ...postWithoutTags } = rawPost
+  
+  return { ...postWithoutTags, tags } as BlogPost
 }
 
 /**
