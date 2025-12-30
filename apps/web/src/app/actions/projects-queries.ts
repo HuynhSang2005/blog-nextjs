@@ -4,9 +4,10 @@ import type { Tables } from '@/lib/supabase/database.types'
 
 /**
  * Response type for project tags query
+ * Note: tag is an array because Supabase returns relations as arrays
  */
 interface ProjectTagResponse {
-  tag: Pick<Tables<'tags'>, 'id' | 'name' | 'slug' | 'color'>
+  tag: Array<Pick<Tables<'tags'>, 'id' | 'name' | 'slug' | 'color'>>
 }
 
 /**
@@ -175,8 +176,10 @@ export const getProjectTags = cache(async (locale: string) => {
   // Extract unique tags
   const uniqueTags = new Map<string, Pick<Tables<'tags'>, 'id' | 'name' | 'slug' | 'color'>>()
   data?.forEach((item: ProjectTagResponse) => {
-    if (item.tag) {
-      uniqueTags.set(item.tag.id, item.tag)
+    // tag is an array, get first element if exists
+    const tag = item.tag?.[0]
+    if (tag) {
+      uniqueTags.set(tag.id, tag)
     }
   })
 
