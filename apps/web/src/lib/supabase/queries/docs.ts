@@ -19,21 +19,33 @@ export type DocListItem = Omit<Tables<'docs'>, 'content'> & {
   parent: Pick<Tables<'docs'>, 'id' | 'title' | 'slug'> | null
 }
 
-function normalizeDocList(rows: Array<Record<string, unknown>>): DocListItem[] {
+/**
+ * Raw Supabase response can return topic/parent as object or array
+ */
+interface RawDocResponse extends Omit<Tables<'docs'>, 'content'> {
+  content?: string // Optional since some queries omit content
+  topic: Pick<Tables<'docs_topics'>, 'id' | 'name' | 'slug' | 'icon'> | Array<Pick<Tables<'docs_topics'>, 'id' | 'name' | 'slug' | 'icon'>>
+  parent: Pick<Tables<'docs'>, 'id' | 'title' | 'slug'> | Array<Pick<Tables<'docs'>, 'id' | 'title' | 'slug'>> | null
+}
+
+function normalizeDocList(rows: RawDocResponse[]): DocListItem[] {
   return rows.map((row) => {
-    const topic = Array.isArray((row as any).topic)
-      ? (row as any).topic[0]
-      : (row as any).topic
+    const topic = Array.isArray(row.topic)
+      ? row.topic[0]!
+      : row.topic
 
-    const parent = Array.isArray((row as any).parent)
-      ? (row as any).parent[0] ?? null
-      : (row as any).parent ?? null
+    const parent = Array.isArray(row.parent)
+      ? row.parent[0] ?? null
+      : row.parent ?? null
 
+    // Remove content field and ensure proper type
+    const {content, ...restRow} = row
+    
     return {
-      ...(row as Tables<'docs'>),
+      ...restRow,
       topic,
       parent,
-    }
+    } as DocListItem
   })
 }
 
