@@ -30,6 +30,8 @@ import { projectSchema, type ProjectFormData } from '@/lib/validations/project'
 import { createProject, updateProject } from '@/app/actions/projects'
 import { toast } from 'sonner'
 import { useTranslations } from 'next-intl'
+import { MediaPicker } from '@/components/admin/media/media-picker'
+import { GalleryManager } from '@/components/admin/projects/gallery-manager'
 
 interface ProjectFormProps {
   project?: any
@@ -66,6 +68,8 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
           slug: project.slug || '',
           description: project.description || '',
           long_description: project.long_description || '',
+          cover_media_id: project.cover_media_id || null,
+          og_media_id: project.og_media_id || null,
           demo_url: project.demo_url || '',
           github_url: project.github_url || '',
           status: project.status || 'completed',
@@ -79,6 +83,8 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
           slug: '',
           description: '',
           long_description: '',
+          cover_media_id: null,
+          og_media_id: null,
           demo_url: '',
           github_url: '',
           status: 'completed',
@@ -198,6 +204,51 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
           )}
         />
 
+        {/* Cover Media */}
+        <FormField
+          control={form.control}
+          name="cover_media_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ảnh bìa</FormLabel>
+              <FormControl>
+                <MediaPicker
+                  selectedMediaId={field.value || undefined}
+                  onSelect={(mediaId) => field.onChange(mediaId)}
+                  label="Chọn ảnh bìa"
+                  description="Ảnh đại diện cho dự án (tỷ lệ 16:9 khuyến nghị)"
+                  aspectRatio="video"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
+        {/* OG Media */}
+        <FormField
+          control={form.control}
+          name="og_media_id"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Ảnh Open Graph</FormLabel>
+              <FormControl>
+                <MediaPicker
+                  selectedMediaId={field.value || undefined}
+                  onSelect={(mediaId) => field.onChange(mediaId)}
+                  label="Chọn ảnh OG"
+                  description="Ảnh hiển thị khi chia sẻ link (1200x630px)"
+                  aspectRatio="16/9"
+                />
+              </FormControl>
+              <FormDescription>
+                Không bắt buộc (mặc định dùng ảnh bìa)
+              </FormDescription>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+
         {/* Demo URL */}
         <FormField
           control={form.control}
@@ -281,6 +332,19 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
             </FormItem>
           )}
         />
+
+        {/* Gallery Manager */}
+        <div className="space-y-2">
+          <FormLabel className="text-base">Gallery ảnh dự án</FormLabel>
+          <FormDescription>
+            Thêm nhiều ảnh để hiển thị trong trang chi tiết dự án. Kéo thả để sắp xếp thứ tự.
+          </FormDescription>
+          <GalleryManager
+            projectId={project?.id}
+            initialGallery={project?.gallery || []}
+            maxImages={10}
+          />
+        </div>
 
         {/* Featured */}
         <FormField

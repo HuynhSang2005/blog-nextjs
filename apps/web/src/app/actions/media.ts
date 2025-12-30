@@ -262,3 +262,28 @@ export async function deleteMultipleMedia(ids: string[]) {
     }
   }
 }
+
+/**
+ * Get all media
+ * Lấy tất cả media (for MediaPicker)
+ */
+export async function getAllMedia() {
+  try {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+      .from('media')
+      .select('*')
+      .order('uploaded_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching media:', error)
+      return []
+    }
+
+    return data || []
+  } catch (error) {
+    console.error('Error in getAllMedia:', error)
+    return []
+  }
+}
