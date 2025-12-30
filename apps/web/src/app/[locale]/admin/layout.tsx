@@ -52,7 +52,9 @@ export default async function AdminLayout({
           user={{
             name: profile.full_name || 'Admin',
             email: profile.email,
-            avatar: profile.avatar_media?.public_id,
+            avatar: profile.avatar_media && typeof profile.avatar_media === 'object' && 'public_id' in profile.avatar_media 
+              ? String(profile.avatar_media.public_id)
+              : undefined,
           }}
         />
         <div className="flex w-full flex-1 flex-col">

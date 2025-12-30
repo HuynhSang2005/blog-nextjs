@@ -48,7 +48,7 @@ export default async function AdminDashboardPage() {
   ]
 
   return (
-    <div className={cn('space-y-6', ds.layout.maxWidth)}>
+    <div className={cn('space-y-6', ds.layout.content.maxWidth, 'mx-auto')}>
       <div className="flex items-center justify-between">
         <h1 className={cn('font-bold tracking-tight', ds.typography.h1)}>
           Dashboard
