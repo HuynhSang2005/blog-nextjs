@@ -84,6 +84,24 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
     },
   })
 
+  // Auto-calculate read time from content
+  const calculateReadTime = (content: string): number => {
+    // Remove MDX/Markdown syntax for accurate word count
+    const cleanContent = content
+      .replace(/```[\s\S]*?```/g, '') // Remove code blocks
+      .replace(/`[^`]*`/g, '') // Remove inline code
+      .replace(/[#*_\[\]()]/g, '') // Remove markdown symbols
+      .trim()
+    
+    const words = cleanContent.split(/\s+/).filter(w => w.length > 0).length
+    
+    // Average reading speed: 200 words/minute for Vietnamese
+    // Reference: https://en.wikipedia.org/wiki/Words_per_minute
+    const readTime = Math.ceil(words / 200)
+    
+    return readTime > 0 ? readTime : 1 // Minimum 1 minute
+  }
+
   // Auto-generate slug from title
   const handleTitleChange = (value: string) => {
     if (mode === 'create' && !form.getValues('slug')) {
@@ -105,16 +123,25 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
     try {
       setIsSaving(true)
 
-      const { tag_ids, ...rest } = data
-      const postData = { ...rest, status: 'draft' as const }
+      // Auto-calculate read time before saving
+      const readTime = calculateReadTime(data.content)
+      const postData = {
+        ...data,
+        status: 'draft' as const,
+        read_time_minutes: readTime,
+        series_id: null, // Hide series feature for now
+        series_order: null,
+      }
+
+      const { tag_ids, ...rest } = postData
       
       if (mode === 'create') {
-        const result = await createBlogPost(postData)
+        const result = await createBlogPost(rest)
         await updateBlogPostTags(result.id, tag_ids)
         toast.success('Đã lưu nháp thành công')
         router.push(`/admin/blog/${result.id}`)
       } else if (post) {
-        await updateBlogPost(post.id, postData)
+        await updateBlogPost(post.id, rest)
         await updateBlogPostTags(post.id, tag_ids)
         toast.success('Đã cập nhật bài viết')
         router.refresh()
@@ -131,21 +158,31 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
     try {
       setIsPublishing(true)
 
-      const { tag_ids, ...rest } = data
-      const postData = { ...rest, status: 'published' as const }
+      // Auto-calculate read time before publishing
+      const readTime = calculateReadTime(data.content)
+      const postData = {
+        ...data,
+        status: 'published' as const,
+        read_time_minutes: readTime,
+        series_id: null, // Hide series feature for now
+        series_order: null,
+      }
+
+      const { tag_ids, ...rest } = postData
       
       if (mode === 'create') {
-        const result = await createBlogPost(postData)
+        const result = await createBlogPost(rest)
         await updateBlogPostTags(result.id, tag_ids)
         await publishBlogPost(result.id)
         toast.success('Đã xuất bản bài viết')
         router.push('/admin/blog')
       } else if (post) {
-        await updateBlogPost(post.id, postData)
+        await updateBlogPost(post.id, rest)
         await updateBlogPostTags(post.id, tag_ids)
         await publishBlogPost(post.id)
         toast.success('Đã xuất bản bài viết')
         router.push('/admin/blog')
+      }
       }
     } catch (error) {
       console.error('Error publishing:', error)
