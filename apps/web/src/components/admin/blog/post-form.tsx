@@ -8,6 +8,7 @@ import { toast } from 'sonner'
 import { Check, ChevronsUpDown, Loader2, Save, Send } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
+import { MediaPicker } from '@/components/admin/media/media-picker'
 import {
   Form,
   FormControl,
@@ -219,6 +220,59 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                           value={field.value || ''}
                         />
                       </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            {/* Media Card */}
+            <Card>
+              <CardContent className="pt-6 space-y-6">
+                <div>
+                  <h3 className="text-lg font-medium">Hình ảnh</h3>
+                  <p className="text-sm text-muted-foreground">
+                    Ảnh bìa và Open Graph cho bài viết
+                  </p>
+                </div>
+
+                <Separator />
+
+                {/* Cover Media */}
+                <FormField
+                  control={form.control}
+                  name="cover_media_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <MediaPicker
+                        label="Ảnh bìa"
+                        description="Ảnh chính hiển thị trên bài viết (tỷ lệ 16:9)"
+                        selectedMediaId={field.value}
+                        onSelect={field.onChange}
+                        aspectRatio="16/9"
+                      />
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* OG Media */}
+                <FormField
+                  control={form.control}
+                  name="og_media_id"
+                  render={({ field }) => (
+                    <FormItem>
+                      <MediaPicker
+                        label="Ảnh Open Graph"
+                        description="Ảnh hiển thị khi chia sẻ trên mạng xã hội (1200x630px, tỷ lệ 16:9)"
+                        selectedMediaId={field.value}
+                        onSelect={field.onChange}
+                        aspectRatio="16/9"
+                      />
+                      <FormDescription>
+                        Nếu không chọn, sẽ sử dụng ảnh bìa làm OG image
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}
