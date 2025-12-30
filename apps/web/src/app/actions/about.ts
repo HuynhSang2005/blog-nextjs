@@ -2,6 +2,7 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { cache } from 'react'
+import type { Tables } from '@/lib/supabase/database.types'
 
 /**
  * Lấy tất cả dữ liệu About Page từ database
@@ -168,7 +169,7 @@ export async function getSkills() {
  * @param skills - Skills array
  * @returns Object with skills grouped by category
  */
-export async function groupSkillsByCategory(skills: any[]) {
+export async function groupSkillsByCategory(skills: Tables<'skills'>[]) {
   return skills.reduce((acc, skill) => {
     const category = skill.category || 'other'
     if (!acc[category]) {
@@ -176,5 +177,5 @@ export async function groupSkillsByCategory(skills: any[]) {
     }
     acc[category].push(skill)
     return acc
-  }, {} as Record<string, any[]>)
+  }, {} as Record<string, Tables<'skills'>[]>)
 }
