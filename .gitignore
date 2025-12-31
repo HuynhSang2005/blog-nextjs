@@ -27,6 +27,10 @@ out/
 build
 dist
 
+# Test outputs
+/playwright-report/
+/test-results/
+
 
 # Debug
 npm-debug.log*
@@ -35,6 +39,9 @@ bun-debug.log*
 # Misc
 .DS_Store
 *.pem
+
+# Tooling
+.serena/
 
 # Documentation (internal only - root level)
 /docs/
