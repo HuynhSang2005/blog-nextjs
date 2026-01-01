@@ -6,7 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Check, ChevronsUpDown, Loader2, Save, Send } from 'lucide-react'
-import { useLocale } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { MediaPicker } from '@/components/admin/media/media-picker'
@@ -31,7 +31,12 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Card, CardContent } from '@/components/ui/card'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Command,
   CommandEmpty,
@@ -47,6 +52,10 @@ import {
   updateBlogPost,
   updateBlogPostTags,
 } from '@/app/actions/blog'
+import {
+  MDXEditorPreview,
+  MDXEditorWrapper,
+} from '@/components/admin/shared/mdx-editor'
 import type { Database } from '@/lib/supabase/database.types'
 import { cn } from '@/lib/utils'
 
@@ -62,6 +71,7 @@ interface BlogPostFormProps {
 export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
   const router = useRouter()
   const locale = useLocale()
+  const t = useTranslations('admin.blog')
   const [isSaving, setIsSaving] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
 
@@ -79,7 +89,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
       meta_description: post?.meta_description || '',
       cover_media_id: post?.cover_media_id || null,
       og_media_id: post?.og_media_id || null,
-      tag_ids: post?.tags?.map((t) => t.id) || [],
+      tag_ids: post?.tags?.map(t => t.id) || [],
       series_id: post?.series_id || null,
       series_order: post?.series_order || null,
       read_time_minutes: post?.read_time_minutes || null,
@@ -92,15 +102,15 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
     const cleanContent = content
       .replace(/```[\s\S]*?```/g, '') // Remove code blocks
       .replace(/`[^`]*`/g, '') // Remove inline code
-      .replace(/[#*_\[\]()]/g, '') // Remove markdown symbols
+      .replace(/[#*_[\]()]/g, '') // Remove markdown symbols
       .trim()
-    
+
     const words = cleanContent.split(/\s+/).filter(w => w.length > 0).length
-    
+
     // Average reading speed: 200 words/minute for Vietnamese
     // Reference: https://en.wikipedia.org/wiki/Words_per_minute
     const readTime = Math.ceil(words / 200)
-    
+
     return readTime > 0 ? readTime : 1 // Minimum 1 minute
   }
 
@@ -143,7 +153,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
       }
 
       const { tag_ids, ...rest } = postData
-      
+
       if (mode === 'create') {
         const result = await createBlogPost(rest)
         await updateBlogPostTags(result.id, tag_ids)
@@ -178,7 +188,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
       }
 
       const { tag_ids, ...rest } = postData
-      
+
       if (mode === 'create') {
         const result = await createBlogPost(rest)
         await updateBlogPostTags(result.id, tag_ids)
@@ -220,7 +230,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                         <Input
                           placeholder="Nhập tiêu đề bài viết..."
                           {...field}
-                          onChange={(e) => {
+                          onChange={e => {
                             field.onChange(e)
                             handleTitleChange(e.target.value)
                           }}
@@ -258,8 +268,8 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                       <FormLabel>Mô tả ngắn</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Mô tả ngắn gọn về bài viết (hiển thị trong danh sách)..."
                           className="resize-none"
+                          placeholder="Mô tả ngắn gọn về bài viết (hiển thị trong danh sách)..."
                           rows={3}
                           {...field}
                           value={field.value || ''}
@@ -291,11 +301,11 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <MediaPicker
-                        label="Ảnh bìa"
-                        description="Ảnh chính hiển thị trên bài viết (tỷ lệ 16:9)"
-                        selectedMediaId={field.value}
-                        onSelect={field.onChange}
                         aspectRatio="16/9"
+                        description="Ảnh chính hiển thị trên bài viết (tỷ lệ 16:9)"
+                        label="Ảnh bìa"
+                        onSelect={field.onChange}
+                        selectedMediaId={field.value}
                       />
                       <FormMessage />
                     </FormItem>
@@ -309,11 +319,11 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                   render={({ field }) => (
                     <FormItem>
                       <MediaPicker
-                        label="Ảnh Open Graph"
-                        description="Ảnh hiển thị khi chia sẻ trên mạng xã hội (1200x630px, tỷ lệ 16:9)"
-                        selectedMediaId={field.value}
-                        onSelect={field.onChange}
                         aspectRatio="16/9"
+                        description="Ảnh hiển thị khi chia sẻ trên mạng xã hội (1200x630px, tỷ lệ 16:9)"
+                        label="Ảnh Open Graph"
+                        onSelect={field.onChange}
+                        selectedMediaId={field.value}
                       />
                       <FormDescription>
                         Nếu không chọn, sẽ sử dụng ảnh bìa làm OG image
@@ -335,14 +345,36 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                     <FormItem>
                       <FormLabel>Nội dung *</FormLabel>
                       <FormControl>
-                        <Textarea
-                          placeholder="Nội dung bài viết (MDX)..."
-                          className="min-h-[400px] font-mono text-sm"
-                          {...field}
-                        />
+                        <Tabs className="w-full" defaultValue="editor">
+                          <TabsList className="w-full justify-start">
+                            <TabsTrigger value="editor">Soạn thảo</TabsTrigger>
+                            <TabsTrigger value="preview">Xem trước</TabsTrigger>
+                          </TabsList>
+
+                          <TabsContent value="editor">
+                            <div className="min-h-[500px] rounded-md border">
+                              <MDXEditorWrapper
+                                i18nNamespace="admin.blog"
+                                onChange={field.onChange}
+                                placeholder={t('form.placeholders.content')}
+                                value={field.value}
+                              />
+                            </div>
+                          </TabsContent>
+
+                          <TabsContent value="preview">
+                            <div className="min-h-[500px] rounded-md border">
+                              <MDXEditorPreview
+                                className="min-h-[500px]"
+                                i18nNamespace="admin.blog"
+                                value={field.value}
+                              />
+                            </div>
+                          </TabsContent>
+                        </Tabs>
                       </FormControl>
                       <FormDescription>
-                        Hỗ trợ Markdown và MDX. Sẽ tích hợp Novel editor trong future.
+                        Hỗ trợ Markdown/MDX (code block, bảng, ảnh).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -371,8 +403,8 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                       <FormLabel>Meta Description</FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="Mô tả cho Google Search (tối đa 160 ký tự)..."
                           className="resize-none"
+                          placeholder="Mô tả cho Google Search (tối đa 160 ký tự)..."
                           rows={2}
                           {...field}
                           value={field.value || ''}
@@ -408,8 +440,8 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                     <FormItem>
                       <FormLabel>Trạng thái</FormLabel>
                       <Select
-                        onValueChange={field.onChange}
                         defaultValue={field.value}
+                        onValueChange={field.onChange}
                       >
                         <FormControl>
                           <SelectTrigger>
@@ -476,11 +508,11 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                 {/* Action Buttons */}
                 <div className="flex flex-col gap-2">
                   <Button
-                    type="button"
-                    variant="outline"
                     className="w-full"
                     disabled={isSaving || isPublishing}
                     onClick={form.handleSubmit(onSaveDraft)}
+                    type="button"
+                    variant="outline"
                   >
                     {isSaving ? (
                       <>
@@ -496,10 +528,10 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                   </Button>
 
                   <Button
-                    type="button"
                     className="w-full"
                     disabled={isSaving || isPublishing}
                     onClick={form.handleSubmit(onPublish)}
+                    type="button"
                   >
                     {isPublishing ? (
                       <>
@@ -542,10 +574,10 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                           <PopoverTrigger asChild>
                             <FormControl>
                               <Button
+                                className="w-full justify-between"
+                                role="combobox"
                                 type="button"
                                 variant="outline"
-                                role="combobox"
-                                className="w-full justify-between"
                               >
                                 {selectedCount === 0
                                   ? 'Chọn thẻ'
@@ -555,34 +587,42 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                             </FormControl>
                           </PopoverTrigger>
 
-                          <PopoverContent className="w-full p-0" align="start">
+                          <PopoverContent align="start" className="w-full p-0">
                             <Command>
                               <CommandInput placeholder="Tìm thẻ..." />
                               <CommandList>
                                 <CommandEmpty>Không tìm thấy thẻ</CommandEmpty>
                                 <CommandGroup>
-                                  {tags.map((tag) => {
-                                    const isSelected = selectedIds.includes(tag.id)
+                                  {tags.map(tag => {
+                                    const isSelected = selectedIds.includes(
+                                      tag.id
+                                    )
 
                                     return (
                                       <CommandItem
                                         key={tag.id}
-                                        value={tag.name}
                                         onSelect={() => {
                                           const next = isSelected
-                                            ? selectedIds.filter((id) => id !== tag.id)
+                                            ? selectedIds.filter(
+                                                id => id !== tag.id
+                                              )
                                             : [...selectedIds, tag.id]
 
                                           field.onChange(next)
                                         }}
+                                        value={tag.name}
                                       >
                                         <Check
                                           className={cn(
                                             'mr-2 h-4 w-4',
-                                            isSelected ? 'opacity-100' : 'opacity-0',
+                                            isSelected
+                                              ? 'opacity-100'
+                                              : 'opacity-0'
                                           )}
                                         />
-                                        <span className="flex-1">{tag.name}</span>
+                                        <span className="flex-1">
+                                          {tag.name}
+                                        </span>
                                         {tag.slug ? (
                                           <span className="text-muted-foreground text-xs">
                                             {tag.slug}
@@ -612,18 +652,14 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-4">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={() => router.back()}
-          >
+          <Button onClick={() => router.back()} type="button" variant="outline">
             Hủy
           </Button>
           <Button
-            type="button"
-            variant="secondary"
             disabled={isSaving || isPublishing}
             onClick={form.handleSubmit(onSaveDraft)}
+            type="button"
+            variant="secondary"
           >
             {isSaving ? (
               <>
@@ -638,9 +674,9 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
             )}
           </Button>
           <Button
-            type="button"
             disabled={isSaving || isPublishing}
             onClick={form.handleSubmit(onPublish)}
+            type="button"
           >
             {isPublishing ? (
               <>

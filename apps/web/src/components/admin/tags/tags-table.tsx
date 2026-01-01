@@ -98,7 +98,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
         return description ? (
           <span className="text-sm text-muted-foreground">{description}</span>
         ) : (
-          <span className="text-sm text-muted-foreground italic">Chưa có mô tả</span>
+          <span className="text-sm text-muted-foreground italic">
+            Chưa có mô tả
+          </span>
         )
       },
     },
@@ -118,7 +120,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button className="h-8 w-8 p-0" variant="ghost">
                 <span className="sr-only">Mở menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -183,21 +185,21 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
       <div className="space-y-4">
         {/* Filter */}
         <Input
-          placeholder="Tìm kiếm thẻ..."
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
+          className="max-w-sm"
+          onChange={event =>
             table.getColumn('name')?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          placeholder="Tìm kiếm thẻ..."
+          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
         />
 
         {/* Table */}
         <div className="rounded-md border">
           <Table>
             <TableHeader>
-              {table.getHeaderGroups().map((headerGroup) => (
+              {table.getHeaderGroups().map(headerGroup => (
                 <TableRow key={headerGroup.id}>
-                  {headerGroup.headers.map((header) => (
+                  {headerGroup.headers.map(header => (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
                         ? null
@@ -212,12 +214,12 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
             </TableHeader>
             <TableBody>
               {table.getRowModel().rows?.length ? (
-                table.getRowModel().rows.map((row) => (
+                table.getRowModel().rows.map(row => (
                   <TableRow
-                    key={row.id}
                     data-state={row.getIsSelected() && 'selected'}
+                    key={row.id}
                   >
-                    {row.getVisibleCells().map((cell) => (
+                    {row.getVisibleCells().map(cell => (
                       <TableCell key={cell.id}>
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -230,8 +232,8 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
               ) : (
                 <TableRow>
                   <TableCell
-                    colSpan={columns.length}
                     className="h-24 text-center"
+                    colSpan={columns.length}
                   >
                     Chưa có thẻ nào.
                   </TableCell>
@@ -243,7 +245,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
       </div>
 
       {/* Delete Confirmation Dialog */}
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
@@ -252,8 +254,8 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
               <strong>{deletingTag?.name}</strong>.
               {deletingTag?.usageCount && deletingTag.usageCount > 0 ? (
                 <span className="mt-2 block text-destructive">
-                  Thẻ này đang được sử dụng bởi {deletingTag.usageCount} bài viết/dự
-                  án. Bạn cần gỡ thẻ khỏi các nội dung trước khi xóa.
+                  Thẻ này đang được sử dụng bởi {deletingTag.usageCount} bài
+                  viết/dự án. Bạn cần gỡ thẻ khỏi các nội dung trước khi xóa.
                 </span>
               ) : null}
             </AlertDialogDescription>
@@ -261,9 +263,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           <AlertDialogFooter>
             <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
             <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isDeleting || (deletingTag?.usageCount || 0) > 0}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+              disabled={isDeleting || (deletingTag?.usageCount || 0) > 0}
+              onClick={handleDelete}
             >
               {isDeleting ? 'Đang xóa...' : 'Xóa'}
             </AlertDialogAction>

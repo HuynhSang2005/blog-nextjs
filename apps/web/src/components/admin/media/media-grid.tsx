@@ -23,7 +23,6 @@ import { Label } from '@/components/ui/label'
 import { Textarea } from '@/components/ui/textarea'
 import { toast } from 'sonner'
 import { deleteMedia, updateMedia } from '@/app/actions/media'
-import { cn } from '@/lib/utils'
 
 export interface MediaItem {
   id: string
@@ -36,7 +35,7 @@ export interface MediaItem {
   alt_text: string | null
   caption: string | null
   uploaded_at: string
-  metadata: Record<string, any> | null
+  metadata: Record<string, unknown> | null
 }
 
 interface MediaGridProps {
@@ -75,7 +74,7 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
       } else {
         toast.error(result.error || 'Không thể xóa media')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Đã xảy ra lỗi khi xóa media')
     } finally {
       setIsDeleting(false)
@@ -105,7 +104,7 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
       } else {
         toast.error(result.error || 'Không thể cập nhật media')
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error('Đã xảy ra lỗi khi cập nhật media')
     } finally {
       setIsUpdating(false)
@@ -134,16 +133,16 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
   return (
     <>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-        {media.map((item) => (
-          <Card key={item.id} className="group overflow-hidden">
+        {media.map(item => (
+          <Card className="group overflow-hidden" key={item.id}>
             <div className="relative aspect-square bg-muted">
               {item.resource_type === 'image' ? (
                 <CldImage
-                  src={item.public_id}
                   alt={item.alt_text || 'Media'}
-                  fill
                   className="object-cover"
+                  fill
                   sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                  src={item.public_id}
                 />
               ) : item.resource_type === 'video' ? (
                 <div className="flex items-center justify-center h-full">
@@ -158,29 +157,29 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
               {/* Actions overlay */}
               <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
                 <Button
-                  size="icon"
-                  variant="secondary"
                   onClick={() => handleCopyUrl(item.public_id)}
+                  size="icon"
                   title="Sao chép URL"
+                  variant="secondary"
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
                 <Button
-                  size="icon"
-                  variant="secondary"
                   onClick={() => handleEdit(item)}
+                  size="icon"
                   title="Chỉnh sửa"
+                  variant="secondary"
                 >
                   <Edit className="h-4 w-4" />
                 </Button>
                 <Button
-                  size="icon"
-                  variant="destructive"
                   onClick={() => {
                     setSelectedMedia(item)
                     setDeleteDialogOpen(true)
                   }}
+                  size="icon"
                   title="Xóa"
+                  variant="destructive"
                 >
                   <Trash2 className="h-4 w-4" />
                 </Button>
@@ -188,14 +187,19 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
             </div>
 
             <div className="p-3">
-              <p className="text-sm font-medium truncate" title={item.public_id}>
+              <p
+                className="text-sm font-medium truncate"
+                title={item.public_id}
+              >
                 {item.public_id.split('/').pop()}
               </p>
               <div className="flex items-center justify-between mt-1">
                 <span className="text-xs text-muted-foreground uppercase">
                   {item.format || item.resource_type}
                 </span>
-                <span className="text-xs text-muted-foreground">{formatBytes(item.bytes)}</span>
+                <span className="text-xs text-muted-foreground">
+                  {formatBytes(item.bytes)}
+                </span>
               </div>
               {item.width && item.height && (
                 <p className="text-xs text-muted-foreground mt-1">
@@ -208,7 +212,7 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
       </div>
 
       {/* Delete Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <Dialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Xác nhận xóa</DialogTitle>
@@ -216,15 +220,23 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
               Bạn có chắc muốn xóa media này? Hành động này không thể hoàn tác.
               <br />
               <span className="text-sm text-muted-foreground mt-2 block">
-                Lưu ý: File sẽ chỉ bị xóa khỏi database, không xóa khỏi Cloudinary.
+                Lưu ý: File sẽ chỉ bị xóa khỏi database, không xóa khỏi
+                Cloudinary.
               </span>
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteDialogOpen(false)}>
+            <Button
+              onClick={() => setDeleteDialogOpen(false)}
+              variant="outline"
+            >
               Hủy
             </Button>
-            <Button variant="destructive" onClick={handleDelete} disabled={isDeleting}>
+            <Button
+              disabled={isDeleting}
+              onClick={handleDelete}
+              variant="destructive"
+            >
               {isDeleting ? 'Đang xóa...' : 'Xóa'}
             </Button>
           </DialogFooter>
@@ -232,38 +244,44 @@ export function MediaGrid({ media, onRefresh }: MediaGridProps) {
       </Dialog>
 
       {/* Edit Dialog */}
-      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+      <Dialog onOpenChange={setEditDialogOpen} open={editDialogOpen}>
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Chỉnh sửa media</DialogTitle>
-            <DialogDescription>Cập nhật thông tin mô tả cho media</DialogDescription>
+            <DialogDescription>
+              Cập nhật thông tin mô tả cho media
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-4 py-4">
             <div className="space-y-2">
               <Label htmlFor="alt_text">Alt Text</Label>
               <Input
                 id="alt_text"
-                value={editForm.alt_text}
-                onChange={(e) => setEditForm({ ...editForm, alt_text: e.target.value })}
+                onChange={e =>
+                  setEditForm({ ...editForm, alt_text: e.target.value })
+                }
                 placeholder="Mô tả ngắn gọn cho ảnh"
+                value={editForm.alt_text}
               />
             </div>
             <div className="space-y-2">
               <Label htmlFor="caption">Caption</Label>
               <Textarea
                 id="caption"
-                value={editForm.caption}
-                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) => setEditForm({ ...editForm, caption: e.target.value })}
+                onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                  setEditForm({ ...editForm, caption: e.target.value })
+                }
                 placeholder="Chú thích chi tiết (tùy chọn)"
                 rows={3}
+                value={editForm.caption}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button variant="outline" onClick={() => setEditDialogOpen(false)}>
+            <Button onClick={() => setEditDialogOpen(false)} variant="outline">
               Hủy
             </Button>
-            <Button onClick={handleUpdate} disabled={isUpdating}>
+            <Button disabled={isUpdating} onClick={handleUpdate}>
               {isUpdating ? 'Đang lưu...' : 'Lưu'}
             </Button>
           </DialogFooter>

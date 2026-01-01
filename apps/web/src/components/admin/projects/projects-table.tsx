@@ -89,7 +89,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           <div className="flex items-center gap-2">
             <span className="font-medium">{row.getValue('title')}</span>
             {isFeatured && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge className="text-xs" variant="secondary">
                 {t('form.featured')}
               </Badge>
             )}
@@ -107,12 +107,8 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           completed: 'default',
           archived: 'outline',
         }[status] as 'default' | 'secondary' | 'outline'
-        
-        return (
-          <Badge variant={statusVariant}>
-            {t(`status.${status}`)}
-          </Badge>
-        )
+
+        return <Badge variant={statusVariant}>{t(`status.${status}`)}</Badge>
       },
       filterFn: (row, id, value) => {
         return value === 'all' || row.getValue(id) === value
@@ -124,16 +120,16 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
       cell: ({ row }) => {
         const demoUrl = row.original.demo_url
         const githubUrl = row.original.github_url
-        
+
         return (
           <div className="flex gap-2">
             {demoUrl && (
-              <Badge variant="outline" className="text-xs">
+              <Badge className="text-xs" variant="outline">
                 Demo
               </Badge>
             )}
             {githubUrl && (
-              <Badge variant="outline" className="text-xs">
+              <Badge className="text-xs" variant="outline">
                 GitHub
               </Badge>
             )}
@@ -149,7 +145,9 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
       header: t('table.created_at'),
       cell: ({ row }) => {
         const date = row.getValue('created_at') as string
-        return date ? format(new Date(date), 'dd MMM yyyy', { locale: vi }) : '-'
+        return date
+          ? format(new Date(date), 'dd MMM yyyy', { locale: vi })
+          : '-'
       },
     },
     {
@@ -160,7 +158,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button className="h-8 w-8 p-0" variant="ghost">
                 <span className="sr-only">Mở menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -225,17 +223,21 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
     <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <Input
-          placeholder={t('table.search_placeholder')}
-          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
+          className="max-w-sm"
+          onChange={event =>
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          placeholder={t('table.search_placeholder')}
+          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
         />
         <Select
-          value={(table.getColumn('status')?.getFilterValue() as string) ?? 'all'}
-          onValueChange={(value) =>
-            table.getColumn('status')?.setFilterValue(value === 'all' ? '' : value)
+          onValueChange={value =>
+            table
+              .getColumn('status')
+              ?.setFilterValue(value === 'all' ? '' : value)
+          }
+          value={
+            (table.getColumn('status')?.getFilterValue() as string) ?? 'all'
           }
         >
           <SelectTrigger className="w-[180px]">
@@ -243,7 +245,9 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{t('table.all_status')}</SelectItem>
-            <SelectItem value="in_progress">{t('status.in_progress')}</SelectItem>
+            <SelectItem value="in_progress">
+              {t('status.in_progress')}
+            </SelectItem>
             <SelectItem value="completed">{t('status.completed')}</SelectItem>
             <SelectItem value="archived">{t('status.archived')}</SelectItem>
           </SelectContent>
@@ -253,9 +257,9 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map(header => {
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
@@ -272,21 +276,27 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map(row => (
                 <TableRow
-                  key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  key={row.id}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
               ))
             ) : (
               <TableRow>
-                <TableCell colSpan={columns.length} className="h-24 text-center">
+                <TableCell
+                  className="h-24 text-center"
+                  colSpan={columns.length}
+                >
                   {t('table.no_results')}
                 </TableCell>
               </TableRow>
@@ -297,24 +307,24 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
 
       <div className="flex items-center justify-end space-x-2">
         <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.previousPage()}
           disabled={!table.getCanPreviousPage()}
+          onClick={() => table.previousPage()}
+          size="sm"
+          variant="outline"
         >
           {t('table.previous')}
         </Button>
         <Button
-          variant="outline"
-          size="sm"
-          onClick={() => table.nextPage()}
           disabled={!table.getCanNextPage()}
+          onClick={() => table.nextPage()}
+          size="sm"
+          variant="outline"
         >
           {t('table.next')}
         </Button>
       </div>
 
-      <AlertDialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+      <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>{t('delete.title')}</AlertDialogTitle>
@@ -324,7 +334,10 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('delete.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
+            <AlertDialogAction
+              className="bg-destructive text-destructive-foreground"
+              onClick={handleDelete}
+            >
               {t('delete.confirm')}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -74,8 +74,8 @@ export function BlogPostsTable({
       header: ({ column }) => {
         return (
           <Button
-            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            variant="ghost"
           >
             Tiêu đề
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -87,8 +87,8 @@ export function BlogPostsTable({
         return (
           <div className="flex flex-col gap-1">
             <Link
-              href={`/${locale}/admin/blog/${post.id}`}
               className="font-medium hover:underline"
+              href={`/${locale}/admin/blog/${post.id}`}
             >
               {post.title}
             </Link>
@@ -126,8 +126,8 @@ export function BlogPostsTable({
       header: ({ column }) => {
         return (
           <Button
-            variant="ghost"
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
+            variant="ghost"
           >
             Ngày tạo
             <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -170,7 +170,7 @@ export function BlogPostsTable({
         return (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
+              <Button className="h-8 w-8 p-0" variant="ghost">
                 <span className="sr-only">Mở menu</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
@@ -190,8 +190,8 @@ export function BlogPostsTable({
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
-                onClick={handleDelete}
                 className="text-destructive"
+                onClick={handleDelete}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
                 Xóa
@@ -227,17 +227,21 @@ export function BlogPostsTable({
       {/* Filters */}
       <div className="flex items-center gap-2">
         <Input
-          placeholder="Tìm kiếm bài viết..."
-          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
-          onChange={(event) =>
+          className="max-w-sm"
+          onChange={event =>
             table.getColumn('title')?.setFilterValue(event.target.value)
           }
-          className="max-w-sm"
+          placeholder="Tìm kiếm bài viết..."
+          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
         />
         <Select
-          value={(table.getColumn('status')?.getFilterValue() as string) ?? 'all'}
-          onValueChange={(value) =>
-            table.getColumn('status')?.setFilterValue(value === 'all' ? '' : value)
+          onValueChange={value =>
+            table
+              .getColumn('status')
+              ?.setFilterValue(value === 'all' ? '' : value)
+          }
+          value={
+            (table.getColumn('status')?.getFilterValue() as string) ?? 'all'
           }
         >
           <SelectTrigger className="w-[180px]">
@@ -256,9 +260,9 @@ export function BlogPostsTable({
       <div className="rounded-md border">
         <Table>
           <TableHeader>
-            {table.getHeaderGroups().map((headerGroup) => (
+            {table.getHeaderGroups().map(headerGroup => (
               <TableRow key={headerGroup.id}>
-                {headerGroup.headers.map((header) => {
+                {headerGroup.headers.map(header => {
                   return (
                     <TableHead key={header.id}>
                       {header.isPlaceholder
@@ -275,12 +279,12 @@ export function BlogPostsTable({
           </TableHeader>
           <TableBody>
             {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
+              table.getRowModel().rows.map(row => (
                 <TableRow
-                  key={row.id}
                   data-state={row.getIsSelected() && 'selected'}
+                  key={row.id}
                 >
-                  {row.getVisibleCells().map((cell) => (
+                  {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id}>
                       {flexRender(
                         cell.column.columnDef.cell,
@@ -293,8 +297,8 @@ export function BlogPostsTable({
             ) : (
               <TableRow>
                 <TableCell
-                  colSpan={columns.length}
                   className="h-24 text-center"
+                  colSpan={columns.length}
                 >
                   Không có bài viết nào.
                 </TableCell>
@@ -307,22 +311,23 @@ export function BlogPostsTable({
       {/* Pagination */}
       <div className="flex items-center justify-end space-x-2">
         <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} / {table.getFilteredRowModel().rows.length} bài viết
+          {table.getFilteredSelectedRowModel().rows.length} /{' '}
+          {table.getFilteredRowModel().rows.length} bài viết
         </div>
         <div className="space-x-2">
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.previousPage()}
             disabled={!table.getCanPreviousPage()}
+            onClick={() => table.previousPage()}
+            size="sm"
+            variant="outline"
           >
             Trước
           </Button>
           <Button
-            variant="outline"
-            size="sm"
-            onClick={() => table.nextPage()}
             disabled={!table.getCanNextPage()}
+            onClick={() => table.nextPage()}
+            size="sm"
+            variant="outline"
           >
             Sau
           </Button>

@@ -1,6 +1,8 @@
 import { Skeleton } from '@/components/ui/skeleton'
 
 export function TableSkeleton() {
+  const rowKeys = ['row-1', 'row-2', 'row-3', 'row-4', 'row-5']
+
   return (
     <div className="space-y-4">
       {/* Search and filter row */}
@@ -23,8 +25,8 @@ export function TableSkeleton() {
         </div>
 
         {/* Table rows */}
-        {[...Array(5)].map((_, i) => (
-          <div key={i} className="border-b p-4 last:border-b-0">
+        {rowKeys.map(rowKey => (
+          <div className="border-b p-4 last:border-b-0" key={rowKey}>
             <div className="flex items-center gap-4">
               <div className="flex-1 space-y-2">
                 <Skeleton className="h-4 w-full max-w-[300px]" />

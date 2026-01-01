@@ -1,7 +1,7 @@
 /**
  * Media Uploader Component
  * Upload media to Cloudinary and save metadata to Supabase
- * 
+ *
  * @example
  * ```tsx
  * <MediaUploader
@@ -63,7 +63,11 @@ export function MediaUploader({
 
   const handleUpload = async (result: CloudinaryUploadWidgetResults) => {
     // Type guard: ensure we have upload success with valid info
-    if (result.event !== 'success' || !result.info || typeof result.info === 'string') {
+    if (
+      result.event !== 'success' ||
+      !result.info ||
+      typeof result.info === 'string'
+    ) {
       return
     }
 
@@ -111,7 +115,10 @@ export function MediaUploader({
 
   return (
     <CldUploadWidget
-      uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME || 'blog_uploads'}
+      onQueuesEnd={() => {
+        setIsUploading(false)
+      }}
+      onSuccess={handleUpload}
       options={{
         folder: folder,
         multiple: multiple,
@@ -122,13 +129,12 @@ export function MediaUploader({
         sources: ['local', 'url', 'camera'],
         showPoweredBy: false,
       }}
-      onSuccess={handleUpload}
-      onQueuesEnd={() => {
-        setIsUploading(false)
-      }}
+      uploadPreset={
+        process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME || 'blog_uploads'
+      }
     >
       {({ open }) => (
-        <Button onClick={() => open()} disabled={isUploading} size="default">
+        <Button disabled={isUploading} onClick={() => open()} size="default">
           {isUploading ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />

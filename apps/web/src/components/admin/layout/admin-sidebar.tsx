@@ -10,10 +10,14 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from '@/components/ui/sidebar'
-import { adminSidebarData } from './sidebar-data'
+import {
+  getAdminSidebarData,
+  type NavGroup as SidebarNavGroup,
+} from './sidebar-data'
 import { NavGroup } from './nav-group'
 import { NavUser } from './nav-user'
 import Link from 'next/link'
+import { useLocale } from 'next-intl'
 
 type AdminSidebarProps = {
   user: {
@@ -24,13 +28,16 @@ type AdminSidebarProps = {
 }
 
 export function AdminSidebar({ user }: AdminSidebarProps) {
+  const locale = useLocale()
+  const adminSidebarData = getAdminSidebarData(locale)
+
   return (
     <Sidebar collapsible="icon">
       <SidebarHeader>
         <SidebarMenu>
           <SidebarMenuItem>
-            <SidebarMenuButton size="lg" asChild>
-              <Link href="/vi/admin">
+            <SidebarMenuButton asChild size="lg">
+              <Link href={`/${locale}/admin`}>
                 <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground">
                   <span className="text-lg font-bold">B</span>
                 </div>
@@ -44,7 +51,7 @@ export function AdminSidebar({ user }: AdminSidebarProps) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        {adminSidebarData.navGroups.map((props) => (
+        {adminSidebarData.navGroups.map((props: SidebarNavGroup) => (
           <NavGroup key={props.title} {...props} />
         ))}
       </SidebarContent>

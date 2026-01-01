@@ -25,14 +25,13 @@ interface GalleryItem {
 }
 
 interface GalleryManagerProps {
-  projectId?: string
   initialGallery?: GalleryItem[]
   onGalleryChange?: (gallery: GalleryItem[]) => void
   maxImages?: number
+  projectId?: string
 }
 
 export function GalleryManager({
-  projectId,
   initialGallery = [],
   onGalleryChange,
   maxImages = 10,
@@ -47,8 +46,13 @@ export function GalleryManager({
   }, [gallery, onGalleryChange])
 
   const handleUpload = async (result: CloudinaryUploadWidgetResults) => {
-    if (result.event !== 'success' || !result.info || typeof result.info === 'string') return
-    
+    if (
+      result.event !== 'success' ||
+      !result.info ||
+      typeof result.info === 'string'
+    )
+      return
+
     setIsUploading(true)
     try {
       const info = result.info
@@ -63,7 +67,7 @@ export function GalleryManager({
         order_index: gallery.length,
       }
 
-      setGallery((prev) => [...prev, newItem])
+      setGallery(prev => [...prev, newItem])
       toast.success('Đã thêm ảnh vào gallery')
     } catch (error) {
       console.error('Error adding image to gallery:', error)
@@ -74,13 +78,13 @@ export function GalleryManager({
   }
 
   const handleCaptionChange = (index: number, caption: string) => {
-    setGallery((prev) =>
+    setGallery(prev =>
       prev.map((item, i) => (i === index ? { ...item, caption } : item))
     )
   }
 
   const handleRemove = (index: number) => {
-    setGallery((prev) => {
+    setGallery(prev => {
       const updated = prev.filter((_, i) => i !== index)
       // Reorder indices
       return updated.map((item, i) => ({ ...item, order_index: i }))
@@ -125,34 +129,34 @@ export function GalleryManager({
         <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
           {gallery.map((item, index) => (
             <Card
-              key={item.id}
-              draggable
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragEnd={handleDragEnd}
               className={cn(
                 'cursor-move transition-shadow hover:shadow-lg',
                 draggedIndex === index && 'opacity-50'
               )}
+              draggable
+              key={item.id}
+              onDragEnd={handleDragEnd}
+              onDragOver={e => handleDragOver(e, index)}
+              onDragStart={() => handleDragStart(index)}
             >
               <CardContent className="p-2">
                 {/* Image */}
                 <div className="relative aspect-video overflow-hidden rounded-md bg-muted">
                   <CldImage
-                    src={item.public_id}
                     alt={item.alt_text || `Gallery image ${index + 1}`}
-                    fill
                     className="object-cover"
+                    fill
                     sizes="(max-width: 768px) 50vw, 33vw"
+                    src={item.public_id}
                   />
-                  
+
                   {/* Remove Button */}
                   <Button
-                    type="button"
-                    variant="destructive"
-                    size="icon"
                     className="absolute right-1 top-1 h-7 w-7"
                     onClick={() => handleRemove(index)}
+                    size="icon"
+                    type="button"
+                    variant="destructive"
                   >
                     <X className="h-4 w-4" />
                   </Button>
@@ -170,11 +174,11 @@ export function GalleryManager({
 
                 {/* Caption Input */}
                 <Input
-                  type="text"
-                  placeholder="Mô tả ảnh (không bắt buộc)"
-                  value={item.caption}
-                  onChange={(e) => handleCaptionChange(index, e.target.value)}
                   className="mt-2 h-8 text-sm"
+                  onChange={e => handleCaptionChange(index, e.target.value)}
+                  placeholder="Mô tả ảnh (không bắt buộc)"
+                  type="text"
+                  value={item.caption}
                 />
               </CardContent>
             </Card>
@@ -185,7 +189,7 @@ export function GalleryManager({
       {/* Upload Button */}
       {canAddMore && (
         <CldUploadWidget
-          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME}
+          onSuccess={handleUpload}
           options={{
             folder: 'projects/gallery',
             maxFiles: 1,
@@ -193,15 +197,15 @@ export function GalleryManager({
             clientAllowedFormats: ['jpg', 'jpeg', 'png', 'gif', 'webp'],
             maxFileSize: 5 * 1024 * 1024, // 5MB
           }}
-          onSuccess={handleUpload}
+          uploadPreset={process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME}
         >
           {({ open }) => (
             <Button
+              className="w-full"
+              disabled={isUploading}
+              onClick={() => open()}
               type="button"
               variant="outline"
-              onClick={() => open()}
-              disabled={isUploading}
-              className="w-full"
             >
               {isUploading ? (
                 <>

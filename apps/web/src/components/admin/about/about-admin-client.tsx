@@ -76,8 +76,10 @@ type AboutSection = Database['public']['Tables']['about_sections']['Row']
 type TimelineEvent = Database['public']['Tables']['timeline_events']['Row']
 type Skill = Database['public']['Tables']['skills']['Row']
 
-type AboutSectionInsert = Database['public']['Tables']['about_sections']['Insert']
-type AboutSectionUpdate = Database['public']['Tables']['about_sections']['Update']
+type AboutSectionInsert =
+  Database['public']['Tables']['about_sections']['Insert']
+type AboutSectionUpdate =
+  Database['public']['Tables']['about_sections']['Update']
 
 type TimelineEventInsert =
   Database['public']['Tables']['timeline_events']['Insert']
@@ -149,10 +151,14 @@ export function AboutAdminClient({
   })
 
   const [sectionDialogOpen, setSectionDialogOpen] = useState(false)
-  const [editingSection, setEditingSection] = useState<AboutSection | null>(null)
+  const [editingSection, setEditingSection] = useState<AboutSection | null>(
+    null
+  )
 
   const [timelineDialogOpen, setTimelineDialogOpen] = useState(false)
-  const [editingTimeline, setEditingTimeline] = useState<TimelineEvent | null>(null)
+  const [editingTimeline, setEditingTimeline] = useState<TimelineEvent | null>(
+    null
+  )
 
   const [skillDialogOpen, setSkillDialogOpen] = useState(false)
   const [editingSkill, setEditingSkill] = useState<Skill | null>(null)
@@ -174,23 +180,25 @@ export function AboutAdminClient({
     try {
       if (deleteState.entityType === 'about_sections') {
         await deleteAboutSection(locale, deleteState.entityId)
-        setSections((prev) => prev.filter((s) => s.id !== deleteState.entityId))
+        setSections(prev => prev.filter(s => s.id !== deleteState.entityId))
       }
 
       if (deleteState.entityType === 'timeline_events') {
         await deleteTimelineEvent(locale, deleteState.entityId)
-        setTimeline((prev) => prev.filter((e) => e.id !== deleteState.entityId))
+        setTimeline(prev => prev.filter(e => e.id !== deleteState.entityId))
       }
 
       if (deleteState.entityType === 'skills') {
         await deleteSkill(locale, deleteState.entityId)
-        setSkills((prev) => prev.filter((s) => s.id !== deleteState.entityId))
+        setSkills(prev => prev.filter(s => s.id !== deleteState.entityId))
       }
 
       toast.success(t('messages.delete_success'))
-      setDeleteState((prev) => ({ ...prev, open: false }))
+      setDeleteState(prev => ({ ...prev, open: false }))
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('messages.delete_error'))
+      toast.error(
+        error instanceof Error ? error.message : t('messages.delete_error')
+      )
     }
   }
 
@@ -221,12 +229,14 @@ export function AboutAdminClient({
                   <TableHead>{t('sections.table.section_key')}</TableHead>
                   <TableHead>{t('sections.table.title')}</TableHead>
                   <TableHead>{t('sections.table.visible')}</TableHead>
-                  <TableHead className="w-[80px]">{t('common.actions')}</TableHead>
+                  <TableHead className="w-[80px]">
+                    {t('common.actions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {sections.length ? (
-                  sections.map((s) => (
+                  sections.map(s => (
                     <TableRow key={s.id}>
                       <TableCell>
                         <code className="rounded bg-muted px-2 py-1 text-xs">
@@ -239,10 +249,6 @@ export function AboutAdminClient({
                       </TableCell>
                       <TableCell>
                         <RowActions
-                          onEdit={() => {
-                            setEditingSection(s)
-                            setSectionDialogOpen(true)
-                          }}
                           onDelete={() =>
                             setDeleteState({
                               open: true,
@@ -251,13 +257,20 @@ export function AboutAdminClient({
                               title: s.title,
                             })
                           }
+                          onEdit={() => {
+                            setEditingSection(s)
+                            setSectionDialogOpen(true)
+                          }}
                         />
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={4} className="h-24 text-center text-muted-foreground">
+                    <TableCell
+                      className="h-24 text-center text-muted-foreground"
+                      colSpan={4}
+                    >
                       {t('common.empty')}
                     </TableCell>
                   </TableRow>
@@ -294,16 +307,20 @@ export function AboutAdminClient({
                   <TableHead>{t('timeline.table.type')}</TableHead>
                   <TableHead>{t('timeline.table.start_date')}</TableHead>
                   <TableHead>{t('timeline.table.current')}</TableHead>
-                  <TableHead className="w-[80px]">{t('common.actions')}</TableHead>
+                  <TableHead className="w-[80px]">
+                    {t('common.actions')}
+                  </TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {timeline.length ? (
-                  timeline.map((e) => (
+                  timeline.map(e => (
                     <TableRow key={e.id}>
                       <TableCell className="font-medium">{e.title}</TableCell>
                       <TableCell>
-                        {timelineEventTypeOptions.find((x) => x.value === e.event_type)?.label || e.event_type}
+                        {timelineEventTypeOptions.find(
+                          x => x.value === e.event_type
+                        )?.label || e.event_type}
                       </TableCell>
                       <TableCell>
                         <code className="text-xs">{e.start_date}</code>
@@ -313,10 +330,6 @@ export function AboutAdminClient({
                       </TableCell>
                       <TableCell>
                         <RowActions
-                          onEdit={() => {
-                            setEditingTimeline(e)
-                            setTimelineDialogOpen(true)
-                          }}
                           onDelete={() =>
                             setDeleteState({
                               open: true,
@@ -325,13 +338,20 @@ export function AboutAdminClient({
                               title: e.title,
                             })
                           }
+                          onEdit={() => {
+                            setEditingTimeline(e)
+                            setTimelineDialogOpen(true)
+                          }}
                         />
                       </TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="h-24 text-center text-muted-foreground">
+                    <TableCell
+                      className="h-24 text-center text-muted-foreground"
+                      colSpan={5}
+                    >
                       {t('common.empty')}
                     </TableCell>
                   </TableRow>
@@ -362,7 +382,7 @@ export function AboutAdminClient({
         <CardContent className="space-y-6">
           {groupedSkills.length ? (
             groupedSkills.map(([category, items]) => (
-              <div key={category} className="space-y-2">
+              <div className="space-y-2" key={category}>
                 <div className="text-sm font-semibold">{category}</div>
                 <div className="rounded-md border">
                   <Table>
@@ -370,30 +390,36 @@ export function AboutAdminClient({
                       <TableRow>
                         <TableHead>{t('skills.table.name')}</TableHead>
                         <TableHead>{t('skills.table.proficiency')}</TableHead>
-                        <TableHead className="w-[80px]">{t('common.actions')}</TableHead>
+                        <TableHead className="w-[80px]">
+                          {t('common.actions')}
+                        </TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {items.map((s) => (
+                      {items.map(s => (
                         <TableRow key={s.id}>
-                          <TableCell className="font-medium">{s.name}</TableCell>
+                          <TableCell className="font-medium">
+                            {s.name}
+                          </TableCell>
                           <TableCell>
-                            {typeof s.proficiency === 'number' ? `${s.proficiency}%` : t('common.na')}
+                            {typeof s.proficiency === 'number'
+                              ? `${s.proficiency}%`
+                              : t('common.na')}
                           </TableCell>
                           <TableCell>
                             <RowActions
+                              onDelete={() =>
+                                setDeleteState({
+                                  open: true,
+                                  entityType: 'skills',
+                                  entityId: s.id,
+                                  title: s.name,
+                                })
+                              }
                               onEdit={() => {
                                 setEditingSkill(s)
                                 setSkillDialogOpen(true)
                               }}
-                              onDelete={() =>
-                                  setDeleteState({
-                                    open: true,
-                                    entityType: 'skills',
-                                    entityId: s.id,
-                                    title: s.name,
-                                  })
-                              }
                             />
                           </TableCell>
                         </TableRow>
@@ -404,19 +430,21 @@ export function AboutAdminClient({
               </div>
             ))
           ) : (
-            <div className="text-sm text-muted-foreground">{t('common.empty')}</div>
+            <div className="text-sm text-muted-foreground">
+              {t('common.empty')}
+            </div>
           )}
         </CardContent>
       </Card>
 
       {/* Delete confirm */}
       <AlertDialog
-        open={deleteState.open}
-        onOpenChange={(open) => {
+        onOpenChange={open => {
           if (!open) {
-            setDeleteState((prev) => ({ ...prev, open: false }))
+            setDeleteState(prev => ({ ...prev, open: false }))
           }
         }}
+        open={deleteState.open}
       >
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -435,36 +463,40 @@ export function AboutAdminClient({
       </AlertDialog>
 
       <AboutSectionDialog
-        locale={locale}
-        open={sectionDialogOpen}
-        onOpenChange={setSectionDialogOpen}
         editing={editingSection}
-        onCreated={(created) => setSections((prev) => [created, ...prev])}
-        onUpdated={(updated) =>
-          setSections((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
+        locale={locale}
+        onCreated={created => setSections(prev => [created, ...prev])}
+        onOpenChange={setSectionDialogOpen}
+        onUpdated={updated =>
+          setSections(prev =>
+            prev.map(s => (s.id === updated.id ? updated : s))
+          )
         }
+        open={sectionDialogOpen}
       />
 
       <TimelineEventDialog
-        locale={locale}
-        open={timelineDialogOpen}
-        onOpenChange={setTimelineDialogOpen}
         editing={editingTimeline}
-        onCreated={(created) => setTimeline((prev) => [created, ...prev])}
-        onUpdated={(updated) =>
-          setTimeline((prev) => prev.map((e) => (e.id === updated.id ? updated : e)))
+        locale={locale}
+        onCreated={created => setTimeline(prev => [created, ...prev])}
+        onOpenChange={setTimelineDialogOpen}
+        onUpdated={updated =>
+          setTimeline(prev =>
+            prev.map(e => (e.id === updated.id ? updated : e))
+          )
         }
+        open={timelineDialogOpen}
       />
 
       <SkillDialog
-        locale={locale}
-        open={skillDialogOpen}
-        onOpenChange={setSkillDialogOpen}
         editing={editingSkill}
-        onCreated={(created) => setSkills((prev) => [created, ...prev])}
-        onUpdated={(updated) =>
-          setSkills((prev) => prev.map((s) => (s.id === updated.id ? updated : s)))
+        locale={locale}
+        onCreated={created => setSkills(prev => [created, ...prev])}
+        onOpenChange={setSkillDialogOpen}
+        onUpdated={updated =>
+          setSkills(prev => prev.map(s => (s.id === updated.id ? updated : s)))
         }
+        open={skillDialogOpen}
       />
     </div>
   )
@@ -482,7 +514,7 @@ function RowActions({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="h-8 w-8 p-0">
+        <Button className="h-8 w-8 p-0" variant="ghost">
           <span className="sr-only">{t('common.open_menu')}</span>
           <MoreHorizontal className="h-4 w-4" />
         </Button>
@@ -574,14 +606,19 @@ function AboutSectionDialog({
           visible,
           order_index: toNullableNumber(orderIndex),
         }
-        const created = (await createAboutSection(locale, payload)) as AboutSection
+        const created = (await createAboutSection(
+          locale,
+          payload
+        )) as AboutSection
         onCreated(created)
         toast.success(t('messages.create_success'))
       }
 
       onOpenChange(false)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('messages.save_error'))
+      toast.error(
+        error instanceof Error ? error.message : t('messages.save_error')
+      )
     } finally {
       setIsSaving(false)
     }
@@ -589,28 +626,34 @@ function AboutSectionDialog({
 
   return (
     <Dialog
-      open={open}
-      onOpenChange={(next) => {
+      onOpenChange={next => {
         onOpenChange(next)
         if (next) resetFromEditing()
       }}
+      open={open}
     >
       <DialogContent className="sm:max-w-[720px]">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? t('sections.dialog.edit_title') : t('sections.dialog.create_title')}
+            {isEdit
+              ? t('sections.dialog.edit_title')
+              : t('sections.dialog.create_title')}
           </DialogTitle>
-          <DialogDescription>{t('sections.dialog.description')}</DialogDescription>
+          <DialogDescription>
+            {t('sections.dialog.description')}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
           <div className="grid gap-2">
-            <Label htmlFor="section_key">{t('sections.form.section_key')}</Label>
+            <Label htmlFor="section_key">
+              {t('sections.form.section_key')}
+            </Label>
             <Input
               id="section_key"
-              value={sectionKey}
-              onChange={(e) => setSectionKey(e.target.value)}
+              onChange={e => setSectionKey(e.target.value)}
               placeholder="bio, contact, ..."
+              value={sectionKey}
             />
           </div>
 
@@ -618,38 +661,42 @@ function AboutSectionDialog({
             <Label htmlFor="title">{t('sections.form.title')}</Label>
             <Input
               id="title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               placeholder={t('sections.form.title_placeholder')}
+              value={title}
             />
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="content">{t('sections.form.content')}</Label>
             <Textarea
-              id="content"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              placeholder={t('sections.form.content_placeholder')}
               className="min-h-[160px]"
+              id="content"
+              onChange={e => setContent(e.target.value)}
+              placeholder={t('sections.form.content_placeholder')}
+              value={content}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="order_index">{t('sections.form.order_index')}</Label>
+              <Label htmlFor="order_index">
+                {t('sections.form.order_index')}
+              </Label>
               <Input
                 id="order_index"
+                onChange={e => setOrderIndex(e.target.value)}
+                placeholder="0"
                 type="number"
                 value={orderIndex}
-                onChange={(e) => setOrderIndex(e.target.value)}
-                placeholder="0"
               />
             </div>
 
             <div className="flex items-center justify-between rounded-md border p-3">
               <div className="grid gap-0.5">
-                <div className="text-sm font-medium">{t('sections.form.visible')}</div>
+                <div className="text-sm font-medium">
+                  {t('sections.form.visible')}
+                </div>
                 <div className="text-xs text-muted-foreground">
                   {t('sections.form.visible_hint')}
                 </div>
@@ -660,10 +707,10 @@ function AboutSectionDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button onClick={() => onOpenChange(false)} variant="outline">
             {t('actions.cancel')}
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button disabled={isSaving} onClick={handleSave}>
             {isSaving ? t('actions.saving') : t('actions.save')}
           </Button>
         </DialogFooter>
@@ -752,14 +799,19 @@ function TimelineEventDialog({
           is_current: isCurrent,
           order_index: toNullableNumber(orderIndex),
         }
-        const created = (await createTimelineEvent(locale, payload)) as TimelineEvent
+        const created = (await createTimelineEvent(
+          locale,
+          payload
+        )) as TimelineEvent
         onCreated(created)
         toast.success(t('messages.create_success'))
       }
 
       onOpenChange(false)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('messages.save_error'))
+      toast.error(
+        error instanceof Error ? error.message : t('messages.save_error')
+      )
     } finally {
       setIsSaving(false)
     }
@@ -767,18 +819,22 @@ function TimelineEventDialog({
 
   return (
     <Dialog
-      open={open}
-      onOpenChange={(next) => {
+      onOpenChange={next => {
         onOpenChange(next)
         if (next) resetFromEditing()
       }}
+      open={open}
     >
       <DialogContent className="sm:max-w-[720px]">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? t('timeline.dialog.edit_title') : t('timeline.dialog.create_title')}
+            {isEdit
+              ? t('timeline.dialog.edit_title')
+              : t('timeline.dialog.create_title')}
           </DialogTitle>
-          <DialogDescription>{t('timeline.dialog.description')}</DialogDescription>
+          <DialogDescription>
+            {t('timeline.dialog.description')}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -786,42 +842,46 @@ function TimelineEventDialog({
             <Label htmlFor="timeline_title">{t('timeline.form.title')}</Label>
             <Input
               id="timeline_title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
+              onChange={e => setTitle(e.target.value)}
               placeholder={t('timeline.form.title_placeholder')}
+              value={title}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="timeline_subtitle">{t('timeline.form.subtitle')}</Label>
+            <Label htmlFor="timeline_subtitle">
+              {t('timeline.form.subtitle')}
+            </Label>
             <Input
               id="timeline_subtitle"
-              value={subtitle}
-              onChange={(e) => setSubtitle(e.target.value)}
+              onChange={e => setSubtitle(e.target.value)}
               placeholder={t('timeline.form.subtitle_placeholder')}
+              value={subtitle}
             />
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="timeline_description">{t('timeline.form.description')}</Label>
+            <Label htmlFor="timeline_description">
+              {t('timeline.form.description')}
+            </Label>
             <Textarea
-              id="timeline_description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder={t('timeline.form.description_placeholder')}
               className="min-h-[120px]"
+              id="timeline_description"
+              onChange={e => setDescription(e.target.value)}
+              placeholder={t('timeline.form.description_placeholder')}
+              value={description}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
               <Label>{t('timeline.form.event_type')}</Label>
-              <Select value={eventType} onValueChange={setEventType}>
+              <Select onValueChange={setEventType} value={eventType}>
                 <SelectTrigger>
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {timelineEventTypeOptions.map((opt) => (
+                  {timelineEventTypeOptions.map(opt => (
                     <SelectItem key={opt.value} value={opt.value}>
                       {opt.label}
                     </SelectItem>
@@ -831,52 +891,60 @@ function TimelineEventDialog({
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="timeline_order">{t('timeline.form.order_index')}</Label>
+              <Label htmlFor="timeline_order">
+                {t('timeline.form.order_index')}
+              </Label>
               <Input
                 id="timeline_order"
+                onChange={e => setOrderIndex(e.target.value)}
+                placeholder="0"
                 type="number"
                 value={orderIndex}
-                onChange={(e) => setOrderIndex(e.target.value)}
-                placeholder="0"
               />
             </div>
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="timeline_start">{t('timeline.form.start_date')}</Label>
+              <Label htmlFor="timeline_start">
+                {t('timeline.form.start_date')}
+              </Label>
               <Input
                 id="timeline_start"
+                onChange={e => setStartDate(e.currentTarget.value)}
+                onInput={e => setStartDate(e.currentTarget.value)}
                 type="date"
                 value={startDate}
-                onChange={(e) => setStartDate(e.currentTarget.value)}
-                onInput={(e) => setStartDate(e.currentTarget.value)}
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="timeline_end">{t('timeline.form.end_date')}</Label>
+              <Label htmlFor="timeline_end">
+                {t('timeline.form.end_date')}
+              </Label>
               <Input
+                disabled={isCurrent}
                 id="timeline_end"
+                onChange={e => setEndDate(e.currentTarget.value)}
+                onInput={e => setEndDate(e.currentTarget.value)}
                 type="date"
                 value={endDate}
-                onChange={(e) => setEndDate(e.currentTarget.value)}
-                onInput={(e) => setEndDate(e.currentTarget.value)}
-                disabled={isCurrent}
               />
             </div>
           </div>
 
           <div className="flex items-center justify-between rounded-md border p-3">
             <div className="grid gap-0.5">
-              <div className="text-sm font-medium">{t('timeline.form.is_current')}</div>
+              <div className="text-sm font-medium">
+                {t('timeline.form.is_current')}
+              </div>
               <div className="text-xs text-muted-foreground">
                 {t('timeline.form.is_current_hint')}
               </div>
             </div>
             <Switch
               checked={isCurrent}
-              onCheckedChange={(checked) => {
+              onCheckedChange={checked => {
                 setIsCurrent(checked)
                 if (checked) setEndDate('')
               }}
@@ -885,10 +953,10 @@ function TimelineEventDialog({
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button onClick={() => onOpenChange(false)} variant="outline">
             {t('actions.cancel')}
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button disabled={isSaving} onClick={handleSave}>
             {isSaving ? t('actions.saving') : t('actions.save')}
           </Button>
         </DialogFooter>
@@ -932,7 +1000,9 @@ function SkillDialog({
     setName(editing?.name ?? '')
     setCategory(editing?.category ?? '')
     setProficiency(
-      typeof editing?.proficiency === 'number' ? String(editing.proficiency) : ''
+      typeof editing?.proficiency === 'number'
+        ? String(editing.proficiency)
+        : ''
     )
     setOrderIndex(editing?.order_index?.toString() ?? '')
     setIcon(editing?.icon ?? '')
@@ -964,7 +1034,11 @@ function SkillDialog({
           icon: toNullableString(icon),
           color: toNullableString(color),
         }
-        const updated = (await updateSkill(locale, editing.id, payload)) as Skill
+        const updated = (await updateSkill(
+          locale,
+          editing.id,
+          payload
+        )) as Skill
         onUpdated(updated)
         toast.success(t('messages.update_success'))
       } else {
@@ -983,7 +1057,9 @@ function SkillDialog({
 
       onOpenChange(false)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('messages.save_error'))
+      toast.error(
+        error instanceof Error ? error.message : t('messages.save_error')
+      )
     } finally {
       setIsSaving(false)
     }
@@ -991,18 +1067,22 @@ function SkillDialog({
 
   return (
     <Dialog
-      open={open}
-      onOpenChange={(next) => {
+      onOpenChange={next => {
         onOpenChange(next)
         if (next) resetFromEditing()
       }}
+      open={open}
     >
       <DialogContent className="sm:max-w-[640px]">
         <DialogHeader>
           <DialogTitle>
-            {isEdit ? t('skills.dialog.edit_title') : t('skills.dialog.create_title')}
+            {isEdit
+              ? t('skills.dialog.edit_title')
+              : t('skills.dialog.create_title')}
           </DialogTitle>
-          <DialogDescription>{t('skills.dialog.description')}</DialogDescription>
+          <DialogDescription>
+            {t('skills.dialog.description')}
+          </DialogDescription>
         </DialogHeader>
 
         <div className="grid gap-4">
@@ -1010,9 +1090,9 @@ function SkillDialog({
             <Label htmlFor="skill_name">{t('skills.form.name')}</Label>
             <Input
               id="skill_name"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              onChange={e => setName(e.target.value)}
               placeholder={t('skills.form.name_placeholder')}
+              value={name}
             />
           </div>
 
@@ -1020,34 +1100,38 @@ function SkillDialog({
             <Label htmlFor="skill_category">{t('skills.form.category')}</Label>
             <Input
               id="skill_category"
-              value={category}
-              onChange={(e) => setCategory(e.target.value)}
+              onChange={e => setCategory(e.target.value)}
               placeholder={t('skills.form.category_placeholder')}
+              value={category}
             />
           </div>
 
           <div className="grid grid-cols-2 gap-4">
             <div className="grid gap-2">
-              <Label htmlFor="skill_proficiency">{t('skills.form.proficiency')}</Label>
+              <Label htmlFor="skill_proficiency">
+                {t('skills.form.proficiency')}
+              </Label>
               <Input
                 id="skill_proficiency"
-                type="number"
-                min={0}
                 max={100}
-                value={proficiency}
-                onChange={(e) => setProficiency(e.target.value)}
+                min={0}
+                onChange={e => setProficiency(e.target.value)}
                 placeholder="0-100"
+                type="number"
+                value={proficiency}
               />
             </div>
 
             <div className="grid gap-2">
-              <Label htmlFor="skill_order">{t('skills.form.order_index')}</Label>
+              <Label htmlFor="skill_order">
+                {t('skills.form.order_index')}
+              </Label>
               <Input
                 id="skill_order"
+                onChange={e => setOrderIndex(e.target.value)}
+                placeholder="0"
                 type="number"
                 value={orderIndex}
-                onChange={(e) => setOrderIndex(e.target.value)}
-                placeholder="0"
               />
             </div>
           </div>
@@ -1057,9 +1141,9 @@ function SkillDialog({
               <Label htmlFor="skill_icon">{t('skills.form.icon')}</Label>
               <Input
                 id="skill_icon"
-                value={icon}
-                onChange={(e) => setIcon(e.target.value)}
+                onChange={e => setIcon(e.target.value)}
                 placeholder={t('skills.form.icon_placeholder')}
+                value={icon}
               />
             </div>
 
@@ -1067,19 +1151,19 @@ function SkillDialog({
               <Label htmlFor="skill_color">{t('skills.form.color')}</Label>
               <Input
                 id="skill_color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
+                onChange={e => setColor(e.target.value)}
                 placeholder={t('skills.form.color_placeholder')}
+                value={color}
               />
             </div>
           </div>
         </div>
 
         <DialogFooter>
-          <Button variant="outline" onClick={() => onOpenChange(false)}>
+          <Button onClick={() => onOpenChange(false)} variant="outline">
             {t('actions.cancel')}
           </Button>
-          <Button onClick={handleSave} disabled={isSaving}>
+          <Button disabled={isSaving} onClick={handleSave}>
             {isSaving ? t('actions.saving') : t('actions.save')}
           </Button>
         </DialogFooter>

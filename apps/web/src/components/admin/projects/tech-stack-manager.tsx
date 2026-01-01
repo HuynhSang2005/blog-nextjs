@@ -29,9 +29,9 @@ interface TechItem {
 }
 
 interface TechStackManagerProps {
-  projectId?: string
   initialTechStack?: TechItem[]
   onTechStackChange?: (techStack: TechItem[]) => void
+  projectId?: string
 }
 
 const CATEGORIES = [
@@ -44,12 +44,14 @@ const CATEGORIES = [
 ] as const
 
 export function TechStackManager({
-  projectId,
   initialTechStack = [],
   onTechStackChange,
 }: TechStackManagerProps) {
   const [techStack, setTechStack] = useState<TechItem[]>(initialTechStack)
-  const [newTech, setNewTech] = useState<{ name: string; category: TechItem['category'] }>({
+  const [newTech, setNewTech] = useState<{
+    name: string
+    category: TechItem['category']
+  }>({
     name: '',
     category: 'frontend',
   })
@@ -73,7 +75,7 @@ export function TechStackManager({
       order_index: techStack.length,
     }
 
-    setTechStack((prev) => [...prev, newItem])
+    setTechStack(prev => [...prev, newItem])
     setNewTech({ name: '', category: 'frontend' })
     toast.success(`Đã thêm ${newItem.name}`)
   }
@@ -81,7 +83,7 @@ export function TechStackManager({
   const handleRemove = (index: number) => {
     const removedName = techStack[index]?.name
     if (!removedName) return
-    setTechStack((prev) => {
+    setTechStack(prev => {
       const updated = prev.filter((_, i) => i !== index)
       // Reorder indices
       return updated.map((item, i) => ({ ...item, order_index: i }))
@@ -141,35 +143,38 @@ export function TechStackManager({
         <CardContent className="p-4">
           <div className="flex gap-2">
             <Input
-              placeholder="Tên công nghệ (vd: Next.js, React)"
-              value={newTech.name}
-              onChange={(e) => setNewTech({ ...newTech, name: e.target.value })}
-              onKeyDown={(e) => {
+              className="flex-1"
+              onChange={e => setNewTech({ ...newTech, name: e.target.value })}
+              onKeyDown={e => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
                   handleAdd()
                 }
               }}
-              className="flex-1"
+              placeholder="Tên công nghệ (vd: Next.js, React)"
+              value={newTech.name}
             />
             <Select
-              value={newTech.category}
-              onValueChange={(value) =>
-                setNewTech({ ...newTech, category: value as TechItem['category'] })
+              onValueChange={value =>
+                setNewTech({
+                  ...newTech,
+                  category: value as TechItem['category'],
+                })
               }
+              value={newTech.category}
             >
               <SelectTrigger className="w-[150px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {CATEGORIES.map((cat) => (
+                {CATEGORIES.map(cat => (
                   <SelectItem key={cat.value} value={cat.value}>
                     {cat.label}
                   </SelectItem>
                 ))}
               </SelectContent>
             </Select>
-            <Button type="button" onClick={handleAdd}>
+            <Button onClick={handleAdd} type="button">
               <Plus className="h-4 w-4" />
             </Button>
           </div>
@@ -181,15 +186,15 @@ export function TechStackManager({
         <div className="grid gap-2">
           {techStack.map((item, index) => (
             <Card
-              key={item.id}
-              draggable
-              onDragStart={() => handleDragStart(index)}
-              onDragOver={(e) => handleDragOver(e, index)}
-              onDragEnd={handleDragEnd}
               className={cn(
                 'cursor-move transition-shadow hover:shadow-md',
                 draggedIndex === index && 'opacity-50'
               )}
+              draggable
+              key={item.id}
+              onDragEnd={handleDragEnd}
+              onDragOver={e => handleDragOver(e, index)}
+              onDragStart={() => handleDragStart(index)}
             >
               <CardContent className="flex items-center gap-3 p-3">
                 {/* Drag Handle */}
@@ -210,16 +215,16 @@ export function TechStackManager({
                     getCategoryColor(item.category)
                   )}
                 >
-                  {CATEGORIES.find((c) => c.value === item.category)?.label}
+                  {CATEGORIES.find(c => c.value === item.category)?.label}
                 </div>
 
                 {/* Remove Button */}
                 <Button
-                  type="button"
-                  variant="ghost"
-                  size="icon"
                   className="h-8 w-8"
                   onClick={() => handleRemove(index)}
+                  size="icon"
+                  type="button"
+                  variant="ghost"
                 >
                   <X className="h-4 w-4" />
                 </Button>

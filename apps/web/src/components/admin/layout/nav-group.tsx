@@ -28,9 +28,9 @@ export function NavGroup({ title, items }: NavGroupType) {
     <SidebarGroup>
       <SidebarGroupLabel>{title}</SidebarGroupLabel>
       <SidebarMenu>
-        {items.map((item) =>
+        {items.map(item =>
           item.items ? (
-            <Collapsible key={item.title} asChild defaultOpen={false}>
+            <Collapsible asChild defaultOpen={false} key={item.title}>
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title}>
@@ -41,9 +41,12 @@ export function NavGroup({ title, items }: NavGroupType) {
                 </CollapsibleTrigger>
                 <CollapsibleContent>
                   <SidebarMenuSub>
-                    {item.items.map((subItem) => (
+                    {item.items.map(subItem => (
                       <SidebarMenuSubItem key={subItem.title}>
-                        <SidebarMenuSubButton asChild isActive={pathname === subItem.url}>
+                        <SidebarMenuSubButton
+                          asChild
+                          isActive={pathname === subItem.url}
+                        >
                           <Link href={subItem.url}>
                             <span>{subItem.title}</span>
                           </Link>
@@ -56,12 +59,16 @@ export function NavGroup({ title, items }: NavGroupType) {
             </Collapsible>
           ) : (
             <SidebarMenuItem key={item.title}>
-              <SidebarMenuButton asChild tooltip={item.title} isActive={pathname === item.url}>
+              <SidebarMenuButton
+                asChild
+                isActive={pathname === item.url}
+                tooltip={item.title}
+              >
                 <Link href={item.url}>
                   {item.icon && <item.icon />}
                   <span>{item.title}</span>
                   {item.badge && (
-                    <Badge variant="outline" className="ml-auto">
+                    <Badge className="ml-auto" variant="outline">
                       {item.badge}
                     </Badge>
                   )}

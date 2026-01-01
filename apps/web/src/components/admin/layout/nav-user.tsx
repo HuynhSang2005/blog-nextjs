@@ -52,15 +52,15 @@ export function NavUser({ user }: NavUserProps) {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <SidebarMenuButton
-              size="lg"
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
+              size="lg"
             >
               <Avatar className="h-8 w-8 rounded-lg">
-                <AvatarImage src={user.avatar} alt={user.name} />
+                <AvatarImage alt={user.name} src={user.avatar} />
                 <AvatarFallback className="rounded-lg">
                   {user.name
                     .split(' ')
-                    .map((n) => n[0])
+                    .map(n => n[0])
                     .join('')
                     .toUpperCase()}
                 </AvatarFallback>
@@ -73,19 +73,19 @@ export function NavUser({ user }: NavUserProps) {
             </SidebarMenuButton>
           </DropdownMenuTrigger>
           <DropdownMenuContent
+            align="end"
             className="w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg"
             side={isMobile ? 'bottom' : 'right'}
-            align="end"
             sideOffset={4}
           >
             <DropdownMenuLabel className="p-0 font-normal">
               <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
                 <Avatar className="h-8 w-8 rounded-lg">
-                  <AvatarImage src={user.avatar} alt={user.name} />
+                  <AvatarImage alt={user.name} src={user.avatar} />
                   <AvatarFallback className="rounded-lg">
                     {user.name
                       .split(' ')
-                      .map((n) => n[0])
+                      .map(n => n[0])
                       .join('')
                       .toUpperCase()}
                   </AvatarFallback>
@@ -97,7 +97,9 @@ export function NavUser({ user }: NavUserProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem onClick={() => router.push(`/${locale}/admin/settings`)}>
+            <DropdownMenuItem
+              onClick={() => router.push(`/${locale}/admin/settings`)}
+            >
               <Settings className="mr-2 h-4 w-4" />
               Cài đặt
             </DropdownMenuItem>

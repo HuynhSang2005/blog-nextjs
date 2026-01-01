@@ -3,7 +3,13 @@
 import { useCallback, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Filter, Search } from 'lucide-react'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import {
   Select,
@@ -62,18 +68,18 @@ export function MediaPageClient({
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
               <Input
-                placeholder="Tìm kiếm theo tên file..."
                 className="pl-9"
                 defaultValue={initialSearch}
-                onChange={(e) => {
+                onChange={e => {
                   updateQueryParam('search', e.target.value || null)
                 }}
+                placeholder="Tìm kiếm theo tên file..."
               />
             </div>
 
             <Select
               defaultValue={initialType}
-              onValueChange={(value) => {
+              onValueChange={value => {
                 updateQueryParam('type', value === 'all' ? null : value)
               }}
             >

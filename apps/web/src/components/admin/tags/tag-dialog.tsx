@@ -86,7 +86,7 @@ export function TagDialog({
         if (data.slug) updateData.slug = data.slug
         if (data.color) updateData.color = data.color
         if (data.description) updateData.description = data.description
-        
+
         result = await updateTag(tag.id, updateData)
         toast.success('Đã cập nhật thẻ thành công')
       } else {
@@ -128,10 +128,12 @@ export function TagDialog({
   }
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog onOpenChange={onOpenChange} open={open}>
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
-          <DialogTitle>{isEditing ? 'Chỉnh sửa thẻ' : 'Tạo thẻ mới'}</DialogTitle>
+          <DialogTitle>
+            {isEditing ? 'Chỉnh sửa thẻ' : 'Tạo thẻ mới'}
+          </DialogTitle>
           <DialogDescription>
             {isEditing
               ? 'Cập nhật thông tin của thẻ'
@@ -140,7 +142,7 @@ export function TagDialog({
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
               control={form.control}
               name="name"
@@ -151,7 +153,7 @@ export function TagDialog({
                     <Input
                       placeholder="Next.js"
                       {...field}
-                      onChange={(e) => {
+                      onChange={e => {
                         field.onChange(e)
                         handleNameChange(e.target.value)
                       }}
@@ -192,8 +194,8 @@ export function TagDialog({
                   <div className="flex gap-2">
                     <FormControl>
                       <Input
-                        type="color"
                         className="h-10 w-20"
+                        type="color"
                         {...field}
                         value={field.value || '#3b82f6'}
                       />
@@ -222,8 +224,8 @@ export function TagDialog({
                   <FormLabel>Mô tả</FormLabel>
                   <FormControl>
                     <Textarea
-                      placeholder="Mô tả về thẻ này..."
                       className="resize-none"
+                      placeholder="Mô tả về thẻ này..."
                       rows={3}
                       {...field}
                       value={field.value || ''}
@@ -236,13 +238,13 @@ export function TagDialog({
 
             <DialogFooter>
               <Button
+                onClick={() => onOpenChange(false)}
                 type="button"
                 variant="outline"
-                onClick={() => onOpenChange(false)}
               >
                 Hủy
               </Button>
-              <Button type="submit" disabled={form.formState.isSubmitting}>
+              <Button disabled={form.formState.isSubmitting} type="submit">
                 {form.formState.isSubmitting
                   ? 'Đang xử lý...'
                   : isEditing

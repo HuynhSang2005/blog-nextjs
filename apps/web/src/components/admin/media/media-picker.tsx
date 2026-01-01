@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CldImage } from 'next-cloudinary'
 import { X, ImageIcon } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -39,12 +39,27 @@ export function MediaPicker({
   const [loading, setLoading] = useState(false)
   const [selectedMedia, setSelectedMedia] = useState<MediaItem | null>(null)
 
+  const loadMedia = useCallback(async () => {
+    setLoading(true)
+    try {
+      const result = await getAllMedia()
+
+      // Filter chỉ images
+      const images = result.filter(m => m.resource_type === 'image')
+      setMedia(images)
+    } catch (error) {
+      console.error('Failed to load media:', error)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
   // Load media when dialog opens
   useEffect(() => {
     if (open) {
       loadMedia()
     }
-  }, [open])
+  }, [open, loadMedia])
 
   // Load selected media details
   useEffect(() => {
@@ -56,7 +71,7 @@ export function MediaPicker({
         return
       }
 
-      const foundInCache = media.find((m) => m.id === selectedMediaId)
+      const foundInCache = media.find(m => m.id === selectedMediaId)
       if (foundInCache) {
         setSelectedMedia(foundInCache)
         return
@@ -80,21 +95,6 @@ export function MediaPicker({
       cancelled = true
     }
   }, [selectedMediaId, media])
-
-  const loadMedia = async () => {
-    setLoading(true)
-    try {
-      const result = await getAllMedia()
-
-      // Filter chỉ images
-      const images = result.filter((m) => m.resource_type === 'image')
-      setMedia(images)
-    } catch (error) {
-      console.error('Failed to load media:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
 
   const handleSelect = (item: MediaItem) => {
     setSelectedMedia(item)
@@ -125,14 +125,14 @@ export function MediaPicker({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <label className="text-sm font-medium">{label}</label>
+        <p className="text-sm font-medium">{label}</p>
         {selectedMedia && (
           <Button
+            className="h-auto p-1 text-muted-foreground hover:text-destructive"
+            onClick={handleClear}
+            size="sm"
             type="button"
             variant="ghost"
-            size="sm"
-            onClick={handleClear}
-            className="h-auto p-1 text-muted-foreground hover:text-destructive"
           >
             <X className="h-4 w-4" />
             <span className="sr-only">Xóa ảnh</span>
@@ -144,7 +144,7 @@ export function MediaPicker({
         <p className="text-sm text-muted-foreground">{description}</p>
       )}
 
-      <Dialog open={open} onOpenChange={setOpen}>
+      <Dialog onOpenChange={setOpen} open={open}>
         <DialogTrigger asChild>
           <Card
             className={cn(
@@ -156,11 +156,11 @@ export function MediaPicker({
             <div className={cn('w-full', getAspectClass())}>
               {selectedMedia ? (
                 <CldImage
-                  src={selectedMedia.public_id}
-                  alt={selectedMedia.alt_text || 'Selected media'}
-                  fill
+                  alt={selectedMedia.alt_text || 'Ảnh đã chọn'}
                   className="object-cover"
+                  fill
                   sizes="(max-width: 768px) 100vw, 600px"
+                  src={selectedMedia.public_id}
                 />
               ) : (
                 <div className="flex flex-col items-center justify-center h-full text-muted-foreground">
@@ -174,7 +174,7 @@ export function MediaPicker({
 
         <DialogContent className="max-w-4xl max-h-[80vh] overflow-y-auto">
           <DialogHeader>
-            <DialogTitle>Chọn ảnh từ Media Library</DialogTitle>
+            <DialogTitle>Chọn ảnh từ thư viện media</DialogTitle>
             <DialogDescription>
               Chọn một ảnh từ thư viện media của bạn
             </DialogDescription>
@@ -194,29 +194,27 @@ export function MediaPicker({
             </div>
           ) : (
             <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-              {media.map((item) => (
+              {media.map(item => (
                 <Card
-                  key={item.id}
                   className={cn(
                     'relative cursor-pointer overflow-hidden transition-all',
                     'hover:ring-2 hover:ring-primary',
                     selectedMedia?.id === item.id && 'ring-2 ring-primary'
                   )}
+                  key={item.id}
                   onClick={() => handleSelect(item)}
                 >
                   <div className="relative aspect-video bg-muted">
                     <CldImage
-                      src={item.public_id}
-                      alt={item.alt_text || 'Media'}
-                      fill
+                      alt={item.alt_text || 'Ảnh'}
                       className="object-cover"
+                      fill
                       sizes="(max-width: 768px) 50vw, 33vw"
+                      src={item.public_id}
                     />
                   </div>
                   {item.alt_text && (
-                    <div className="p-2 text-xs truncate">
-                      {item.alt_text}
-                    </div>
+                    <div className="p-2 text-xs truncate">{item.alt_text}</div>
                   )}
                 </Card>
               ))}
