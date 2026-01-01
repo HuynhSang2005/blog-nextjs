@@ -1,0 +1,18 @@
+# Normalize line endings across platforms (Windows/macOS/Linux)
+# Force LF to align with Biome formatter config (lineEnding = "lf")
+* text=auto eol=lf
+
+# Treat common binary formats as binary (no EOL normalization)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.webp binary
+*.ico binary
+*.pdf binary
+*.zip binary
+*.7z binary
+*.woff binary
+*.woff2 binary
+*.ttf binary
+*.otf binary

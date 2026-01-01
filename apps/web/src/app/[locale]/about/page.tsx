@@ -48,10 +48,14 @@ export default async function AboutPage({ params }: AboutPageProps) {
   const data = await getAboutData(locale)
 
   // Get bio section
-  const bioSection = data.sections.find((s) => s.section_key === 'bio')
+  const bioSection = data.sections.find(s => s.section_key === 'bio')
 
   // If no data at all, show not found
-  if (!data.sections?.length && !data.timeline?.length && !data.skills?.length) {
+  if (
+    !data.sections?.length &&
+    !data.timeline?.length &&
+    !data.skills?.length
+  ) {
     notFound()
   }
 
@@ -67,6 +71,7 @@ export default async function AboutPage({ params }: AboutPageProps) {
       {bioSection && data.profile && (
         <BioSection
           content={bioSection.content}
+          locale={locale}
           profile={data.profile}
         />
       )}
