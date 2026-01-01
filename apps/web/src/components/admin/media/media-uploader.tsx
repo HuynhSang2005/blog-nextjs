@@ -17,6 +17,7 @@
 'use client'
 
 import { useState } from 'react'
+import { useRouter } from 'next/navigation'
 import { CldUploadWidget } from 'next-cloudinary'
 import type { CloudinaryUploadWidgetResults } from 'next-cloudinary'
 import { Upload, Loader2 } from 'lucide-react'
@@ -58,6 +59,7 @@ export function MediaUploader({
   ],
 }: MediaUploaderProps) {
   const [isUploading, setIsUploading] = useState(false)
+  const router = useRouter()
 
   const handleUpload = async (result: CloudinaryUploadWidgetResults) => {
     // Type guard: ensure we have upload success with valid info
@@ -91,7 +93,11 @@ export function MediaUploader({
 
       if (response.success) {
         toast.success('Upload thành công!')
-        onUploadSuccess?.()
+        if (onUploadSuccess) {
+          onUploadSuccess()
+        } else {
+          router.refresh()
+        }
       } else {
         toast.error(response.error || 'Không thể lưu thông tin media')
       }

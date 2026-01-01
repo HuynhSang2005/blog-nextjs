@@ -25,7 +25,7 @@ import { toast } from 'sonner'
 import { deleteMedia, updateMedia } from '@/app/actions/media'
 import { cn } from '@/lib/utils'
 
-interface MediaItem {
+export interface MediaItem {
   id: string
   public_id: string
   resource_type: 'image' | 'video' | 'raw'

@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/dialog'
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
-import { getAllMedia } from '@/app/actions/media'
+import { getAllMedia, getMediaById } from '@/app/actions/media'
 import type { Tables } from '@/lib/supabase/database.types'
 
 type MediaItem = Tables<'media'>
@@ -48,13 +48,36 @@ export function MediaPicker({
 
   // Load selected media details
   useEffect(() => {
-    if (selectedMediaId && media.length > 0) {
-      const found = media.find((m) => m.id === selectedMediaId)
-      if (found) {
-        setSelectedMedia(found)
+    let cancelled = false
+
+    const hydrateSelectedMedia = async () => {
+      if (!selectedMediaId) {
+        setSelectedMedia(null)
+        return
       }
-    } else {
-      setSelectedMedia(null)
+
+      const foundInCache = media.find((m) => m.id === selectedMediaId)
+      if (foundInCache) {
+        setSelectedMedia(foundInCache)
+        return
+      }
+
+      // If the dialog hasn't been opened yet, we won't have `media` loaded.
+      // Fetch just the selected item so the preview persists on reload/edit pages.
+      const result = await getMediaById(selectedMediaId)
+      if (cancelled) return
+
+      if (result && result.resource_type === 'image') {
+        setSelectedMedia(result)
+      } else {
+        setSelectedMedia(null)
+      }
+    }
+
+    void hydrateSelectedMedia()
+
+    return () => {
+      cancelled = true
     }
   }, [selectedMediaId, media])
 

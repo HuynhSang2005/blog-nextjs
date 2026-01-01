@@ -287,3 +287,32 @@ export async function getAllMedia() {
     return []
   }
 }
+
+/**
+ * Get a single media item by id
+ * Lấy một media theo id (for MediaPicker preview)
+ */
+export async function getMediaById(id: string) {
+  try {
+    const supabase = await createClient()
+
+    const { data, error } = await supabase
+      .from('media')
+      .select('*')
+      .eq('id', id)
+      .single()
+
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null
+      }
+      console.error('Error fetching media by id:', error)
+      return null
+    }
+
+    return data
+  } catch (error) {
+    console.error('Error in getMediaById:', error)
+    return null
+  }
+}
