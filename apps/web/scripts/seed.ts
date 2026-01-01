@@ -29,12 +29,33 @@ const supabase = createClient<Database>(supabaseUrl, supabaseServiceRoleKey, {
 /**
  * Helper function để check xem record đã tồn tại chưa
  */
-async function recordExists(
-  table: string,
-  column: string,
-  value: string,
+type PublicTableName = keyof Database['public']['Tables']
+
+type StringColumnKeys<TRow> = {
+  [K in keyof TRow]-?: TRow[K] extends string | null ? K : never
+}[keyof TRow]
+
+async function recordExists<
+  TTable extends PublicTableName,
+  TColumn extends StringColumnKeys<
+    Database['public']['Tables'][TTable]['Row']
+  > &
+    string,
+>(
+  table: TTable,
+  column: TColumn,
+  value: Database['public']['Tables'][TTable]['Row'][TColumn]
 ): Promise<boolean> {
-  const { data, error } = await supabase.from(table as any).select('id').eq(column, value).single()
+  const query = supabase.from(table).select('id') as unknown as {
+    eq: (
+      columnName: string,
+      filterValue: string
+    ) => {
+      single: () => Promise<{ data: { id: string } | null; error: unknown }>
+    }
+  }
+
+  const { data, error } = await query.eq(column, String(value ?? '')).single()
 
   return !error && !!data
 }
@@ -85,7 +106,9 @@ async function seedBlogTags() {
     }
   }
 
-  console.log(`\n✨ Blog tags seeding complete: ${inserted} inserted, ${skipped} skipped`)
+  console.log(
+    `\n✨ Blog tags seeding complete: ${inserted} inserted, ${skipped} skipped`
+  )
 }
 
 /**
@@ -160,14 +183,19 @@ async function seedDocsTopics() {
     const { error } = await supabase.from('docs_topics').insert(topic)
 
     if (error) {
-      console.error(`   ❌ Failed to insert topic "${topic.name}":`, error.message)
+      console.error(
+        `   ❌ Failed to insert topic "${topic.name}":`,
+        error.message
+      )
     } else {
       console.log(`   ✅ Inserted topic: ${topic.name}`)
       inserted++
     }
   }
 
-  console.log(`\n✨ Docs topics seeding complete: ${inserted} inserted, ${skipped} skipped`)
+  console.log(
+    `\n✨ Docs topics seeding complete: ${inserted} inserted, ${skipped} skipped`
+  )
 }
 
 interface MdxFrontmatter {
@@ -175,7 +203,10 @@ interface MdxFrontmatter {
   description?: string
 }
 
-function parseMdxFrontmatter(raw: string): { frontmatter: MdxFrontmatter; body: string } {
+function parseMdxFrontmatter(raw: string): {
+  frontmatter: MdxFrontmatter
+  body: string
+} {
   const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/)
   if (!match) {
     return { frontmatter: {}, body: raw }
@@ -284,7 +315,11 @@ async function seedDocsFromMdx() {
     const { frontmatter, body } = parseMdxFrontmatter(raw)
 
     const slug = mdxFileToSlug(filePath, docsDir)
-    const title = frontmatter.title || inferTitleFromBody(body) || slug.split('/').pop() || slug
+    const title =
+      frontmatter.title ||
+      inferTitleFromBody(body) ||
+      slug.split('/').pop() ||
+      slug
 
     rows.push({
       topic_id: topicId,
@@ -312,16 +347,16 @@ async function seedDocsFromMdx() {
     row.order_index = i
   })
 
-  const hasIndex = rows.some((r) => r.slug === 'index')
+  const hasIndex = rows.some(r => r.slug === 'index')
   if (!hasIndex) {
-    console.warn('   ⚠️  Không có file index.mdx; `/vi/docs` sẽ fallback sang doc đầu tiên.')
+    console.warn(
+      '   ⚠️  Không có file index.mdx; `/vi/docs` sẽ fallback sang doc đầu tiên.'
+    )
   }
 
-  const { error } = await supabase
-    .from('docs')
-    .upsert(rows, {
-      onConflict: 'topic_id,slug,locale',
-    })
+  const { error } = await supabase.from('docs').upsert(rows, {
+    onConflict: 'topic_id,slug,locale',
+  })
 
   if (error) {
     console.error('   ❌ Failed to upsert docs:', error.message)
@@ -341,17 +376,42 @@ async function seedSkills() {
     // Frontend
     { name: 'Next.js', category: 'frontend', proficiency: 90, order_index: 1 },
     { name: 'React', category: 'frontend', proficiency: 95, order_index: 2 },
-    { name: 'TypeScript', category: 'frontend', proficiency: 85, order_index: 3 },
-    { name: 'Tailwind CSS', category: 'frontend', proficiency: 90, order_index: 4 },
+    {
+      name: 'TypeScript',
+      category: 'frontend',
+      proficiency: 85,
+      order_index: 3,
+    },
+    {
+      name: 'Tailwind CSS',
+      category: 'frontend',
+      proficiency: 90,
+      order_index: 4,
+    },
     { name: 'HTML/CSS', category: 'frontend', proficiency: 95, order_index: 5 },
-    { name: 'JavaScript', category: 'frontend', proficiency: 90, order_index: 6 },
+    {
+      name: 'JavaScript',
+      category: 'frontend',
+      proficiency: 90,
+      order_index: 6,
+    },
 
     // Backend
     { name: 'Node.js', category: 'backend', proficiency: 85, order_index: 7 },
-    { name: 'Express.js', category: 'backend', proficiency: 80, order_index: 8 },
+    {
+      name: 'Express.js',
+      category: 'backend',
+      proficiency: 80,
+      order_index: 8,
+    },
     { name: 'Supabase', category: 'backend', proficiency: 85, order_index: 9 },
     { name: 'REST API', category: 'backend', proficiency: 90, order_index: 10 },
-    { name: 'PostgreSQL', category: 'backend', proficiency: 80, order_index: 11 },
+    {
+      name: 'PostgreSQL',
+      category: 'backend',
+      proficiency: 80,
+      order_index: 11,
+    },
     { name: 'MongoDB', category: 'backend', proficiency: 75, order_index: 12 },
     { name: 'SQL', category: 'backend', proficiency: 85, order_index: 13 },
 
@@ -359,7 +419,12 @@ async function seedSkills() {
     { name: 'Git', category: 'tools', proficiency: 90, order_index: 14 },
     { name: 'Docker', category: 'tools', proficiency: 70, order_index: 15 },
     { name: 'Vercel', category: 'tools', proficiency: 85, order_index: 16 },
-    { name: 'GitHub Actions', category: 'tools', proficiency: 75, order_index: 17 },
+    {
+      name: 'GitHub Actions',
+      category: 'tools',
+      proficiency: 75,
+      order_index: 17,
+    },
     { name: 'VS Code', category: 'tools', proficiency: 95, order_index: 18 },
     { name: 'Figma', category: 'tools', proficiency: 70, order_index: 19 },
     { name: 'Postman', category: 'tools', proficiency: 85, order_index: 20 },
@@ -385,14 +450,19 @@ async function seedSkills() {
     const { error } = await supabase.from('skills').insert(skill)
 
     if (error) {
-      console.error(`   ❌ Failed to insert skill "${skill.name}":`, error.message)
+      console.error(
+        `   ❌ Failed to insert skill "${skill.name}":`,
+        error.message
+      )
     } else {
       console.log(`   ✅ Inserted skill: ${skill.name} (${skill.proficiency}%)`)
       inserted++
     }
   }
 
-  console.log(`\n✨ Skills seeding complete: ${inserted} inserted, ${skipped} skipped`)
+  console.log(
+    `\n✨ Skills seeding complete: ${inserted} inserted, ${skipped} skipped`
+  )
 }
 
 /**
@@ -465,7 +535,11 @@ Luôn sẵn sàng kết nối và trao đổi về web development!`,
   let skipped = 0
 
   for (const section of sections) {
-    const exists = await recordExists('about_sections', 'section_key', section.section_key)
+    const exists = await recordExists(
+      'about_sections',
+      'section_key',
+      section.section_key
+    )
 
     if (exists) {
       console.log(`   ⏭️  About section "${section.title}" already exists`)
@@ -476,14 +550,19 @@ Luôn sẵn sàng kết nối và trao đổi về web development!`,
     const { error } = await supabase.from('about_sections').insert(section)
 
     if (error) {
-      console.error(`   ❌ Failed to insert section "${section.title}":`, error.message)
+      console.error(
+        `   ❌ Failed to insert section "${section.title}":`,
+        error.message
+      )
     } else {
       console.log(`   ✅ Inserted about section: ${section.title}`)
       inserted++
     }
   }
 
-  console.log(`\n✨ About sections seeding complete: ${inserted} inserted, ${skipped} skipped`)
+  console.log(
+    `\n✨ About sections seeding complete: ${inserted} inserted, ${skipped} skipped`
+  )
 }
 
 /**
@@ -495,7 +574,7 @@ async function main() {
 
   try {
     // Test connection
-    const { data, error } = await supabase.from('profiles').select('count').single()
+    const { error } = await supabase.from('profiles').select('count').single()
     if (error && error.code !== 'PGRST116') {
       throw new Error(`Failed to connect to Supabase: ${error.message}`)
     }
