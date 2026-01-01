@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getTags } from '@/app/actions/tags'
 import { TagsClient } from './tags-client'
 

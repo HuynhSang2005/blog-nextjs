@@ -10,7 +10,9 @@ interface NewBlogPostPageProps {
   params: Promise<{ locale: string }>
 }
 
-export default async function NewBlogPostPage({ params }: NewBlogPostPageProps) {
+export default async function NewBlogPostPage({
+  params,
+}: NewBlogPostPageProps) {
   const { locale } = await params
   const t = await getTranslations('admin.blog')
   const tags = await getTags()
@@ -19,7 +21,7 @@ export default async function NewBlogPostPage({ params }: NewBlogPostPageProps) 
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+        <Button asChild size="icon" variant="ghost">
           <Link href={`/${locale}/admin/blog`}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
@@ -28,14 +30,12 @@ export default async function NewBlogPostPage({ params }: NewBlogPostPageProps) 
           <h1 className="text-3xl font-bold tracking-tight">
             {t('actions.create')}
           </h1>
-          <p className="text-muted-foreground">
-            Tạo bài viết blog mới
-          </p>
+          <p className="text-muted-foreground">Tạo bài viết blog mới</p>
         </div>
       </div>
 
       {/* Form */}
-      <BlogPostForm tags={tags} mode="create" />
+      <BlogPostForm mode="create" tags={tags} />
     </div>
   )
 }

@@ -3,7 +3,13 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { ProjectsTable } from '@/components/admin/projects/projects-table'
 import { TableSkeleton } from '@/components/admin/table-skeleton'
 import { getProjects } from '@/lib/queries/projects'
@@ -11,7 +17,7 @@ import { getTranslations } from 'next-intl/server'
 
 async function ProjectsTableWrapper({ locale }: { locale: string }) {
   const projects = await getProjects(locale)
-  
+
   return <ProjectsTable projects={projects} />
 }
 
@@ -22,7 +28,7 @@ interface ProjectsPageProps {
 export default async function ProjectsPage({ params }: ProjectsPageProps) {
   const { locale } = await params
   const t = await getTranslations('admin.projects')
-  
+
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">

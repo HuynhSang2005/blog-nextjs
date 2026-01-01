@@ -55,10 +55,10 @@ export default async function AdminAboutPage({ params }: AdminAboutPageProps) {
       </div>
 
       <AboutAdminClient
-        locale={locale}
         initialSections={sections}
-        initialTimeline={timeline}
         initialSkills={skills}
+        initialTimeline={timeline}
+        locale={locale}
       />
     </div>
   )

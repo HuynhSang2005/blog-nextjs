@@ -26,12 +26,18 @@ export function TagsClient({ initialTags }: TagsClientProps) {
   }
 
   const handleUpdateSuccess = (updatedTag: Tag) => {
-    setTags(tags.map((tag) => (tag.id === updatedTag.id ? { ...updatedTag, usageCount: tag.usageCount } : tag)))
+    setTags(
+      tags.map(tag =>
+        tag.id === updatedTag.id
+          ? { ...updatedTag, usageCount: tag.usageCount }
+          : tag
+      )
+    )
     setEditingTag(null)
   }
 
   const handleDeleteSuccess = (deletedId: string) => {
-    setTags(tags.filter((tag) => tag.id !== deletedId))
+    setTags(tags.filter(tag => tag.id !== deletedId))
   }
 
   return (
@@ -47,25 +53,25 @@ export function TagsClient({ initialTags }: TagsClientProps) {
       </div>
 
       <TagsTable
-        tags={tags}
-        onEdit={(tag) => setEditingTag(tag)}
         onDeleteSuccess={handleDeleteSuccess}
+        onEdit={tag => setEditingTag(tag)}
+        tags={tags}
       />
 
       {/* Create Dialog */}
       <TagDialog
-        open={isCreateDialogOpen}
         onOpenChange={setIsCreateDialogOpen}
         onSuccess={handleCreateSuccess}
+        open={isCreateDialogOpen}
       />
 
       {/* Edit Dialog */}
       {editingTag && (
         <TagDialog
-          open={!!editingTag}
-          onOpenChange={(open) => !open && setEditingTag(null)}
-          tag={editingTag}
+          onOpenChange={open => !open && setEditingTag(null)}
           onSuccess={handleUpdateSuccess}
+          open={!!editingTag}
+          tag={editingTag}
         />
       )}
     </>

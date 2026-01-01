@@ -4,7 +4,7 @@
  */
 
 import { getTranslations } from 'next-intl/server'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getMedia, getMediaStats } from '@/lib/queries/media'
 import { MediaUploader } from '@/components/admin/media/media-uploader'
 import { MediaPageClient } from '@/components/admin/media/media-page-client'
@@ -18,7 +18,7 @@ interface MediaPageProps {
 }
 
 export default async function MediaPage({ searchParams }: MediaPageProps) {
-  const t = await getTranslations('admin.media')
+  const _t = await getTranslations('admin.media')
   const params = await searchParams
 
   const search = params.search || ''
@@ -92,10 +92,10 @@ export default async function MediaPage({ searchParams }: MediaPageProps) {
 
       {/* Filters */}
       <MediaPageClient
-        media={media}
-        total={total}
         initialSearch={search}
         initialType={resourceType}
+        media={media}
+        total={total}
       />
     </div>
   )

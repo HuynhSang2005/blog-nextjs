@@ -1,4 +1,4 @@
-import { Metadata } from 'next'
+import type { Metadata } from 'next'
 import { SettingsClient } from './settings-client'
 import { siteConfig } from '@/config/site'
 import { blogConfig } from '@/config/blog'
@@ -18,7 +18,7 @@ export default function SettingsPage() {
         </p>
       </div>
 
-      <SettingsClient siteConfig={siteConfig} blogConfig={blogConfig} />
+      <SettingsClient blogConfig={blogConfig} siteConfig={siteConfig} />
     </div>
   )
 }

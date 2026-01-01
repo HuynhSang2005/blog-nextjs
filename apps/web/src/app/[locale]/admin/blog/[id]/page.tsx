@@ -12,14 +12,13 @@ interface EditBlogPostPageProps {
   params: Promise<{ locale: string; id: string }>
 }
 
-export default async function EditBlogPostPage({ params }: EditBlogPostPageProps) {
+export default async function EditBlogPostPage({
+  params,
+}: EditBlogPostPageProps) {
   const { locale, id } = await params
   const t = await getTranslations('admin.blog')
 
-  const [post, tags] = await Promise.all([
-    getBlogPostById(id),
-    getTags(),
-  ])
+  const [post, tags] = await Promise.all([getBlogPostById(id), getTags()])
 
   if (!post) {
     notFound()
@@ -29,7 +28,7 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
     <div className="flex flex-col gap-6">
       {/* Header */}
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
+        <Button asChild size="icon" variant="ghost">
           <Link href={`/${locale}/admin/blog`}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
@@ -38,14 +37,12 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
           <h1 className="text-3xl font-bold tracking-tight">
             {t('actions.edit')}
           </h1>
-          <p className="text-muted-foreground">
-            {post.title}
-          </p>
+          <p className="text-muted-foreground">{post.title}</p>
         </div>
       </div>
 
       {/* Form */}
-      <BlogPostForm post={post} tags={tags} mode="edit" />
+      <BlogPostForm mode="edit" post={post} tags={tags} />
     </div>
   )
 }

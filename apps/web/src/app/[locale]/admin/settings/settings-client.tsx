@@ -1,6 +1,12 @@
 'use client'
 
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Separator } from '@/components/ui/separator'
 import { Copy, ExternalLink } from 'lucide-react'
@@ -14,7 +20,10 @@ interface SettingsClientProps {
   blogConfig: BlogConfig
 }
 
-export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) {
+export function SettingsClient({
+  siteConfig,
+  blogConfig,
+}: SettingsClientProps) {
   const copyToClipboard = (text: string, label: string) => {
     navigator.clipboard.writeText(text)
     toast.success(`Đã sao chép ${label}`)
@@ -27,20 +36,25 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
         <CardHeader>
           <CardTitle>Thông tin trang web</CardTitle>
           <CardDescription>
-            Cấu hình cơ bản của trang web (được quản lý trong <code className="text-xs">config/site.ts</code>)
+            Cấu hình cơ bản của trang web (được quản lý trong{' '}
+            <code className="text-xs">config/site.ts</code>)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium">Tên trang web</label>
+              <p className="text-sm font-medium">Tên trang web</p>
               <div className="mt-1 flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">{siteConfig.name}</p>
+                <p className="text-sm text-muted-foreground">
+                  {siteConfig.name}
+                </p>
                 <Button
-                  variant="ghost"
-                  size="icon"
                   className="h-8 w-8"
-                  onClick={() => copyToClipboard(siteConfig.name, 'tên trang web')}
+                  onClick={() =>
+                    copyToClipboard(siteConfig.name, 'tên trang web')
+                  }
+                  size="icon"
+                  variant="ghost"
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -48,14 +62,16 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
             </div>
 
             <div>
-              <label className="text-sm font-medium">URL</label>
+              <p className="text-sm font-medium">URL</p>
               <div className="mt-1 flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">{siteConfig.url}</p>
+                <p className="text-sm text-muted-foreground">
+                  {siteConfig.url}
+                </p>
                 <Button
-                  variant="ghost"
-                  size="icon"
                   className="h-8 w-8"
                   onClick={() => copyToClipboard(siteConfig.url || '', 'URL')}
+                  size="icon"
+                  variant="ghost"
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -63,14 +79,18 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
             </div>
 
             <div className="sm:col-span-2">
-              <label className="text-sm font-medium">Mô tả</label>
-              <p className="mt-1 text-sm text-muted-foreground">{siteConfig.description.vi}</p>
+              <p className="text-sm font-medium">Mô tả</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {siteConfig.description.vi}
+              </p>
             </div>
 
             <div>
-              <label className="text-sm font-medium">Phiên bản</label>
+              <p className="text-sm font-medium">Phiên bản</p>
               <div className="mt-1">
-                <Badge variant="secondary">{siteConfig.app.latestVersion}</Badge>
+                <Badge variant="secondary">
+                  {siteConfig.app.latestVersion}
+                </Badge>
               </div>
             </div>
           </div>
@@ -86,19 +106,23 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium">Tên tác giả</label>
-              <p className="mt-1 text-sm text-muted-foreground">{siteConfig.author.name}</p>
+              <p className="text-sm font-medium">Tên tác giả</p>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {siteConfig.author.name}
+              </p>
             </div>
 
             <div>
-              <label className="text-sm font-medium">Website</label>
+              <p className="text-sm font-medium">Trang web</p>
               <div className="mt-1 flex items-center gap-2">
-                <p className="text-sm text-muted-foreground">{siteConfig.author.site}</p>
+                <p className="text-sm text-muted-foreground">
+                  {siteConfig.author.site}
+                </p>
                 <a
-                  href={siteConfig.author.site}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="text-primary hover:underline"
+                  href={siteConfig.author.site}
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <ExternalLink className="h-4 w-4" />
                 </a>
@@ -112,29 +136,31 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
       <Card>
         <CardHeader>
           <CardTitle>Liên kết mạng xã hội</CardTitle>
-          <CardDescription>Các liên kết mạng xã hội của trang web</CardDescription>
+          <CardDescription>
+            Các liên kết mạng xã hội của trang web
+          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-3">
           {Object.entries(siteConfig.links).map(([key, link]) => (
-            <div key={key} className="flex items-center justify-between">
+            <div className="flex items-center justify-between" key={key}>
               <div>
                 <p className="text-sm font-medium">{link.label}</p>
                 <p className="text-sm text-muted-foreground">{link.url}</p>
               </div>
               <div className="flex gap-2">
                 <Button
-                  variant="ghost"
-                  size="icon"
                   className="h-8 w-8"
                   onClick={() => copyToClipboard(link.url, link.label)}
+                  size="icon"
+                  variant="ghost"
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
                 <a
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
                   className="inline-flex h-8 w-8 items-center justify-center rounded-md hover:bg-accent hover:text-accent-foreground"
+                  href={link.url}
+                  rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <ExternalLink className="h-4 w-4" />
                 </a>
@@ -149,25 +175,33 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
         <CardHeader>
           <CardTitle>Cấu hình Blog</CardTitle>
           <CardDescription>
-            Các tùy chọn cơ bản cho blog (được quản lý trong <code className="text-xs">config/blog.ts</code>)
+            Các tùy chọn cơ bản cho blog (được quản lý trong{' '}
+            <code className="text-xs">config/blog.ts</code>)
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div>
-            <label className="text-sm font-medium">Số lượng tác giả</label>
-            <p className="mt-1 text-sm text-muted-foreground">{blogConfig.authors.length} tác giả</p>
+            <p className="text-sm font-medium">Số lượng tác giả</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {blogConfig.authors.length} tác giả
+            </p>
           </div>
 
           <Separator />
 
           <div>
-            <label className="text-sm font-medium">RSS Feeds</label>
+            <p className="text-sm font-medium">RSS Feeds</p>
             <div className="mt-2 space-y-2">
-              {blogConfig.rss.map((feed, index) => (
-                <div key={index} className="flex items-center justify-between rounded-lg border p-3">
+              {blogConfig.rss.map(feed => (
+                <div
+                  className="flex items-center justify-between rounded-lg border p-3"
+                  key={feed.file}
+                >
                   <div>
                     <p className="text-sm font-medium">{feed.file}</p>
-                    <p className="text-xs text-muted-foreground">{feed.type} - {feed.contentType}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {feed.type} - {feed.contentType}
+                    </p>
                   </div>
                   <Badge variant="secondary">{feed.type}</Badge>
                 </div>
@@ -186,14 +220,18 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <div>
-              <label className="text-sm font-medium">Open Graph Image</label>
+              <p className="text-sm font-medium">Open Graph Image</p>
               <div className="mt-1 flex items-center gap-2">
-                <p className="truncate text-sm text-muted-foreground">{siteConfig.og.image}</p>
+                <p className="truncate text-sm text-muted-foreground">
+                  {siteConfig.og.image}
+                </p>
                 <Button
-                  variant="ghost"
-                  size="icon"
                   className="h-8 w-8 flex-shrink-0"
-                  onClick={() => copyToClipboard(siteConfig.og.image, 'OG image URL')}
+                  onClick={() =>
+                    copyToClipboard(siteConfig.og.image, 'OG image URL')
+                  }
+                  size="icon"
+                  variant="ghost"
                 >
                   <Copy className="h-4 w-4" />
                 </Button>
@@ -201,7 +239,7 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
             </div>
 
             <div>
-              <label className="text-sm font-medium">Kích thước OG Image</label>
+              <p className="text-sm font-medium">Kích thước OG Image</p>
               <p className="mt-1 text-sm text-muted-foreground">
                 {siteConfig.og.size.width} × {siteConfig.og.size.height}px
               </p>
@@ -217,7 +255,8 @@ export function SettingsClient({ siteConfig, blogConfig }: SettingsClientProps) 
         </CardHeader>
         <CardContent className="space-y-2 text-sm text-muted-foreground">
           <p>
-            Để thay đổi các cài đặt này, hãy chỉnh sửa các file cấu hình sau trong code:
+            Để thay đổi các cài đặt này, hãy chỉnh sửa các file cấu hình sau
+            trong code:
           </p>
           <ul className="list-disc space-y-1 pl-5">
             <li>

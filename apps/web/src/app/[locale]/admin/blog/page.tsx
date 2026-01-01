@@ -4,7 +4,13 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { TableSkeleton } from '@/components/admin/table-skeleton'
 import { BlogPostsTable } from '@/components/admin/blog/posts-table'
 import { getBlogPosts } from '@/lib/queries/blog'
