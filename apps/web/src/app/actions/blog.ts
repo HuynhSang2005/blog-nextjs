@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/database.types'
+import { locales } from '@/config/i18n'
 
 type BlogPostInsert = Database['public']['Tables']['blog_posts']['Insert']
 type BlogPostUpdate = Database['public']['Tables']['blog_posts']['Update']
@@ -42,8 +43,10 @@ export async function createBlogPost(data: BlogPostInsert) {
     throw new Error('Không thể tạo bài viết')
   }
 
-  revalidatePath('/admin/blog')
-  revalidatePath('/blog')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/blog`)
+    revalidatePath(`/${locale}/blog`)
+  }
 
   return post
 }
@@ -72,10 +75,12 @@ export async function updateBlogPost(id: string, data: BlogPostUpdate) {
     throw new Error('Không thể cập nhật bài viết')
   }
 
-  revalidatePath('/admin/blog')
-  revalidatePath(`/admin/blog/${id}`)
-  revalidatePath('/blog')
-  revalidatePath(`/blog/${post.slug}`)
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/blog`)
+    revalidatePath(`/${locale}/admin/blog/${id}`)
+    revalidatePath(`/${locale}/blog`)
+  }
+  revalidatePath(`/${post.locale}/blog/${post.slug}`)
 
   return post
 }
@@ -106,8 +111,10 @@ export async function deleteBlogPost(id: string) {
     throw new Error('Không thể xóa bài viết')
   }
 
-  revalidatePath('/admin/blog')
-  revalidatePath('/blog')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/blog`)
+    revalidatePath(`/${locale}/blog`)
+  }
 
   return { success: true }
 }
@@ -144,8 +151,10 @@ export async function updateBlogPostTags(postId: string, tagIds: string[]) {
     }
   }
 
-  revalidatePath('/admin/blog')
-  revalidatePath(`/admin/blog/${postId}`)
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/blog`)
+    revalidatePath(`/${locale}/admin/blog/${postId}`)
+  }
 
   return { success: true }
 }
@@ -174,9 +183,11 @@ export async function publishBlogPost(id: string) {
     throw new Error('Không thể xuất bản bài viết')
   }
 
-  revalidatePath('/admin/blog')
-  revalidatePath(`/admin/blog/${id}`)
-  revalidatePath('/blog')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/blog`)
+    revalidatePath(`/${locale}/admin/blog/${id}`)
+    revalidatePath(`/${locale}/blog`)
+  }
 
   return post
 }
@@ -204,9 +215,11 @@ export async function unpublishBlogPost(id: string) {
     throw new Error('Không thể hủy xuất bản bài viết')
   }
 
-  revalidatePath('/admin/blog')
-  revalidatePath(`/admin/blog/${id}`)
-  revalidatePath('/blog')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/blog`)
+    revalidatePath(`/${locale}/admin/blog/${id}`)
+    revalidatePath(`/${locale}/blog`)
+  }
 
   return post
 }

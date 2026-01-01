@@ -1,34 +1,40 @@
 import { redirect } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { getTranslations } from 'next-intl/server'
+
 import { AdminSidebar } from '@/components/admin/layout/admin-sidebar'
-import { Separator } from '@/components/ui/separator'
 import {
   Breadcrumb,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator,
 } from '@/components/ui/breadcrumb'
+import { Separator } from '@/components/ui/separator'
+import { SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar'
+import { createClient } from '@/lib/supabase/server'
 
 export default async function AdminLayout({
   children,
+  params,
 }: {
   children: React.ReactNode
+  params: Promise<{ locale: string }>
 }) {
+  const { locale } = await params
+  const t = await getTranslations('auth')
+
   const supabase = await createClient()
 
-  // Check authentication
   const {
     data: { user },
   } = await supabase.auth.getUser()
 
+  const adminHomePath = `/${locale}/admin`
+
   if (!user) {
-    redirect('/vi/login')
+    redirect(`/${locale}/login?redirectTo=${encodeURIComponent(adminHomePath)}`)
   }
 
-  // Check if user is admin
   const { data: profile } = await supabase
     .from('profiles')
     .select('role, full_name, email')
@@ -36,14 +42,14 @@ export default async function AdminLayout({
     .single()
 
   if (!profile || profile.role !== 'admin') {
-    redirect('/vi')
+    redirect(`/${locale}`)
   }
 
   return (
     <SidebarProvider>
       <AdminSidebar
         user={{
-          name: profile.full_name || 'Admin',
+          name: profile.full_name || 'Quản trị',
           email: profile.email,
           avatar: undefined,
         }}
@@ -55,17 +61,13 @@ export default async function AdminLayout({
           <Breadcrumb>
             <BreadcrumbList>
               <BreadcrumbItem className="hidden md:block">
-                <BreadcrumbLink href="/vi/admin">
-                  Dashboard
-                </BreadcrumbLink>
+                <BreadcrumbLink href={adminHomePath}>{t('admin_panel')}</BreadcrumbLink>
               </BreadcrumbItem>
               <BreadcrumbSeparator className="hidden md:block" />
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">
-          {children}
-        </div>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
       </main>
     </SidebarProvider>
   )

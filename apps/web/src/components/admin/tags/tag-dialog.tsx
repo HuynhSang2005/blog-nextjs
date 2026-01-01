@@ -107,17 +107,23 @@ export function TagDialog({
     }
   }
 
+  const slugify = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/đ/g, 'd')
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '')
+
   // Auto-generate slug from name
   const handleNameChange = (name: string) => {
-    if (!isEditing && !form.getValues('slug')) {
-      const slug = name
-        .toLowerCase()
-        .normalize('NFD')
-        .replace(/[\u0300-\u036f]/g, '')
-        .replace(/đ/g, 'd')
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-+|-+$/g, '')
-      form.setValue('slug', slug)
+    if (isEditing) return
+
+    // Keep auto-updating until the user manually edits the slug.
+    // (Otherwise it would get stuck at the first typed character.)
+    if (!form.formState.dirtyFields.slug) {
+      form.setValue('slug', slugify(name), { shouldDirty: false })
     }
   }
 

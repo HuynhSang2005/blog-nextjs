@@ -6,7 +6,12 @@ import { Button } from '@/components/ui/button'
 import { getTags } from '@/lib/queries/tags'
 import { BlogPostForm } from '@/components/admin/blog/post-form'
 
-export default async function NewBlogPostPage() {
+interface NewBlogPostPageProps {
+  params: Promise<{ locale: string }>
+}
+
+export default async function NewBlogPostPage({ params }: NewBlogPostPageProps) {
+  const { locale } = await params
   const t = await getTranslations('admin.blog')
   const tags = await getTags()
 
@@ -15,7 +20,7 @@ export default async function NewBlogPostPage() {
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/blog">
+          <Link href={`/${locale}/admin/blog`}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>

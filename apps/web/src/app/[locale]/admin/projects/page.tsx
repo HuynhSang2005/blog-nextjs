@@ -7,16 +7,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { ProjectsTable } from '@/components/admin/projects/projects-table'
 import { TableSkeleton } from '@/components/admin/table-skeleton'
 import { getProjects } from '@/lib/queries/projects'
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 
-async function ProjectsTableWrapper() {
-  const projects = await getProjects('vi')
+async function ProjectsTableWrapper({ locale }: { locale: string }) {
+  const projects = await getProjects(locale)
   
   return <ProjectsTable projects={projects} />
 }
 
-export default async function ProjectsPage() {
-  const t = await useTranslations('admin.projects')
+interface ProjectsPageProps {
+  params: Promise<{ locale: string }>
+}
+
+export default async function ProjectsPage({ params }: ProjectsPageProps) {
+  const { locale } = await params
+  const t = await getTranslations('admin.projects')
   
   return (
     <div className="space-y-6">
@@ -26,7 +31,7 @@ export default async function ProjectsPage() {
           <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <Button asChild>
-          <Link href="/admin/projects/new">
+          <Link href={`/${locale}/admin/projects/new`}>
             <Plus className="mr-2 h-4 w-4" />
             {t('actions.create')}
           </Link>
@@ -40,7 +45,7 @@ export default async function ProjectsPage() {
         </CardHeader>
         <CardContent>
           <Suspense fallback={<TableSkeleton />}>
-            <ProjectsTableWrapper />
+            <ProjectsTableWrapper locale={locale} />
           </Suspense>
         </CardContent>
       </Card>

@@ -9,11 +9,11 @@ import { getTags } from '@/lib/queries/tags'
 import { BlogPostForm } from '@/components/admin/blog/post-form'
 
 interface EditBlogPostPageProps {
-  params: Promise<{ id: string }>
+  params: Promise<{ locale: string; id: string }>
 }
 
 export default async function EditBlogPostPage({ params }: EditBlogPostPageProps) {
-  const { id } = await params
+  const { locale, id } = await params
   const t = await getTranslations('admin.blog')
 
   const [post, tags] = await Promise.all([
@@ -30,7 +30,7 @@ export default async function EditBlogPostPage({ params }: EditBlogPostPageProps
       {/* Header */}
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/blog">
+          <Link href={`/${locale}/admin/blog`}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>

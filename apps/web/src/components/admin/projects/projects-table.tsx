@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
+import { useLocale, useTranslations } from 'next-intl'
 import {
   flexRender,
   getCoreRowModel,
@@ -55,7 +56,6 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { useTranslations } from 'next-intl'
 import { deleteProject } from '@/app/actions/projects'
 import { toast } from 'sonner'
 
@@ -72,6 +72,7 @@ interface ProjectsTableProps {
 
 export function ProjectsTable({ projects }: ProjectsTableProps) {
   const router = useRouter()
+  const locale = useLocale()
   const t = useTranslations('admin.projects')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -168,7 +169,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
               <DropdownMenuLabel>{t('table.actions')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/admin/projects/${project.id}`}>
+                <Link href={`/${locale}/admin/projects/${project.id}`}>
                   <Pencil className="mr-2 h-4 w-4" />
                   {t('actions.edit')}
                 </Link>

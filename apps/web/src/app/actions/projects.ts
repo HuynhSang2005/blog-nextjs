@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/database.types'
+import { locales } from '@/config/i18n'
 
 type Project = Database['public']['Tables']['projects']['Row']
 type ProjectInsert = Database['public']['Tables']['projects']['Insert']
@@ -32,15 +33,21 @@ export async function createProject(data: Omit<ProjectInsert, 'id' | 'created_at
   if (profile?.role !== 'admin') {
     throw new Error('Unauthorized: Admin access required')
   }
+
+  const normalizedData: Omit<ProjectInsert, 'id' | 'created_at' | 'updated_at'> = {
+    ...data,
+    start_date: data.start_date === '' ? null : data.start_date,
+    end_date: data.end_date === '' ? null : data.end_date,
+  }
   
   // Create project
   const { data: project, error } = await supabase
     .from('projects')
     .insert({
-      ...data,
-      locale: data.locale || 'vi',
-      status: data.status || 'completed',
-      featured: data.featured || false,
+      ...normalizedData,
+      locale: normalizedData.locale || 'vi',
+      status: normalizedData.status || 'completed',
+      featured: normalizedData.featured || false,
     })
     .select()
     .single()
@@ -50,8 +57,10 @@ export async function createProject(data: Omit<ProjectInsert, 'id' | 'created_at
     throw new Error('Failed to create project')
   }
   
-  revalidatePath('/admin/projects')
-  revalidatePath('/projects')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/projects`)
+    revalidatePath(`/${locale}/projects`)
+  }
   
   return project
 }
@@ -79,12 +88,18 @@ export async function updateProject(id: string, data: ProjectUpdate) {
   if (profile?.role !== 'admin') {
     throw new Error('Unauthorized: Admin access required')
   }
+
+  const normalizedData: ProjectUpdate = {
+    ...data,
+    start_date: data.start_date === '' ? null : data.start_date,
+    end_date: data.end_date === '' ? null : data.end_date,
+  }
   
   // Update project
   const { data: project, error } = await supabase
     .from('projects')
     .update({
-      ...data,
+      ...normalizedData,
       updated_at: new Date().toISOString(),
     })
     .eq('id', id)
@@ -96,9 +111,11 @@ export async function updateProject(id: string, data: ProjectUpdate) {
     throw new Error('Failed to update project')
   }
   
-  revalidatePath('/admin/projects')
-  revalidatePath(`/projects/${project.slug}`)
-  revalidatePath('/projects')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/projects`)
+    revalidatePath(`/${locale}/projects`)
+  }
+  revalidatePath(`/${project.locale}/projects/${project.slug}`)
   
   return project
 }
@@ -156,8 +173,10 @@ export async function deleteProject(id: string) {
     throw new Error('Failed to delete project')
   }
   
-  revalidatePath('/admin/projects')
-  revalidatePath('/projects')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/projects`)
+    revalidatePath(`/${locale}/projects`)
+  }
 }
 
 /**
@@ -196,7 +215,9 @@ export async function updateProjectTags(projectId: string, tagIds: string[]) {
     }
   }
   
-  revalidatePath('/admin/projects')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/projects`)
+  }
 }
 
 /**
@@ -246,7 +267,9 @@ export async function updateProjectTechStack(
     }
   }
   
-  revalidatePath('/admin/projects')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/projects`)
+  }
 }
 
 /**
@@ -275,7 +298,9 @@ export async function addProjectMedia(
     throw new Error('Failed to add project media')
   }
   
-  revalidatePath('/admin/projects')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/projects`)
+  }
 }
 
 /**
@@ -295,5 +320,7 @@ export async function removeProjectMedia(projectMediaId: string) {
     throw new Error('Failed to remove project media')
   }
   
-  revalidatePath('/admin/projects')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/projects`)
+  }
 }

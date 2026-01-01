@@ -55,7 +55,13 @@ const statusConfig = {
   archived: { label: 'Đã lưu trữ', variant: 'outline' as const },
 }
 
-export function BlogPostsTable({ data }: { data: BlogPost[] }) {
+export function BlogPostsTable({
+  data,
+  locale,
+}: {
+  data: BlogPost[]
+  locale: string
+}) {
   const router = useRouter()
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
@@ -81,7 +87,7 @@ export function BlogPostsTable({ data }: { data: BlogPost[] }) {
         return (
           <div className="flex flex-col gap-1">
             <Link
-              href={`/admin/blog/${post.id}`}
+              href={`/${locale}/admin/blog/${post.id}`}
               className="font-medium hover:underline"
             >
               {post.title}
@@ -178,7 +184,7 @@ export function BlogPostsTable({ data }: { data: BlogPost[] }) {
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
-                <Link href={`/admin/blog/${post.id}`}>
+                <Link href={`/${locale}/admin/blog/${post.id}`}>
                   <Pencil className="mr-2 h-4 w-4" />
                   Chỉnh sửa
                 </Link>

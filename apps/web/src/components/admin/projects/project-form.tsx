@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Loader2 } from 'lucide-react'
+import { Check, ChevronsUpDown, Loader2 } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -19,6 +19,19 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from '@/components/ui/command'
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -27,16 +40,50 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { projectSchema, type ProjectFormData } from '@/lib/validations/project'
-import { createProject, updateProject } from '@/app/actions/projects'
+import {
+  createProject,
+  updateProject,
+  updateProjectTags,
+} from '@/app/actions/projects'
 import { toast } from 'sonner'
-import { useTranslations } from 'next-intl'
+import { useLocale, useTranslations } from 'next-intl'
 import { MediaPicker } from '@/components/admin/media/media-picker'
 import { GalleryManager } from '@/components/admin/projects/gallery-manager'
 import { TechStackManager } from '@/components/admin/projects/tech-stack-manager'
+import { cn } from '@/lib/utils'
+import type { Database } from '@/lib/supabase/database.types'
 
 interface ProjectFormProps {
-  project?: any
+  project?: ProjectWithAdminRelations
   mode: 'create' | 'edit'
+  tags: Tag[]
+}
+
+type Tag = Database['public']['Tables']['tags']['Row']
+type Project = Database['public']['Tables']['projects']['Row']
+type ProjectTag = Database['public']['Tables']['project_tags']['Row']
+
+interface GalleryItem {
+  id: string
+  media_id: string
+  public_id: string
+  alt_text: string
+  caption: string
+  order_index: number
+}
+
+interface TechItem {
+  id: string
+  name: string
+  category: 'frontend' | 'backend' | 'database' | 'devops' | 'tools' | 'other'
+  icon?: string
+  order_index: number
+}
+
+interface ProjectWithAdminRelations extends Project {
+  project_tags?: Array<Pick<ProjectTag, 'tag_id'>>
+  gallery?: GalleryItem[]
+  tech_stack?: TechItem[]
 }
 
 // Function to remove Vietnamese tones for slug generation
@@ -56,8 +103,9 @@ function removeVietnameseTones(str: string): string {
   return str
 }
 
-export function ProjectForm({ project, mode }: ProjectFormProps) {
+export function ProjectForm({ project, mode, tags }: ProjectFormProps) {
   const router = useRouter()
+  const locale = useLocale()
   const t = useTranslations('admin.projects')
   const [isCreating, setIsCreating] = useState(false)
 
@@ -67,13 +115,20 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
       ? {
           title: project.title || '',
           slug: project.slug || '',
+          tag_ids:
+            project.project_tags?.map(pt => pt.tag_id).filter(Boolean) || [],
           description: project.description || '',
           long_description: project.long_description || '',
           cover_media_id: project.cover_media_id || null,
           og_media_id: project.og_media_id || null,
           demo_url: project.demo_url || '',
           github_url: project.github_url || '',
-          status: project.status || 'completed',
+          status:
+            project.status === 'in_progress' ||
+            project.status === 'completed' ||
+            project.status === 'archived'
+              ? project.status
+              : 'completed',
           featured: project.featured || false,
           start_date: project.start_date || '',
           end_date: project.end_date || '',
@@ -82,6 +137,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
       : {
           title: '',
           slug: '',
+          tag_ids: [],
           description: '',
           long_description: '',
           cover_media_id: null,
@@ -100,26 +156,42 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
   const watchTitle = form.watch('title')
   useEffect(() => {
     if (mode === 'create' && watchTitle) {
+      if (form.formState.dirtyFields.slug) return
       const slug = removeVietnameseTones(watchTitle)
-      form.setValue('slug', slug)
+      form.setValue('slug', slug, {
+        shouldValidate: true,
+        shouldDirty: false,
+      })
     }
   }, [watchTitle, mode, form])
 
   const onSubmit = async (data: ProjectFormData) => {
     setIsCreating(true)
     try {
+      const { tag_ids, ...rest } = data
+
       if (mode === 'create') {
-        await createProject(data)
+        const created = await createProject(rest)
+        await updateProjectTags(created.id, tag_ids)
         toast.success(t('messages.create_success'))
       } else {
-        await updateProject(project.id, data)
+        if (!project?.id) {
+          throw new Error('Không tìm thấy dự án để cập nhật')
+        }
+
+        await updateProject(project.id, rest)
+        await updateProjectTags(project.id, tag_ids)
         toast.success(t('messages.update_success'))
       }
-      router.push('/admin/projects')
+      router.push(`/${locale}/admin/projects`)
       router.refresh()
     } catch (error) {
       console.error('Error saving project:', error)
-      toast.error(mode === 'create' ? t('messages.create_error') : t('messages.update_error'))
+      toast.error(
+        mode === 'create'
+          ? t('messages.create_error')
+          : t('messages.update_error')
+      )
     } finally {
       setIsCreating(false)
     }
@@ -127,7 +199,7 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+      <form className="space-y-6" onSubmit={form.handleSubmit(onSubmit)}>
         {/* Title */}
         <FormField
           control={form.control}
@@ -141,6 +213,86 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
               <FormMessage />
             </FormItem>
           )}
+        />
+
+        {/* Tags */}
+        <FormField
+          control={form.control}
+          name="tag_ids"
+          render={({ field }) => {
+            const selectedIds = field.value || []
+            const selectedCount = selectedIds.length
+
+            return (
+              <FormItem>
+                <div>
+                  <FormLabel>Thẻ</FormLabel>
+                  <FormDescription>Chọn thẻ cho dự án</FormDescription>
+                </div>
+
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <FormControl>
+                      <Button
+                        className="w-full justify-between"
+                        role="combobox"
+                        type="button"
+                        variant="outline"
+                      >
+                        {selectedCount === 0
+                          ? 'Chọn thẻ'
+                          : `Đã chọn ${selectedCount} thẻ`}
+                        <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                      </Button>
+                    </FormControl>
+                  </PopoverTrigger>
+
+                  <PopoverContent align="start" className="w-full p-0">
+                    <Command>
+                      <CommandInput placeholder="Tìm thẻ..." />
+                      <CommandList>
+                        <CommandEmpty>Không tìm thấy thẻ</CommandEmpty>
+                        <CommandGroup>
+                          {tags.map(tag => {
+                            const isSelected = selectedIds.includes(tag.id)
+
+                            return (
+                              <CommandItem
+                                key={tag.id}
+                                onSelect={() => {
+                                  const next = isSelected
+                                    ? selectedIds.filter(id => id !== tag.id)
+                                    : [...selectedIds, tag.id]
+
+                                  field.onChange(next)
+                                }}
+                                value={tag.name}
+                              >
+                                <Check
+                                  className={cn(
+                                    'mr-2 h-4 w-4',
+                                    isSelected ? 'opacity-100' : 'opacity-0'
+                                  )}
+                                />
+                                <span className="flex-1">{tag.name}</span>
+                                {tag.slug ? (
+                                  <span className="text-muted-foreground text-xs">
+                                    {tag.slug}
+                                  </span>
+                                ) : null}
+                              </CommandItem>
+                            )
+                          })}
+                        </CommandGroup>
+                      </CommandList>
+                    </Command>
+                  </PopoverContent>
+                </Popover>
+
+                <FormMessage />
+              </FormItem>
+            )
+          }}
         />
 
         {/* Slug */}
@@ -170,8 +322,8 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
               <FormLabel>{t('form.description')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Mô tả ngắn về dự án..."
                   className="min-h-[80px]"
+                  placeholder="Mô tả ngắn về dự án..."
                   {...field}
                 />
               </FormControl>
@@ -192,8 +344,8 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
               <FormLabel>{t('form.long_description')}</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder="Mô tả chi tiết về dự án (hỗ trợ MDX)..."
                   className="min-h-[200px] font-mono text-sm"
+                  placeholder="Mô tả chi tiết về dự án (hỗ trợ MDX)..."
                   {...field}
                 />
               </FormControl>
@@ -214,11 +366,11 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
               <FormLabel>Ảnh bìa</FormLabel>
               <FormControl>
                 <MediaPicker
-                  selectedMediaId={field.value || undefined}
-                  onSelect={(mediaId) => field.onChange(mediaId)}
-                  label="Chọn ảnh bìa"
-                  description="Ảnh đại diện cho dự án (tỷ lệ 16:9 khuyến nghị)"
                   aspectRatio="video"
+                  description="Ảnh đại diện cho dự án (tỷ lệ 16:9 khuyến nghị)"
+                  label="Chọn ảnh bìa"
+                  onSelect={mediaId => field.onChange(mediaId)}
+                  selectedMediaId={field.value || undefined}
                 />
               </FormControl>
               <FormMessage />
@@ -235,11 +387,11 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
               <FormLabel>Ảnh Open Graph</FormLabel>
               <FormControl>
                 <MediaPicker
-                  selectedMediaId={field.value || undefined}
-                  onSelect={(mediaId) => field.onChange(mediaId)}
-                  label="Chọn ảnh OG"
-                  description="Ảnh hiển thị khi chia sẻ link (1200x630px)"
                   aspectRatio="16/9"
+                  description="Ảnh hiển thị khi chia sẻ link (1200x630px)"
+                  label="Chọn ảnh OG"
+                  onSelect={mediaId => field.onChange(mediaId)}
+                  selectedMediaId={field.value || undefined}
                 />
               </FormControl>
               <FormDescription>
@@ -273,7 +425,10 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
             <FormItem>
               <FormLabel>{t('form.github_url')}</FormLabel>
               <FormControl>
-                <Input placeholder="https://github.com/username/repo" {...field} />
+                <Input
+                  placeholder="https://github.com/username/repo"
+                  {...field}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -287,16 +442,22 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
           render={({ field }) => (
             <FormItem>
               <FormLabel>{t('form.status')}</FormLabel>
-              <Select onValueChange={field.onChange} defaultValue={field.value}>
+              <Select defaultValue={field.value} onValueChange={field.onChange}>
                 <FormControl>
                   <SelectTrigger>
                     <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                 </FormControl>
                 <SelectContent>
-                  <SelectItem value="in_progress">{t('status.in_progress')}</SelectItem>
-                  <SelectItem value="completed">{t('status.completed')}</SelectItem>
-                  <SelectItem value="archived">{t('status.archived')}</SelectItem>
+                  <SelectItem value="in_progress">
+                    {t('status.in_progress')}
+                  </SelectItem>
+                  <SelectItem value="completed">
+                    {t('status.completed')}
+                  </SelectItem>
+                  <SelectItem value="archived">
+                    {t('status.archived')}
+                  </SelectItem>
                 </SelectContent>
               </Select>
               <FormMessage />
@@ -338,12 +499,13 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
         <div className="space-y-2">
           <FormLabel className="text-base">Gallery ảnh dự án</FormLabel>
           <FormDescription>
-            Thêm nhiều ảnh để hiển thị trong trang chi tiết dự án. Kéo thả để sắp xếp thứ tự.
+            Thêm nhiều ảnh để hiển thị trong trang chi tiết dự án. Kéo thả để
+            sắp xếp thứ tự.
           </FormDescription>
           <GalleryManager
-            projectId={project?.id}
-            initialGallery={project?.gallery || []}
+            initialGallery={project?.gallery ?? []}
             maxImages={10}
+            projectId={project?.id}
           />
         </div>
 
@@ -351,11 +513,12 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
         <div className="space-y-2">
           <FormLabel className="text-base">Công nghệ sử dụng</FormLabel>
           <FormDescription>
-            Thêm các công nghệ, framework, tools được sử dụng trong dự án. Kéo thả để sắp xếp thứ tự.
+            Thêm các công nghệ, framework, tools được sử dụng trong dự án. Kéo
+            thả để sắp xếp thứ tự.
           </FormDescription>
           <TechStackManager
+            initialTechStack={project?.tech_stack ?? []}
             projectId={project?.id}
-            initialTechStack={project?.tech_stack || []}
           />
         </div>
 
@@ -366,13 +529,18 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
           render={({ field }) => (
             <FormItem className="flex flex-row items-center justify-between rounded-lg border p-4">
               <div className="space-y-0.5">
-                <FormLabel className="text-base">{t('form.featured')}</FormLabel>
+                <FormLabel className="text-base">
+                  {t('form.featured')}
+                </FormLabel>
                 <FormDescription>
                   Hiển thị dự án này ở vị trí nổi bật
                 </FormDescription>
               </div>
               <FormControl>
-                <Switch checked={field.value} onCheckedChange={field.onChange} />
+                <Switch
+                  checked={field.value}
+                  onCheckedChange={field.onChange}
+                />
               </FormControl>
             </FormItem>
           )}
@@ -380,14 +548,14 @@ export function ProjectForm({ project, mode }: ProjectFormProps) {
 
         {/* Action Buttons */}
         <div className="flex items-center gap-4">
-          <Button type="submit" disabled={isCreating}>
+          <Button disabled={isCreating} type="submit">
             {isCreating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             {t('form.save')}
           </Button>
           <Button
+            onClick={() => router.push(`/${locale}/admin/projects`)}
             type="button"
             variant="outline"
-            onClick={() => router.push('/admin/projects')}
           >
             {t('form.cancel')}
           </Button>

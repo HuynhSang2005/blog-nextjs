@@ -3,23 +3,33 @@ import { notFound } from 'next/navigation'
 import { ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from '@/components/ui/card'
 import { ProjectForm } from '@/components/admin/projects/project-form'
 import { getProjectById } from '@/lib/queries/projects'
 import { getTranslations } from 'next-intl/server'
+import { getTags } from '@/lib/queries/tags'
 
 interface EditProjectPageProps {
   params: Promise<{
+    locale: string
     id: string
   }>
 }
 
-export default async function EditProjectPage({ params }: EditProjectPageProps) {
-  const { id } = await params
+export default async function EditProjectPage({
+  params,
+}: EditProjectPageProps) {
+  const { locale, id } = await params
   const t = await getTranslations('admin.projects')
-  
-  const project = await getProjectById(id)
-  
+
+  const [project, tags] = await Promise.all([getProjectById(id), getTags()])
+
   if (!project) {
     notFound()
   }
@@ -27,13 +37,15 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
   return (
     <div className="space-y-6">
       <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link href="/admin/projects">
+        <Button asChild size="icon" variant="ghost">
+          <Link href={`/${locale}/admin/projects`}>
             <ArrowLeft className="h-4 w-4" />
           </Link>
         </Button>
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">{t('actions.edit')}</h1>
+          <h1 className="text-3xl font-bold tracking-tight">
+            {t('actions.edit')}
+          </h1>
           <p className="text-muted-foreground">Chỉnh sửa thông tin dự án</p>
         </div>
       </div>
@@ -46,7 +58,7 @@ export default async function EditProjectPage({ params }: EditProjectPageProps) 
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProjectForm project={project} mode="edit" />
+          <ProjectForm mode="edit" project={project} tags={tags} />
         </CardContent>
       </Card>
     </div>

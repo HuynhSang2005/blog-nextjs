@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/database.types'
+import { locales } from '@/config/i18n'
 
 type TagInsert = Database['public']['Tables']['tags']['Insert']
 type TagUpdate = Database['public']['Tables']['tags']['Update']
@@ -61,7 +62,9 @@ export async function createTag(data: TagInsert) {
     throw new Error('Không thể tạo thẻ')
   }
 
-  revalidatePath('/admin/tags')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/tags`)
+  }
   return tag
 }
 
@@ -91,7 +94,9 @@ export async function updateTag(id: string, data: TagUpdate) {
     throw new Error('Không thể cập nhật thẻ')
   }
 
-  revalidatePath('/admin/tags')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/tags`)
+  }
   return tag
 }
 
@@ -125,7 +130,9 @@ export async function deleteTag(id: string) {
     throw new Error('Không thể xóa thẻ')
   }
 
-  revalidatePath('/admin/tags')
+  for (const locale of locales) {
+    revalidatePath(`/${locale}/admin/tags`)
+  }
 }
 
 /**

@@ -1,7 +1,6 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 
 /**
@@ -42,12 +41,8 @@ export async function signIn(email: string, password: string) {
     return { error: error.message }
   }
 
-  // Get admin path from environment
-  const adminPath = process.env.NEXT_PUBLIC_ADMIN_PATH || '/admin'
-
   // Revalidate cached pages
   revalidatePath('/', 'layout')
 
-  // Redirect to admin
-  redirect(adminPath)
+  return { error: '' }
 }

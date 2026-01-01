@@ -9,7 +9,12 @@ import { TableSkeleton } from '@/components/admin/table-skeleton'
 import { BlogPostsTable } from '@/components/admin/blog/posts-table'
 import { getBlogPosts } from '@/lib/queries/blog'
 
-export default async function BlogPostsPage() {
+interface BlogPostsPageProps {
+  params: Promise<{ locale: string }>
+}
+
+export default async function BlogPostsPage({ params }: BlogPostsPageProps) {
+  const { locale } = await params
   const t = await getTranslations('admin.blog')
 
   return (
@@ -21,7 +26,7 @@ export default async function BlogPostsPage() {
           <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <Button asChild>
-          <Link href="/admin/blog/new">
+          <Link href={`/${locale}/admin/blog/new`}>
             <Plus className="mr-2 h-4 w-4" />
             {t('actions.create')}
           </Link>
@@ -36,7 +41,7 @@ export default async function BlogPostsPage() {
         </CardHeader>
         <CardContent>
           <Suspense fallback={<TableSkeleton />}>
-            <BlogPostsTableWrapper />
+            <BlogPostsTableWrapper locale={locale} />
           </Suspense>
         </CardContent>
       </Card>
@@ -44,7 +49,7 @@ export default async function BlogPostsPage() {
   )
 }
 
-async function BlogPostsTableWrapper() {
+async function BlogPostsTableWrapper({ locale }: { locale: string }) {
   const posts = await getBlogPosts()
-  return <BlogPostsTable data={posts} />
+  return <BlogPostsTable data={posts} locale={locale} />
 }

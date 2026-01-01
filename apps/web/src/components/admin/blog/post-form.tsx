@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Check, ChevronsUpDown, Loader2, Save, Send } from 'lucide-react'
+import { useLocale } from 'next-intl'
 
 import { Button } from '@/components/ui/button'
 import { MediaPicker } from '@/components/admin/media/media-picker'
@@ -60,6 +61,7 @@ interface BlogPostFormProps {
 
 export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
   const router = useRouter()
+  const locale = useLocale()
   const [isSaving, setIsSaving] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
 
@@ -102,21 +104,28 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
     return readTime > 0 ? readTime : 1 // Minimum 1 minute
   }
 
-  // Auto-generate slug from title
+  const generateSlugFromTitle = (value: string) =>
+    value
+      .toLowerCase()
+      .normalize('NFD') // Decompose Vietnamese characters
+      .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+      .replace(/đ/g, 'd') // Replace đ
+      .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
+      .trim()
+      .replace(/\s+/g, '-') // Replace spaces with -
+      .replace(/-+/g, '-') // Replace multiple - with single -
+      .replace(/^-+|-+$/g, '') // Trim dashes
+
+  // Auto-generate slug from title (until the user edits slug manually)
   const handleTitleChange = (value: string) => {
-    if (mode === 'create' && !form.getValues('slug')) {
-      const slug = value
-        .toLowerCase()
-        .normalize('NFD') // Decompose Vietnamese characters
-        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
-        .replace(/đ/g, 'd') // Replace đ
-        .replace(/[^a-z0-9\s-]/g, '') // Remove special chars
-        .trim()
-        .replace(/\s+/g, '-') // Replace spaces with -
-        .replace(/-+/g, '-') // Replace multiple - with single -
-      
-      form.setValue('slug', slug)
-    }
+    if (mode !== 'create') return
+    if (form.formState.dirtyFields.slug) return
+
+    const slug = generateSlugFromTitle(value)
+    form.setValue('slug', slug, {
+      shouldValidate: true,
+      shouldDirty: false,
+    })
   }
 
   const onSaveDraft = async (data: BlogPostFormData) => {
@@ -139,7 +148,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
         const result = await createBlogPost(rest)
         await updateBlogPostTags(result.id, tag_ids)
         toast.success('Đã lưu nháp thành công')
-        router.push(`/admin/blog/${result.id}`)
+        router.push(`/${locale}/admin/blog/${result.id}`)
       } else if (post) {
         await updateBlogPost(post.id, rest)
         await updateBlogPostTags(post.id, tag_ids)
@@ -175,13 +184,13 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
         await updateBlogPostTags(result.id, tag_ids)
         await publishBlogPost(result.id)
         toast.success('Đã xuất bản bài viết')
-        router.push('/admin/blog')
+        router.push(`/${locale}/admin/blog`)
       } else if (post) {
         await updateBlogPost(post.id, rest)
         await updateBlogPostTags(post.id, tag_ids)
         await publishBlogPost(post.id)
         toast.success('Đã xuất bản bài viết')
-        router.push('/admin/blog')
+        router.push(`/${locale}/admin/blog`)
       }
     } catch (error) {
       console.error('Error publishing:', error)
