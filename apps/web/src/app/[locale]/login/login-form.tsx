@@ -60,13 +60,15 @@ export function LoginForm() {
         setError(result.error)
       } else {
         // Redirect to admin or redirectTo param (with locale prefix)
-        const redirectTo = new URLSearchParams(window.location.search).get('redirectTo')
+        const redirectTo = new URLSearchParams(window.location.search).get(
+          'redirectTo'
+        )
         const adminPath = process.env.NEXT_PUBLIC_ADMIN_PATH || '/admin'
         const targetPath = redirectTo || `/${locale}${adminPath}`
         router.push(targetPath)
         router.refresh()
       }
-    } catch (err) {
+    } catch (_err) {
       setError(t('errors.unknown_error'))
     } finally {
       setIsLoading(false)
@@ -81,7 +83,7 @@ export function LoginForm() {
       </CardHeader>
       <CardContent>
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form className="space-y-4" onSubmit={form.handleSubmit(onSubmit)}>
             {error && (
               <div className="rounded-lg bg-destructive/10 p-3 text-sm text-destructive">
                 {error}
@@ -96,10 +98,10 @@ export function LoginForm() {
                   <FormLabel>{t('login.email')}</FormLabel>
                   <FormControl>
                     <Input
-                      type="email"
-                      placeholder={t('login.email_placeholder')}
                       autoComplete="email"
                       disabled={isLoading}
+                      placeholder={t('login.email_placeholder')}
+                      type="email"
                       {...field}
                     />
                   </FormControl>
@@ -116,10 +118,10 @@ export function LoginForm() {
                   <FormLabel>{t('login.password')}</FormLabel>
                   <FormControl>
                     <Input
-                      type="password"
-                      placeholder={t('login.password_placeholder')}
                       autoComplete="current-password"
                       disabled={isLoading}
+                      placeholder={t('login.password_placeholder')}
+                      type="password"
                       {...field}
                     />
                   </FormControl>
@@ -128,11 +130,7 @@ export function LoginForm() {
               )}
             />
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
+            <Button className="w-full" disabled={isLoading} type="submit">
               {isLoading ? t('login.logging_in') : t('login.submit')}
             </Button>
           </form>

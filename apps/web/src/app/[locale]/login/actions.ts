@@ -28,7 +28,7 @@ export async function signIn(email: string, password: string) {
     if (error.message.includes('Invalid login credentials')) {
       return { error: 'Email hoặc mật khẩu không đúng' }
     }
-    
+
     if (error.message.includes('Email not confirmed')) {
       return { error: 'Email chưa được xác nhận' }
     }
