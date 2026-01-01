@@ -1,0 +1,118 @@
+/* MDX Editor Styling */
+
+.mdx-editor {
+  min-height: 400px;
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  border-radius: var(--radius);
+}
+
+.mdx-editor:focus-within {
+  outline: 2px solid hsl(var(--ring));
+  outline-offset: 2px;
+}
+
+/* Toolbar styling */
+._toolbarRoot_lrmda_1 {
+  padding: 0.5rem;
+  background: hsl(var(--muted) / 0.3);
+  border-bottom: 1px solid hsl(var(--border));
+}
+
+/* Editor content area */
+._contentEditable_14dum_306 {
+  min-height: 400px;
+  padding: 1rem;
+}
+
+/* Dark mode support */
+.dark .mdx-editor {
+  --mdxeditor-background: hsl(var(--background));
+  --mdxeditor-foreground: hsl(var(--foreground));
+  --mdxeditor-border: hsl(var(--border));
+  --mdxeditor-muted: hsl(var(--muted));
+  --mdxeditor-accent: hsl(var(--accent));
+}
+
+/* Code block styling */
+._editorRoot_lrmda_1 pre {
+  padding: 1rem;
+  overflow-x: auto;
+  background: hsl(var(--muted));
+  border-radius: var(--radius);
+}
+
+.dark ._editorRoot_lrmda_1 pre {
+  background: hsl(var(--muted) / 0.5);
+}
+
+/* Table styling */
+._editorRoot_lrmda_1 table {
+  width: 100%;
+  margin: 1rem 0;
+  border-collapse: collapse;
+}
+
+._editorRoot_lrmda_1 table th,
+._editorRoot_lrmda_1 table td {
+  padding: 0.5rem;
+  border: 1px solid hsl(var(--border));
+}
+
+._editorRoot_lrmda_1 table th {
+  font-weight: 600;
+  background: hsl(var(--muted));
+}
+
+/* Image styling */
+._editorRoot_lrmda_1 img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+}
+
+/* Blockquote styling */
+._editorRoot_lrmda_1 blockquote {
+  padding-left: 1rem;
+  margin-left: 0;
+  font-style: italic;
+  color: hsl(var(--muted-foreground));
+  border-left: 4px solid hsl(var(--primary));
+}
+
+/* Link styling */
+._editorRoot_lrmda_1 a {
+  color: hsl(var(--primary));
+  text-decoration: underline;
+}
+
+._editorRoot_lrmda_1 a:hover {
+  text-decoration: none;
+}
+
+/* Headings */
+._editorRoot_lrmda_1 h1,
+._editorRoot_lrmda_1 h2,
+._editorRoot_lrmda_1 h3,
+._editorRoot_lrmda_1 h4,
+._editorRoot_lrmda_1 h5,
+._editorRoot_lrmda_1 h6 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  line-height: 1.25;
+}
+
+/* Lists */
+._editorRoot_lrmda_1 ul,
+._editorRoot_lrmda_1 ol {
+  padding-left: 1.5rem;
+  margin: 0.5rem 0;
+}
+
+/* Placeholder text */
+._editorRoot_lrmda_1 [data-placeholder]:empty:before {
+  color: hsl(var(--muted-foreground));
+  pointer-events: none;
+  content: attr(data-placeholder);
+}
