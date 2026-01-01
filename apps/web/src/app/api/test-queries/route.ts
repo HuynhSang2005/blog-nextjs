@@ -1,6 +1,14 @@
 import { NextResponse } from 'next/server'
-import { getBlogPosts, getBlogPost, getFeaturedBlogPosts } from '@/lib/supabase/queries/blog'
-import { getProjects, getProject, getFeaturedProjects } from '@/lib/supabase/queries/projects'
+import {
+  getBlogPosts,
+  getBlogPost,
+  getFeaturedBlogPosts,
+} from '@/lib/supabase/queries/blog'
+import {
+  getProjects,
+  getProject,
+  getFeaturedProjects,
+} from '@/lib/supabase/queries/projects'
 import { getRecentMedia, getMediaStats } from '@/lib/supabase/queries/media'
 
 /**
@@ -27,7 +35,10 @@ export async function GET() {
   try {
     // Test 1: getBlogPosts
     try {
-      const blogPostsResult = await getBlogPosts('vi', undefined, { page: 1, pageSize: 5 })
+      const blogPostsResult = await getBlogPosts('vi', undefined, {
+        page: 1,
+        pageSize: 5,
+      })
       testResults.tests.blog.getBlogPosts = {
         status: 'passed',
         itemCount: blogPostsResult.data?.length || 0,
@@ -92,7 +103,10 @@ export async function GET() {
   try {
     // Test 4: getProjects
     try {
-      const projectsResult = await getProjects('vi', undefined, { page: 1, pageSize: 5 })
+      const projectsResult = await getProjects('vi', undefined, {
+        page: 1,
+        pageSize: 5,
+      })
       testResults.tests.projects.getProjects = {
         status: 'passed',
         itemCount: projectsResult.data?.length || 0,
@@ -199,6 +213,6 @@ export async function GET() {
     },
     {
       status: overallStatus === 'success' ? 200 : 500,
-    },
+    }
   )
 }

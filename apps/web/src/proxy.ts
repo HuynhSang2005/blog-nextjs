@@ -1,5 +1,5 @@
 import { type NextRequest, NextResponse } from 'next/server'
-import { createServerClient } from '@supabase/ssr'
+import { type CookieOptions, createServerClient } from '@supabase/ssr'
 import proxyImpl from '@/lib/core/proxy'
 import { defaultLocale, locales } from '@/config/i18n'
 
@@ -7,7 +7,7 @@ import { defaultLocale, locales } from '@/config/i18n'
  * Proxy để xử lý:
  * 1. Authentication check cho admin routes
  * 2. I18n routing (delegate to proxyImpl)
- * 
+ *
  * Note: Next.js 16 đã đổi tên middleware → proxy
  */
 export default async function proxy(request: NextRequest) {
@@ -18,10 +18,14 @@ export default async function proxy(request: NextRequest) {
   // Enforce locale prefix for admin routes (next-intl middleware is bypassed below).
   // Without this, `/admin` is treated as locale="admin" and breaks routing.
   const firstSegment = pathname.split('/')[1] || ''
-  const hasLocalePrefix = locales.includes(firstSegment as (typeof locales)[number])
+  const hasLocalePrefix = locales.includes(
+    firstSegment as (typeof locales)[number]
+  )
   const isAdminRoute = pathname.includes(adminPath)
   if (isAdminRoute && !hasLocalePrefix) {
-    return NextResponse.redirect(new URL(`/${defaultLocale}${pathname}`, request.url))
+    return NextResponse.redirect(
+      new URL(`/${defaultLocale}${pathname}`, request.url)
+    )
   }
 
   // Initialize response
@@ -32,51 +36,43 @@ export default async function proxy(request: NextRequest) {
   })
 
   // Create Supabase client for proxy
-  const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        get(name: string) {
-          return request.cookies.get(name)?.value
-        },
-        set(name: string, value: string, options: any) {
-          request.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value,
-            ...options,
-          })
-        },
-        remove(name: string, options: any) {
-          request.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-          response = NextResponse.next({
-            request: {
-              headers: request.headers,
-            },
-          })
-          response.cookies.set({
-            name,
-            value: '',
-            ...options,
-          })
-        },
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+
+  if (!url || !anonKey) {
+    throw new Error(
+      'Thiếu biến môi trường Supabase: NEXT_PUBLIC_SUPABASE_URL hoặc NEXT_PUBLIC_SUPABASE_ANON_KEY'
+    )
+  }
+
+  const supabase = createServerClient(url, anonKey, {
+    cookies: {
+      getAll() {
+        return request.cookies
+          .getAll()
+          .map(({ name, value }) => ({ name, value }))
       },
-    }
-  )
+      setAll(
+        cookiesToSet: Array<{
+          name: string
+          value: string
+          options: CookieOptions
+        }>
+      ) {
+        // Create a fresh response so Set-Cookie headers are preserved.
+        response = NextResponse.next({
+          request: {
+            headers: request.headers,
+          },
+        })
+
+        for (const { name, value, options } of cookiesToSet) {
+          request.cookies.set({ name, value, ...options })
+          response.cookies.set({ name, value, ...options })
+        }
+      },
+    },
+  })
 
   // Refresh session if exists
   const {
@@ -112,7 +108,9 @@ export default async function proxy(request: NextRequest) {
 
   // Redirect old /admin to custom admin path (if different)
   if (pathname === '/admin' && adminPath !== '/admin') {
-    return NextResponse.redirect(new URL(`/${defaultLocale}${adminPath}`, request.url))
+    return NextResponse.redirect(
+      new URL(`/${defaultLocale}${adminPath}`, request.url)
+    )
   }
 
   // For non-admin routes, delegate to i18n proxy

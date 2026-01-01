@@ -18,7 +18,10 @@ export async function GET() {
 
     if (error) {
       // If profiles table doesn't exist yet, that's expected
-      if (error.message.includes('relation') || error.message.includes('does not exist')) {
+      if (
+        error.message.includes('relation') ||
+        error.message.includes('does not exist')
+      ) {
         return NextResponse.json({
           status: '✅ KẾT NỐI THÀNH CÔNG',
           message: 'Supabase connection successful (tables not created yet)',
@@ -62,4 +65,3 @@ export async function GET() {
     )
   }
 }
-
