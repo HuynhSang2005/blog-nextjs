@@ -143,7 +143,7 @@ export async function updateBlogPostTags(postId: string, tagIds: string[]) {
   if (tagIds.length > 0) {
     const { error: insertError } = await supabase
       .from('blog_post_tags')
-      .insert(tagIds.map((tagId) => ({ blog_post_id: postId, tag_id: tagId })))
+      .insert(tagIds.map(tagId => ({ blog_post_id: postId, tag_id: tagId })))
 
     if (insertError) {
       console.error('Error inserting blog post tags:', insertError)

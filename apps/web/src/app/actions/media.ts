@@ -180,12 +180,14 @@ export async function deleteMedia(id: string) {
       { count: projectMediaCount },
       { count: profilesCount },
     ] = await Promise.all([
-      supabase.from('blog_posts').select('id', { count: 'exact', head: true }).or(
-        `cover_media_id.eq.${id},og_media_id.eq.${id}`
-      ),
-      supabase.from('projects').select('id', { count: 'exact', head: true }).or(
-        `cover_media_id.eq.${id},og_media_id.eq.${id}`
-      ),
+      supabase
+        .from('blog_posts')
+        .select('id', { count: 'exact', head: true })
+        .or(`cover_media_id.eq.${id},og_media_id.eq.${id}`),
+      supabase
+        .from('projects')
+        .select('id', { count: 'exact', head: true })
+        .or(`cover_media_id.eq.${id},og_media_id.eq.${id}`),
       supabase
         .from('project_media')
         .select('id', { count: 'exact', head: true })
@@ -241,7 +243,7 @@ export async function deleteMedia(id: string) {
  */
 export async function deleteMultipleMedia(ids: string[]) {
   try {
-    const supabase = await createClient()
+    const _supabase = await createClient()
 
     // Check if any media is being used
     for (const id of ids) {

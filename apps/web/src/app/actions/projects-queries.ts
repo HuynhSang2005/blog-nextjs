@@ -76,14 +76,13 @@ export const getProjects = cache(
  * @param locale - Locale code
  * @returns Project with full details
  */
-export const getProjectBySlug = cache(
-  async (slug: string, locale: string) => {
-    const supabase = await createClient()
+export const getProjectBySlug = cache(async (slug: string, locale: string) => {
+  const supabase = await createClient()
 
-    const { data, error } = await supabase
-      .from('projects')
-      .select(
-        `
+  const { data, error } = await supabase
+    .from('projects')
+    .select(
+      `
         *,
         cover_media:media!cover_media_id (
           public_id,
@@ -122,19 +121,18 @@ export const getProjectBySlug = cache(
           )
         )
       `
-      )
-      .eq('slug', slug)
-      .eq('locale', locale)
-      .single()
+    )
+    .eq('slug', slug)
+    .eq('locale', locale)
+    .single()
 
-    if (error) {
-      console.error('Error fetching project:', error)
-      return null
-    }
-
-    return data
+  if (error) {
+    console.error('Error fetching project:', error)
+    return null
   }
-)
+
+  return data
+})
 
 /**
  * Lấy all unique tags từ projects.
@@ -142,7 +140,7 @@ export const getProjectBySlug = cache(
  * @param locale - Locale code
  * @returns Array of unique tags
  */
-export const getProjectTags = cache(async (locale: string) => {
+export const getProjectTags = cache(async (_locale: string) => {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -164,14 +162,35 @@ export const getProjectTags = cache(async (locale: string) => {
     return []
   }
 
+  interface ProjectTagRow {
+    tag:
+      | {
+          id: string
+          name: string
+          slug: string
+          color: string | null
+        }
+      | Array<{
+          id: string
+          name: string
+          slug: string
+          color: string | null
+        }>
+      | null
+  }
+
   // Extract unique tags
-  const uniqueTags = new Map<string, { id: string; name: string; slug: string; color: string | null }>()
-  data?.forEach((item: any) => {
-    if (item.tag && typeof item.tag === 'object' && 'id' in item.tag) {
-      const tag = item.tag as { id: string; name: string; slug: string; color: string | null }
+  const uniqueTags = new Map<
+    string,
+    { id: string; name: string; slug: string; color: string | null }
+  >()
+  const rows = (data ?? []) as unknown as ProjectTagRow[]
+  for (const row of rows) {
+    const tags = Array.isArray(row.tag) ? row.tag : row.tag ? [row.tag] : []
+    for (const tag of tags) {
       uniqueTags.set(tag.id, tag)
     }
-  })
+  }
 
   return Array.from(uniqueTags.values())
 })
@@ -249,9 +268,9 @@ export const getProjectStats = cache(async (locale: string) => {
 
   const stats = {
     total: data?.length || 0,
-    in_progress: data?.filter((p) => p.status === 'in_progress').length || 0,
-    completed: data?.filter((p) => p.status === 'completed').length || 0,
-    archived: data?.filter((p) => p.status === 'archived').length || 0,
+    in_progress: data?.filter(p => p.status === 'in_progress').length || 0,
+    completed: data?.filter(p => p.status === 'completed').length || 0,
+    archived: data?.filter(p => p.status === 'archived').length || 0,
   }
 
   return stats

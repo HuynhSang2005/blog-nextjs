@@ -31,10 +31,11 @@ export async function getTags() {
   }
 
   // Calculate total usage count for each tag
-  return tags.map((tag) => ({
+  return tags.map(tag => ({
     ...tag,
     usageCount:
-      (tag.blog_post_tags?.[0]?.count || 0) + (tag.project_tags?.[0]?.count || 0),
+      (tag.blog_post_tags?.[0]?.count || 0) +
+      (tag.project_tags?.[0]?.count || 0),
   }))
 }
 
@@ -119,7 +120,10 @@ export async function deleteTag(id: string) {
     .eq('tag_id', id)
     .limit(1)
 
-  if ((blogUsage && blogUsage.length > 0) || (projectUsage && projectUsage.length > 0)) {
+  if (
+    (blogUsage && blogUsage.length > 0) ||
+    (projectUsage && projectUsage.length > 0)
+  ) {
     throw new Error('Không thể xóa thẻ đang được sử dụng')
   }
 

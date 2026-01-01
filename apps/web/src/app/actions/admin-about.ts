@@ -4,11 +4,15 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/database.types'
 
-type AboutSectionInsert = Database['public']['Tables']['about_sections']['Insert']
-type AboutSectionUpdate = Database['public']['Tables']['about_sections']['Update']
+type AboutSectionInsert =
+  Database['public']['Tables']['about_sections']['Insert']
+type AboutSectionUpdate =
+  Database['public']['Tables']['about_sections']['Update']
 
-type TimelineEventInsert = Database['public']['Tables']['timeline_events']['Insert']
-type TimelineEventUpdate = Database['public']['Tables']['timeline_events']['Update']
+type TimelineEventInsert =
+  Database['public']['Tables']['timeline_events']['Insert']
+type TimelineEventUpdate =
+  Database['public']['Tables']['timeline_events']['Update']
 
 type SkillInsert = Database['public']['Tables']['skills']['Insert']
 type SkillUpdate = Database['public']['Tables']['skills']['Update']
@@ -18,7 +22,10 @@ function revalidateAbout(locale: string) {
   revalidatePath(`/${locale}/about`)
 }
 
-export async function createAboutSection(locale: string, data: AboutSectionInsert) {
+export async function createAboutSection(
+  locale: string,
+  data: AboutSectionInsert
+) {
   const supabase = await createClient()
 
   const { data: section, error } = await supabase
@@ -85,7 +92,10 @@ export async function deleteAboutSection(locale: string, id: string) {
   return { success: true }
 }
 
-export async function createTimelineEvent(locale: string, data: TimelineEventInsert) {
+export async function createTimelineEvent(
+  locale: string,
+  data: TimelineEventInsert
+) {
   const supabase = await createClient()
 
   const { data: event, error } = await supabase
@@ -167,7 +177,11 @@ export async function createSkill(locale: string, data: SkillInsert) {
   return skill
 }
 
-export async function updateSkill(locale: string, id: string, data: SkillUpdate) {
+export async function updateSkill(
+  locale: string,
+  id: string,
+  data: SkillUpdate
+) {
   const supabase = await createClient()
 
   const { data: skill, error } = await supabase

@@ -6,7 +6,7 @@ import { cache } from 'react'
 /**
  * Lấy tất cả dữ liệu About Page từ database
  * Fetches all about page data from database
- * 
+ *
  * @param locale - Locale code (e.g., 'vi')
  * @returns About sections, timeline events, skills
  */
@@ -84,7 +84,7 @@ export const getAboutData = cache(async (locale: string) => {
 /**
  * Lấy bio section từ about_sections
  * Gets bio section from about_sections table
- * 
+ *
  * @param locale - Locale code
  * @returns Bio section content (MDX)
  */
@@ -110,7 +110,7 @@ export async function getBioSection(locale: string) {
 /**
  * Lấy timeline events theo locale
  * Gets timeline events by locale
- * 
+ *
  * @param locale - Locale code
  * @returns Timeline events array
  */
@@ -142,7 +142,7 @@ export async function getTimelineEvents(locale: string) {
 /**
  * Lấy skills grouped by category
  * Gets skills grouped by category
- * 
+ *
  * @returns Skills array
  */
 export async function getSkills() {
@@ -161,20 +161,29 @@ export async function getSkills() {
   return data || []
 }
 
+interface SkillWithCategory {
+  category: string | null
+}
+
 /**
  * Group skills by category
  * Helper function để group skills theo category
- * 
+ *
  * @param skills - Skills array
  * @returns Object with skills grouped by category
  */
-export async function groupSkillsByCategory(skills: any[]) {
-  return skills.reduce((acc, skill) => {
-    const category = skill.category || 'other'
-    if (!acc[category]) {
-      acc[category] = []
-    }
-    acc[category].push(skill)
-    return acc
-  }, {} as Record<string, any[]>)
+function _groupSkillsByCategory<TSkill extends SkillWithCategory>(
+  skills: TSkill[]
+): Record<string, TSkill[]> {
+  return skills.reduce(
+    (acc, skill) => {
+      const category = skill.category || 'other'
+      if (!acc[category]) {
+        acc[category] = []
+      }
+      acc[category].push(skill)
+      return acc
+    },
+    {} as Record<string, TSkill[]>
+  )
 }
