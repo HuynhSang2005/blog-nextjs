@@ -19,18 +19,22 @@ interface MDXEditorWrapperProps {
   value: string
   onChange: (value: string) => void
   readOnly?: boolean
+  withToolbar?: boolean
   placeholder?: string
   className?: string
+  i18nNamespace?: string
 }
 
 export function MDXEditorWrapper({
   value,
   onChange,
   readOnly = false,
+  withToolbar = true,
   placeholder,
   className,
+  i18nNamespace = 'admin.docs',
 }: MDXEditorWrapperProps) {
-  const t = useTranslations('admin.docs')
+  const t = useTranslations(i18nNamespace)
   const [isMounted, setIsMounted] = useState(false)
   const [plugins, setPlugins] = useState<
     NonNullable<MDXEditorProps['plugins']>
@@ -73,9 +77,7 @@ export function MDXEditorWrapper({
           const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_PRESET_NAME
 
           if (!cloudName || !uploadPreset) {
-            throw new Error(
-              t('messages.cloudinary_missing_config')
-            )
+            throw new Error(t('messages.cloudinary_missing_config'))
           }
 
           const formData = new FormData()
@@ -142,30 +144,34 @@ export function MDXEditorWrapper({
 
         // UX improvements
         markdownShortcutPlugin(),
-
-        // Toolbar
-        toolbarPlugin({
-          toolbarContents: () => (
-            <>
-              <UndoRedo />
-              <ToolbarSeparator />
-              <BoldItalicUnderlineToggles />
-              <CodeToggle />
-              <ToolbarSeparator />
-              <BlockTypeSelect />
-              <ToolbarSeparator />
-              <CreateLink />
-              <ListsToggle />
-              <ToolbarSeparator />
-              <InsertCodeBlock />
-              <InsertImage />
-              <InsertTable />
-            </>
-          ),
-        }),
       ])
+
+      if (withToolbar) {
+        setPlugins(prev => [
+          ...prev,
+          toolbarPlugin({
+            toolbarContents: () => (
+              <>
+                <UndoRedo />
+                <ToolbarSeparator />
+                <BoldItalicUnderlineToggles />
+                <CodeToggle />
+                <ToolbarSeparator />
+                <BlockTypeSelect />
+                <ToolbarSeparator />
+                <CreateLink />
+                <ListsToggle />
+                <ToolbarSeparator />
+                <InsertCodeBlock />
+                <InsertImage />
+                <InsertTable />
+              </>
+            ),
+          }),
+        ])
+      }
     })
-  }, [])
+  }, [t, withToolbar])
 
   if (!isMounted || plugins.length === 0) {
     return (
@@ -199,16 +205,20 @@ export function MDXEditorWrapper({
 export function MDXEditorPreview({
   value,
   className,
+  i18nNamespace,
 }: {
   value: string
   className?: string
+  i18nNamespace?: string
 }) {
   return (
     <MDXEditorWrapper
       className={className}
+      i18nNamespace={i18nNamespace}
       onChange={() => {}} // No-op
       readOnly
       value={value}
+      withToolbar={false}
     />
   )
 }

@@ -155,7 +155,9 @@ export function DocForm({ doc, topics, mode }: DocFormProps) {
                   <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                       <SelectTrigger>
-                        <SelectValue placeholder={t('form.placeholders.topic')} />
+                        <SelectValue
+                          placeholder={t('form.placeholders.topic')}
+                        />
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
