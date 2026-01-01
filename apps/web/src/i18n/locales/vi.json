@@ -248,6 +248,68 @@
         "unpublish_success": "Đã hủy xuất bản bài viết"
       }
     },
+    "docs": {
+      "title": "Quản lý Tài liệu",
+      "description": "Tạo, chỉnh sửa và quản lý các trang tài liệu",
+      "actions": {
+        "create": "Tạo tài liệu mới",
+        "edit": "Chỉnh sửa",
+        "save": "Lưu",
+        "delete": "Xóa",
+        "open_menu": "Mở menu"
+      },
+      "form": {
+        "labels": {
+          "topic": "Chủ đề",
+          "title": "Tiêu đề",
+          "slug": "Slug",
+          "description": "Mô tả",
+          "locale": "Ngôn ngữ",
+          "order_index": "Thứ tự",
+          "show_toc": "Hiện TOC",
+          "content": "Nội dung (MDX)"
+        },
+        "placeholders": {
+          "topic": "Chọn chủ đề",
+          "title": "Nhập tiêu đề tài liệu...",
+          "slug": "ví dụ: getting-started",
+          "description": "Mô tả ngắn gọn về tài liệu...",
+          "content": "Nhập nội dung..."
+        },
+        "help": {
+          "show_toc": "Hiển thị mục lục ở sidebar"
+        },
+        "saving": "Đang lưu..."
+      },
+      "table": {
+        "search_placeholder": "Tìm kiếm tài liệu...",
+        "empty": "Chưa có tài liệu nào.",
+        "actions_label": "Thao tác",
+        "columns": {
+          "title": "Tiêu đề",
+          "topic": "Chủ đề",
+          "locale": "Ngôn ngữ",
+          "updated_at": "Cập nhật"
+        },
+        "pagination": {
+          "previous": "Trang trước",
+          "next": "Trang sau"
+        }
+      },
+      "messages": {
+        "loading": "Đang tải...",
+        "create_hint": "Tạo trang tài liệu mới",
+        "create_success": "Đã tạo tài liệu",
+        "update_success": "Đã lưu thay đổi",
+        "save_error": "Không thể lưu tài liệu",
+        "delete_confirm": "Bạn có chắc muốn xóa tài liệu này?",
+        "delete_success": "Đã xóa tài liệu",
+        "delete_error": "Không thể xóa tài liệu",
+        "editor_initializing": "Đang khởi tạo trình soạn thảo...",
+        "cloudinary_missing_config": "Thiếu cấu hình Cloudinary. Vui lòng kiểm tra biến môi trường.",
+        "image_upload_failed": "Không thể tải ảnh lên. Vui lòng thử lại."
+      }
+    },
     "projects": {
       "title": "Quản lý Projects",
       "description": "Tạo, chỉnh sửa và quản lý các dự án",

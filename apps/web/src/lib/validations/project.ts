@@ -9,25 +9,15 @@ export const projectSchema = z.object({
     .string()
     .min(1, 'Slug không được để trống')
     .regex(/^[a-z0-9-]+$/, 'Slug chỉ chứa chữ thường, số và dấu gạch ngang'),
+  tag_ids: z.array(z.string().uuid()),
   description: z
     .string()
     .max(500, 'Mô tả không được quá 500 ký tự')
     .optional()
     .or(z.literal('')),
-  long_description: z
-    .string()
-    .optional()
-    .or(z.literal('')),
-  demo_url: z
-    .string()
-    .url('URL không hợp lệ')
-    .optional()
-    .or(z.literal('')),
-  github_url: z
-    .string()
-    .url('URL không hợp lệ')
-    .optional()
-    .or(z.literal('')),
+  long_description: z.string().optional().or(z.literal('')),
+  demo_url: z.string().url('URL không hợp lệ').optional().or(z.literal('')),
+  github_url: z.string().url('URL không hợp lệ').optional().or(z.literal('')),
   status: z.enum(['in_progress', 'completed', 'archived']),
   locale: z.string(),
   featured: z.boolean(),

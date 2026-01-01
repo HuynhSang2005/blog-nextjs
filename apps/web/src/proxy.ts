@@ -1,6 +1,7 @@
 import { type NextRequest, NextResponse } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 import proxyImpl from '@/lib/core/proxy'
+import { defaultLocale, locales } from '@/config/i18n'
 
 /**
  * Proxy để xử lý:
@@ -13,6 +14,15 @@ export default async function proxy(request: NextRequest) {
   // Get custom admin path from environment or use default
   const adminPath = process.env.NEXT_PUBLIC_ADMIN_PATH || '/admin'
   const pathname = request.nextUrl.pathname
+
+  // Enforce locale prefix for admin routes (next-intl middleware is bypassed below).
+  // Without this, `/admin` is treated as locale="admin" and breaks routing.
+  const firstSegment = pathname.split('/')[1] || ''
+  const hasLocalePrefix = locales.includes(firstSegment as (typeof locales)[number])
+  const isAdminRoute = pathname.includes(adminPath)
+  if (isAdminRoute && !hasLocalePrefix) {
+    return NextResponse.redirect(new URL(`/${defaultLocale}${pathname}`, request.url))
+  }
 
   // Initialize response
   let response = NextResponse.next({
@@ -73,9 +83,6 @@ export default async function proxy(request: NextRequest) {
     data: { session },
   } = await supabase.auth.getSession()
 
-  // Check if accessing admin route (including locale prefix like /vi/admin)
-  const isAdminRoute = pathname.includes(adminPath)
-
   // If accessing admin route
   if (isAdminRoute) {
     // Not authenticated -> redirect to login
@@ -105,7 +112,7 @@ export default async function proxy(request: NextRequest) {
 
   // Redirect old /admin to custom admin path (if different)
   if (pathname === '/admin' && adminPath !== '/admin') {
-    return NextResponse.redirect(new URL(adminPath, request.url))
+    return NextResponse.redirect(new URL(`/${defaultLocale}${adminPath}`, request.url))
   }
 
   // For non-admin routes, delegate to i18n proxy

@@ -2,10 +2,13 @@ import { Balancer } from '@/components/ui/balancer'
 
 import { DocNotAvailableInThisLanguage } from './not-available'
 import type { LocaleOptions } from '@/lib/core/types/i18n'
-import type { Doc } from 'contentlayer/generated'
 
 interface DocHeadingProps {
-  doc: Doc & { notAvailable: boolean }
+  doc: {
+    title: string
+    description: string | null
+    notAvailable: boolean
+  }
   locale: LocaleOptions
 }
 

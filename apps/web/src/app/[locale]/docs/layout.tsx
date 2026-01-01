@@ -1,9 +1,9 @@
 import { setRequestLocale } from 'next-intl/server'
 
-import { getServerDocsConfig } from '@/lib/core/utils/get-server-docs-config'
 import { DocsSidebarNav } from '@/components/docs/sidebar-nav'
 import type { LocaleOptions } from '@/lib/core/types/i18n'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { getDocsSidebarNav } from '@/lib/queries/docs'
 
 interface DocsLayoutProps {
   children: React.ReactNode
@@ -32,7 +32,7 @@ export default async function DocsLayout(props: {
 
   setRequestLocale(locale)
 
-  const docsConfig = await getServerDocsConfig({ locale })
+  const sidebarNav = await getDocsSidebarNav(locale)
 
   return (
     <div className="border-b">
@@ -40,8 +40,8 @@ export default async function DocsLayout(props: {
         <aside className="h-max-[calc(100vh-3.5rem)] fixed top-14 z-30 -ml-2 hidden w-full shrink-0 md:sticky md:block">
           <ScrollArea className="h-max-[calc(100vh-3.5rem)] h-full min-h-fit py-6 pr-6 lg:py-8">
             <DocsSidebarNav
-              items={docsConfig.docs.sidebarNav}
-              locale={docsConfig.currentLocale}
+              items={sidebarNav}
+              locale={locale}
             />
           </ScrollArea>
         </aside>

@@ -1,12 +1,22 @@
 import { getTranslations } from 'next-intl/server'
 import { ExternalLinkIcon } from 'lucide-react'
 
-import type { Doc } from 'contentlayer/generated'
 import { badgeVariants } from '../ui/badge'
 import { Link } from '@/navigation'
 import { cn } from '@/lib/utils'
 
-export async function DocLinks({ doc }: { doc: Doc }) {
+interface DocLinksValue {
+  source?: string
+  doc?: string
+  api?: string
+  blog?: string
+}
+
+export async function DocLinks({
+  doc,
+}: {
+  doc: Record<string, unknown> & { links?: DocLinksValue | null }
+}) {
   if (!doc?.links) {
     return null
   }
