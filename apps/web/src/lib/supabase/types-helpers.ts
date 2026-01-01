@@ -77,11 +77,21 @@ export type DocsTopic = Tables<'docs_topics'>
  * Status enums (matching database constraints)
  */
 export type BlogPostStatus = 'draft' | 'published' | 'archived'
-export type ProjectStatus = 'planning' | 'in-progress' | 'completed' | 'archived'
+export type ProjectStatus =
+  | 'planning'
+  | 'in-progress'
+  | 'completed'
+  | 'archived'
 export type EventType = 'work' | 'education' | 'project' | 'achievement'
 export type UserRole = 'admin' | 'author' | 'viewer' | 'guest'
 export type MediaResourceType = 'image' | 'video' | 'raw'
-export type SkillCategory = 'frontend' | 'backend' | 'devops' | 'database' | 'tools' | 'other'
+export type SkillCategory =
+  | 'frontend'
+  | 'backend'
+  | 'devops'
+  | 'database'
+  | 'tools'
+  | 'other'
 
 /**
  * Pagination helpers
