@@ -30,7 +30,7 @@ const POSTS_PER_PAGE = 10
 /**
  * Blog listing page với server-side pagination
  * Sử dụng searchParams để quản lý pagination state trong URL
- * 
+ *
  * Best practices:
  * - Server Component by default (RSC)
  * - searchParams là single source of truth
@@ -80,7 +80,10 @@ export default async function BlogPage(props: BlogPageProps) {
     {
       search,
       sort:
-        sort === 'newest' || sort === 'oldest' || sort === 'title' || sort === 'views'
+        sort === 'newest' ||
+        sort === 'oldest' ||
+        sort === 'title' ||
+        sort === 'views'
           ? sort
           : undefined,
       dateFrom: from,
@@ -89,9 +92,10 @@ export default async function BlogPage(props: BlogPageProps) {
     }
   )
 
-  const normalizedTotalPages = precheck.pagination.totalItems > 0
-    ? Math.ceil(precheck.pagination.totalItems / POSTS_PER_PAGE)
-    : 0
+  const normalizedTotalPages =
+    precheck.pagination.totalItems > 0
+      ? Math.ceil(precheck.pagination.totalItems / POSTS_PER_PAGE)
+      : 0
 
   // If there are no posts at all, force page=1 to avoid upstream range errors
   if (normalizedTotalPages === 0 && page > 1) {
@@ -114,7 +118,10 @@ export default async function BlogPage(props: BlogPageProps) {
     {
       search,
       sort:
-        sort === 'newest' || sort === 'oldest' || sort === 'title' || sort === 'views'
+        sort === 'newest' ||
+        sort === 'oldest' ||
+        sort === 'title' ||
+        sort === 'views'
           ? sort
           : undefined,
       dateFrom: from,
@@ -160,36 +167,34 @@ export default async function BlogPage(props: BlogPageProps) {
 
       {/* Blog Posts List */}
       <BlogPostList
-        posts={postsData}
         locale={locale}
         messages={{
           by: t('blog.by'),
           min_read: t('blog.min_read'),
           read_more: t('blog.read_more'),
         }}
+        posts={postsData}
       />
 
       {/* Pagination */}
       {pagination.totalPages > 1 && (
         <BlogPagination
           currentPage={pagination.page}
-          totalPages={pagination.totalPages}
-          searchParams={searchParams}
           messages={{
             next: t('blog.next'),
             previous: t('blog.previous'),
             go_to_next_page: t('blog.go_to_next_page'),
             go_to_previous_page: t('blog.go_to_previous_page'),
           }}
+          searchParams={searchParams}
+          totalPages={pagination.totalPages}
         />
       )}
 
       {/* Empty state */}
       {postsData.length === 0 && (
         <div className="text-center py-12">
-          <p className="text-muted-foreground">
-            {t('blog.no_posts_found')}
-          </p>
+          <p className="text-muted-foreground">{t('blog.no_posts_found')}</p>
         </div>
       )}
     </main>

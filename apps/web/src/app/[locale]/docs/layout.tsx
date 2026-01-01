@@ -39,10 +39,7 @@ export default async function DocsLayout(props: {
       <div className="container flex-1 items-start md:grid md:grid-cols-[220px_minmax(0,1fr)] md:gap-6 lg:grid-cols-[240px_minmax(0,1fr)] lg:gap-10">
         <aside className="h-max-[calc(100vh-3.5rem)] fixed top-14 z-30 -ml-2 hidden w-full shrink-0 md:sticky md:block">
           <ScrollArea className="h-max-[calc(100vh-3.5rem)] h-full min-h-fit py-6 pr-6 lg:py-8">
-            <DocsSidebarNav
-              items={sidebarNav}
-              locale={locale}
-            />
+            <DocsSidebarNav items={sidebarNav} locale={locale} />
           </ScrollArea>
         </aside>
 

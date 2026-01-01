@@ -1,7 +1,11 @@
-import { type Metadata } from 'next'
+import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getProjects, getProjectStats } from '@/app/actions/projects-queries'
-import { PageHeader, PageHeaderHeading, PageHeaderDescription } from '@/components/page-header'
+import {
+  PageHeader,
+  PageHeaderHeading,
+  PageHeaderDescription,
+} from '@/components/page-header'
 import { ProjectsGrid } from '@/components/projects/projects-grid'
 import { ProjectFilters } from '@/components/projects/project-filters'
 
@@ -60,22 +64,23 @@ export default async function ProjectsPage({
       {/* Projects Grid */}
       <div className="py-12">
         {projects.length > 0 ? (
-          <ProjectsGrid projects={projects} locale={locale} />
+          <ProjectsGrid locale={locale} projects={projects} />
         ) : (
           <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 text-center">
             <div className="rounded-full bg-muted p-4">
               <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
+                className="text-muted-foreground"
                 fill="none"
+                height="48"
                 stroke="currentColor"
-                strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-muted-foreground"
+                strokeWidth="2"
+                viewBox="0 0 24 24"
+                width="48"
+                xmlns="http://www.w3.org/2000/svg"
               >
+                <title>{t('empty_state')}</title>
                 <path d="M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.69-.9L9.6 3.9A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2Z" />
               </svg>
             </div>

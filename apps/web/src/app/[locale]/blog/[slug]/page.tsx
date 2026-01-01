@@ -15,9 +15,15 @@ import { dateLocales } from '@/config/i18n'
 import { ReadTime } from '@/components/blog/read-time'
 import { badgeVariants } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
-import { Card, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
+import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardDescription,
+} from '@/components/ui/card'
 import { TwitterLogoIcon, LinkedInLogoIcon } from '@radix-ui/react-icons'
 import { Icons } from '@/components/icons'
+import { MdxRemote } from '@/components/docs/mdx-remote'
 
 interface BlogPostPageProps {
   params: Promise<{
@@ -51,14 +57,14 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
         {post.cover_media && (
           <div className="relative aspect-video overflow-hidden rounded-lg mb-8 not-prose">
             <CldImage
-              src={post.cover_media.public_id}
               alt={post.cover_media.alt_text || post.title}
-              width={1200}
-              height={630}
+              className="object-cover"
               crop="fill"
               gravity="auto"
-              className="object-cover"
+              height={630}
               priority
+              src={post.cover_media.public_id}
+              width={1200}
             />
           </div>
         )}
@@ -70,14 +76,26 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
           </h1>
 
           <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            {post.author && <span>{t('by')} {post.author.full_name}</span>}
+            {post.author && (
+              <span>
+                {t('by')} {post.author.full_name}
+              </span>
+            )}
             {(post.published_at || post.created_at) && (
-              <time dateTime={(post.published_at || post.created_at) || undefined}>
-                {formatDate((post.published_at || post.created_at) as string, dateLocales[locale])}
+              <time
+                dateTime={post.published_at || post.created_at || undefined}
+              >
+                {formatDate(
+                  (post.published_at || post.created_at) as string,
+                  dateLocales[locale]
+                )}
               </time>
             )}
             {post.read_time_minutes && (
-              <ReadTime time={post.read_time_minutes} messages={{ min_read: t('min_read') }} />
+              <ReadTime
+                messages={{ min_read: t('min_read') }}
+                time={post.read_time_minutes}
+              />
             )}
           </div>
 
@@ -86,9 +104,12 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
             <div className="flex flex-wrap gap-2 mt-4">
               {post.tags.map(tag => (
                 <Link
-                  key={tag.id}
+                  className={cn(
+                    badgeVariants({ variant: 'secondary' }),
+                    'hover:bg-primary hover:text-primary-foreground transition-colors'
+                  )}
                   href={`/blog?tag=${encodeURIComponent(tag.slug)}`}
-                  className={cn(badgeVariants({ variant: 'secondary' }), 'hover:bg-primary hover:text-primary-foreground transition-colors')}
+                  key={tag.id}
                   style={{ backgroundColor: tag.color || undefined }}
                 >
                   {tag.name}
@@ -99,7 +120,7 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
         </header>
 
         {/* Content */}
-        <div dangerouslySetInnerHTML={{ __html: post.content || '' }} />
+        {post.content ? <MdxRemote source={post.content} /> : null}
 
         {/* Author Card */}
         {post.author && (
@@ -109,35 +130,43 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
                 <div className="flex-1">
                   <CardTitle>{post.author.full_name}</CardTitle>
                   {post.author.bio && (
-                    <CardDescription className="mt-1">{post.author.bio}</CardDescription>
+                    <CardDescription className="mt-1">
+                      {post.author.bio}
+                    </CardDescription>
                   )}
                   <div className="flex gap-2 mt-3">
                     {post.author.twitter_username && (
                       <Link
+                        className={cn(
+                          buttonVariants({ variant: 'ghost', size: 'sm' })
+                        )}
                         href={`https://twitter.com/${post.author.twitter_username}`}
-                        target="_blank"
                         rel="noopener noreferrer"
-                        className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
+                        target="_blank"
                       >
                         <TwitterLogoIcon className="h-4 w-4" />
                       </Link>
                     )}
                     {post.author.github_username && (
                       <Link
+                        className={cn(
+                          buttonVariants({ variant: 'ghost', size: 'sm' })
+                        )}
                         href={`https://github.com/${post.author.github_username}`}
-                        target="_blank"
                         rel="noopener noreferrer"
-                        className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
+                        target="_blank"
                       >
                         <Icons.gitHub className="h-4 w-4" />
                       </Link>
                     )}
                     {post.author.linkedin_username && (
                       <Link
+                        className={cn(
+                          buttonVariants({ variant: 'ghost', size: 'sm' })
+                        )}
                         href={`https://linkedin.com/in/${post.author.linkedin_username}`}
-                        target="_blank"
                         rel="noopener noreferrer"
-                        className={cn(buttonVariants({ variant: 'ghost', size: 'sm' }))}
+                        target="_blank"
                       >
                         <LinkedInLogoIcon className="h-4 w-4" />
                       </Link>
@@ -177,7 +206,9 @@ export async function generateMetadata(
       ? `https://res.cloudinary.com/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/image/upload/c_fill,w_1200,h_630/${post.cover_media.public_id}`
       : absoluteUrl('/blog-og/default-og.jpg')
 
-  const authorTwitter = post.author?.twitter_username || siteConfig.links.twitter.username.replace('@', '')
+  const authorTwitter =
+    post.author?.twitter_username ||
+    siteConfig.links.twitter.username.replace('@', '')
 
   return {
     title: post.title,
@@ -189,7 +220,7 @@ export async function generateMetadata(
       description: post.excerpt || '',
       type: 'article',
       url: absoluteUrl(`/${locale}/blog/${post.slug}`),
-      publishedTime: (post.published_at || post.created_at) || undefined,
+      publishedTime: post.published_at || post.created_at || undefined,
       authors: [post.author?.full_name || siteConfig.author.name],
       tags: post.tags?.map(tag => tag.name) || [],
       images: [
