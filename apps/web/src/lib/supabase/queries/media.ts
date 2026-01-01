@@ -12,7 +12,9 @@ import type { Tables, TablesInsert } from '../database.types'
  * @param id - Media ID
  * @returns Media với creator info
  */
-export async function getMedia(id: string): Promise<QueryResult<MediaWithCreator>> {
+export async function getMedia(
+  id: string
+): Promise<QueryResult<MediaWithCreator>> {
   try {
     const supabase = await createClient()
 
@@ -26,7 +28,7 @@ export async function getMedia(id: string): Promise<QueryResult<MediaWithCreator
           full_name,
           email
         )
-      `,
+      `
       )
       .eq('id', id)
       .single()
@@ -52,7 +54,7 @@ export async function getMedia(id: string): Promise<QueryResult<MediaWithCreator
  * @returns Media record
  */
 export async function getMediaByPublicId(
-  publicId: string,
+  publicId: string
 ): Promise<QueryResult<Tables<'media'>>> {
   try {
     const supabase = await createClient()
@@ -86,7 +88,7 @@ export async function getMediaByPublicId(
  */
 export async function getMediaByType(
   resourceType: MediaResourceType,
-  limit = 50,
+  limit = 50
 ): Promise<QueryListResult<Tables<'media'>>> {
   try {
     const supabase = await createClient()
@@ -117,7 +119,7 @@ export async function getMediaByType(
  */
 export async function getMediaByFolder(
   folder: string,
-  limit = 50,
+  limit = 50
 ): Promise<QueryListResult<Tables<'media'>>> {
   try {
     const supabase = await createClient()
@@ -146,12 +148,16 @@ export async function getMediaByFolder(
  * @returns Created media record
  */
 export async function createMedia(
-  mediaData: TablesInsert<'media'>,
+  mediaData: TablesInsert<'media'>
 ): Promise<QueryResult<Tables<'media'>>> {
   try {
     const supabase = await createClient()
 
-    const { data, error } = await supabase.from('media').insert(mediaData).select().single()
+    const { data, error } = await supabase
+      .from('media')
+      .insert(mediaData)
+      .select()
+      .single()
 
     if (error) {
       throw error
@@ -172,7 +178,7 @@ export async function createMedia(
  */
 export async function updateMedia(
   id: string,
-  updates: Partial<TablesInsert<'media'>>,
+  updates: Partial<TablesInsert<'media'>>
 ): Promise<QueryResult<Tables<'media'>>> {
   try {
     const supabase = await createClient()
@@ -201,7 +207,9 @@ export async function updateMedia(
  * @param id - Media ID
  * @returns Success status
  */
-export async function deleteMedia(id: string): Promise<{ success: boolean; error: Error | null }> {
+export async function deleteMedia(
+  id: string
+): Promise<{ success: boolean; error: Error | null }> {
   try {
     const supabase = await createClient()
 
@@ -226,7 +234,7 @@ export async function deleteMedia(id: string): Promise<{ success: boolean; error
  */
 export async function searchMedia(
   searchQuery: string,
-  limit = 20,
+  limit = 20
 ): Promise<QueryListResult<Tables<'media'>>> {
   try {
     const supabase = await createClient()
@@ -254,7 +262,9 @@ export async function searchMedia(
  * @param limit - Maximum number of items (default: 20)
  * @returns Recent media list
  */
-export async function getRecentMedia(limit = 20): Promise<QueryListResult<MediaWithCreator>> {
+export async function getRecentMedia(
+  limit = 20
+): Promise<QueryListResult<MediaWithCreator>> {
   try {
     const supabase = await createClient()
 
@@ -268,7 +278,7 @@ export async function getRecentMedia(limit = 20): Promise<QueryListResult<MediaW
           full_name,
           email
         )
-      `,
+      `
       )
       .order('uploaded_at', { ascending: false })
       .limit(limit)
@@ -312,7 +322,10 @@ export async function getMediaStats(): Promise<{
     // Get total size (sum of bytes)
     const { data: sizeData } = await supabase.from('media').select('bytes')
 
-    const totalSize = (sizeData || []).reduce((sum, item) => sum + (item.bytes || 0), 0)
+    const totalSize = (sizeData || []).reduce(
+      (sum, item) => sum + (item.bytes || 0),
+      0
+    )
 
     return {
       totalImages: imageCount || 0,

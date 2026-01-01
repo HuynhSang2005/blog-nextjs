@@ -9,6 +9,23 @@ import type {
   PaginationParams,
 } from '../types-helpers'
 
+type TagJoinRow<TTag> = {
+  tag: TTag | null
+}
+
+function flattenTags<TTag>(rows: Array<TagJoinRow<TTag>> | null | undefined) {
+  return (rows || [])
+    .map(row => row.tag)
+    .filter((tag): tag is TTag => tag !== null)
+}
+
+function byOrderIndexAsc(
+  a: { order_index: number | null },
+  b: { order_index: number | null }
+) {
+  return (a.order_index ?? 0) - (b.order_index ?? 0)
+}
+
 /**
  * Lấy tất cả projects với pagination và filters
  * @param locale - Locale code (e.g., 'vi', 'en')
@@ -19,7 +36,7 @@ import type {
 export async function getProjects(
   locale: string,
   status?: ProjectStatus,
-  pagination?: PaginationParams,
+  pagination?: PaginationParams
 ): Promise<PaginatedResponse<ProjectListItem>> {
   try {
     const supabase = await createClient()
@@ -44,7 +61,7 @@ export async function getProjects(
           )
         )
       `,
-        { count: 'exact' },
+        { count: 'exact' }
       )
       .eq('locale', locale)
 
@@ -72,16 +89,21 @@ export async function getProjects(
     }
 
     // Transform tags structure
-    const projects = (data || []).map((project) => ({
+    const projects = (data || []).map(project => ({
       ...project,
-      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<ProjectListItem['tags'][number]>(
+        project.tags as unknown as Array<
+          TagJoinRow<ProjectListItem['tags'][number]>
+        >
+      ),
     })) as ProjectListItem[]
 
     // Calculate pagination
     const totalItems = count || 0
     const currentPage = pagination?.page || 1
     const currentPageSize = pagination?.pageSize || projects.length
-    const totalPages = currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
+    const totalPages =
+      currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
 
     return {
       data: projects,
@@ -107,7 +129,7 @@ export async function getProjects(
  */
 export async function getProject(
   slug: string,
-  locale: string,
+  locale: string
 ): Promise<QueryResult<ProjectWithRelations>> {
   try {
     const supabase = await createClient()
@@ -127,7 +149,7 @@ export async function getProject(
           *,
           media:media(*)
         )
-      `,
+      `
       )
       .eq('slug', slug)
       .eq('locale', locale)
@@ -144,13 +166,17 @@ export async function getProject(
     // Transform nested structures
     const project = {
       ...data,
-      tags: data.tags?.map((t: any) => t.tag).filter(Boolean) || [],
-      tech_stack: (data.tech_stack || []).sort(
-        (a: any, b: any) => (a.order_index || 0) - (b.order_index || 0),
+      tags: flattenTags<ProjectWithRelations['tags'][number]>(
+        data.tags as unknown as Array<
+          TagJoinRow<ProjectWithRelations['tags'][number]>
+        >
       ),
-      gallery: (data.gallery || []).sort(
-        (a: any, b: any) => (a.order_index || 0) - (b.order_index || 0),
-      ),
+      tech_stack: (
+        (data.tech_stack || []) as unknown as ProjectWithRelations['tech_stack']
+      ).sort(byOrderIndexAsc),
+      gallery: (
+        (data.gallery || []) as unknown as ProjectWithRelations['gallery']
+      ).sort(byOrderIndexAsc),
     } as ProjectWithRelations
 
     return { data: project, error: null }
@@ -168,7 +194,7 @@ export async function getProject(
  */
 export async function getFeaturedProjects(
   locale: string,
-  limit = 6,
+  limit = 6
 ): Promise<QueryListResult<ProjectListItem>> {
   try {
     const supabase = await createClient()
@@ -191,7 +217,7 @@ export async function getFeaturedProjects(
             color
           )
         )
-      `,
+      `
       )
       .eq('locale', locale)
       .eq('featured', true)
@@ -204,9 +230,13 @@ export async function getFeaturedProjects(
     }
 
     // Transform tags structure
-    const projects = (data || []).map((project) => ({
+    const projects = (data || []).map(project => ({
       ...project,
-      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<ProjectListItem['tags'][number]>(
+        project.tags as unknown as Array<
+          TagJoinRow<ProjectListItem['tags'][number]>
+        >
+      ),
     })) as ProjectListItem[]
 
     return { data: projects, error: null }
@@ -226,7 +256,7 @@ export async function getFeaturedProjects(
 export async function getProjectsByTag(
   tagSlug: string,
   locale: string,
-  pagination?: PaginationParams,
+  pagination?: PaginationParams
 ): Promise<PaginatedResponse<ProjectListItem>> {
   try {
     const supabase = await createClient()
@@ -303,11 +333,11 @@ export async function getProjectsByTag(
             color
           )
         )
-      `,
+      `
       )
       .in(
         'id',
-        projectIds.map((p) => p.project_id),
+        projectIds.map(p => p.project_id)
       )
       .eq('locale', locale)
       .order('order_index', { ascending: true, nullsFirst: false })
@@ -318,16 +348,21 @@ export async function getProjectsByTag(
     }
 
     // Transform tags structure
-    const transformedProjects = (projects || []).map((project) => ({
+    const transformedProjects = (projects || []).map(project => ({
       ...project,
-      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<ProjectListItem['tags'][number]>(
+        project.tags as unknown as Array<
+          TagJoinRow<ProjectListItem['tags'][number]>
+        >
+      ),
     })) as ProjectListItem[]
 
     // Calculate pagination
     const totalItems = count || 0
     const currentPage = pagination?.page || 1
     const currentPageSize = pagination?.pageSize || transformedProjects.length
-    const totalPages = currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
+    const totalPages =
+      currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
 
     return {
       data: transformedProjects,
@@ -353,7 +388,7 @@ export async function getProjectsByTag(
  */
 export async function getProjectsByStatus(
   status: ProjectStatus,
-  locale: string,
+  locale: string
 ): Promise<QueryListResult<ProjectListItem>> {
   try {
     const supabase = await createClient()
@@ -376,7 +411,7 @@ export async function getProjectsByStatus(
             color
           )
         )
-      `,
+      `
       )
       .eq('locale', locale)
       .eq('status', status)
@@ -388,9 +423,13 @@ export async function getProjectsByStatus(
     }
 
     // Transform tags structure
-    const projects = (data || []).map((project) => ({
+    const projects = (data || []).map(project => ({
       ...project,
-      tags: project.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<ProjectListItem['tags'][number]>(
+        project.tags as unknown as Array<
+          TagJoinRow<ProjectListItem['tags'][number]>
+        >
+      ),
     })) as ProjectListItem[]
 
     return { data: projects, error: null }

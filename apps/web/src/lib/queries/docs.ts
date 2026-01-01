@@ -219,7 +219,10 @@ export async function getDocByPath(
   }
 }
 
-function toLocalizedRecord(value: string, locale: LocaleOptions): LocalizedRecord {
+function toLocalizedRecord(
+  value: string,
+  locale: LocaleOptions
+): LocalizedRecord {
   return { [locale]: value } as LocalizedRecord
 }
 
@@ -233,19 +236,21 @@ export const getDocsSidebarNav = cache(
   async (locale: LocaleOptions): Promise<SidebarNavItem[]> => {
     const supabase = await createClient()
 
-    const [{ data: topics, error: topicsError }, { data: docs, error: docsError }] =
-      await Promise.all([
-        supabase
-          .from('docs_topics')
-          .select('id,name,order_index')
-          .order('order_index', { ascending: true }),
-        supabase
-          .from('docs')
-          .select('id,title,slug,topic_id,order_index')
-          .eq('locale', locale)
-          .order('order_index', { ascending: true })
-          .order('title', { ascending: true }),
-      ])
+    const [
+      { data: topics, error: topicsError },
+      { data: docs, error: docsError },
+    ] = await Promise.all([
+      supabase
+        .from('docs_topics')
+        .select('id,name,order_index')
+        .order('order_index', { ascending: true }),
+      supabase
+        .from('docs')
+        .select('id,title,slug,topic_id,order_index')
+        .eq('locale', locale)
+        .order('order_index', { ascending: true })
+        .order('title', { ascending: true }),
+    ])
 
     if (topicsError) {
       console.error('Error fetching docs topics for sidebar:', topicsError)
@@ -257,7 +262,10 @@ export const getDocsSidebarNav = cache(
       throw docsError
     }
 
-    const docsByTopic = new Map<string, Array<{ title: string; slug: string }>>()
+    const docsByTopic = new Map<
+      string,
+      Array<{ title: string; slug: string }>
+    >()
     for (const doc of docs ?? []) {
       if (!doc.topic_id) continue
       const list = docsByTopic.get(doc.topic_id) ?? []
@@ -266,18 +274,18 @@ export const getDocsSidebarNav = cache(
     }
 
     return (topics ?? [])
-      .map((topic) => {
+      .map(topic => {
         const topicDocs = docsByTopic.get(topic.id) ?? []
 
         return {
           title: toLocalizedRecord(topic.name, locale),
-          items: topicDocs.map((doc) => ({
+          items: topicDocs.map(doc => ({
             title: toLocalizedRecord(doc.title, locale),
             href: doc.slug === 'index' ? '/docs' : `/docs/${doc.slug}`,
             items: [],
           })),
         } satisfies SidebarNavItem
       })
-      .filter((topic) => topic.items.length > 0)
+      .filter(topic => topic.items.length > 0)
   }
 )

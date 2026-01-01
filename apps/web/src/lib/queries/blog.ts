@@ -7,6 +7,12 @@ export type BlogPost = Database['public']['Tables']['blog_posts']['Row'] & {
   tags?: Array<Database['public']['Tables']['tags']['Row']>
 }
 
+type TagRow = Database['public']['Tables']['tags']['Row']
+
+interface BlogPostTagJoinRow {
+  tag: TagRow | null
+}
+
 /**
  * Get all blog posts with related data
  * @param locale - Optional locale filter (default: 'vi')
@@ -97,11 +103,15 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
   }
 
   // Transform blog_post_tags to tags array
-  const post = data as any
-  const tags = post.blog_post_tags?.map((bpt: any) => bpt.tag) || []
-  delete post.blog_post_tags
+  const post = data as BlogPost & {
+    blog_post_tags?: BlogPostTagJoinRow[] | null
+  }
+  const tags = (post.blog_post_tags || [])
+    .map(bpt => bpt.tag)
+    .filter((tag): tag is TagRow => tag !== null)
+  const { blog_post_tags: _blogPostTags, ...rest } = post
 
-  return { ...post, tags } as BlogPost
+  return { ...rest, tags } as BlogPost
 }
 
 /**

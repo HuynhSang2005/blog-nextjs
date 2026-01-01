@@ -58,7 +58,10 @@ export async function getMedia(filters: MediaFilters = {}) {
   }
 
   if (filters.offset) {
-    query = query.range(filters.offset, filters.offset + (filters.limit || 10) - 1)
+    query = query.range(
+      filters.offset,
+      filters.offset + (filters.limit || 10) - 1
+    )
   }
 
   const { data, error, count } = await query
@@ -123,7 +126,7 @@ export async function getMediaFolders() {
   }
 
   // Get unique folders
-  const folders = [...new Set(data?.map((item) => item.folder).filter(Boolean))]
+  const folders = [...new Set(data?.map(item => item.folder).filter(Boolean))]
 
   return folders as string[]
 }
@@ -144,9 +147,9 @@ export async function getMediaStats() {
 
   const stats = {
     total: data?.length || 0,
-    images: data?.filter((item) => item.resource_type === 'image').length || 0,
-    videos: data?.filter((item) => item.resource_type === 'video').length || 0,
-    raw: data?.filter((item) => item.resource_type === 'raw').length || 0,
+    images: data?.filter(item => item.resource_type === 'image').length || 0,
+    videos: data?.filter(item => item.resource_type === 'video').length || 0,
+    raw: data?.filter(item => item.resource_type === 'raw').length || 0,
   }
 
   return stats

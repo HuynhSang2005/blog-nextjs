@@ -9,6 +9,16 @@ import type {
   PaginationParams,
 } from '../types-helpers'
 
+type TagJoinRow<TTag> = {
+  tag: TTag | null
+}
+
+function flattenTags<TTag>(rows: Array<TagJoinRow<TTag>> | null | undefined) {
+  return (rows || [])
+    .map(row => row.tag)
+    .filter((tag): tag is TTag => tag !== null)
+}
+
 /**
  * Filter parameters cho blog posts query
  */
@@ -42,7 +52,7 @@ export async function getBlogPosts(
   locale: string,
   status?: BlogPostStatus,
   pagination?: PaginationParams,
-  filters?: FilterParams,
+  filters?: FilterParams
 ): Promise<PaginatedResponse<BlogPostListItem>> {
   try {
     const supabase = await createClient()
@@ -84,7 +94,7 @@ export async function getBlogPosts(
         ),
         ${tagsSelect}
       `,
-        { count: 'exact' },
+        { count: 'exact' }
       )
       .eq('locale', locale)
 
@@ -100,7 +110,7 @@ export async function getBlogPosts(
     if (filters?.search) {
       const searchTerm = filters.search.trim()
       query = query.or(
-        `title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%`,
+        `title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%`
       )
     }
 
@@ -131,7 +141,10 @@ export async function getBlogPosts(
         query = query.order('title', { ascending: true })
         break
       case 'views':
-        query = query.order('view_count', { ascending: false, nullsFirst: false })
+        query = query.order('view_count', {
+          ascending: false,
+          nullsFirst: false,
+        })
         break
       default:
         query = query.order('published_at', { ascending: false })
@@ -152,16 +165,21 @@ export async function getBlogPosts(
     }
 
     // Transform tags structure (flatten nested array)
-    const posts = (data || []).map((post) => ({
+    const posts = (data || []).map(post => ({
       ...post,
-      tags: post.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<BlogPostListItem['tags'][number]>(
+        post.tags as unknown as Array<
+          TagJoinRow<BlogPostListItem['tags'][number]>
+        >
+      ),
     })) as BlogPostListItem[]
 
     // Calculate pagination
     const totalItems = count || 0
     const currentPage = pagination?.page || 1
     const currentPageSize = pagination?.pageSize || posts.length
-    const totalPages = currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
+    const totalPages =
+      currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
 
     return {
       data: posts,
@@ -187,7 +205,7 @@ export async function getBlogPosts(
  */
 export async function getBlogPost(
   slug: string,
-  locale: string,
+  locale: string
 ): Promise<QueryResult<BlogPostWithRelations>> {
   try {
     const supabase = await createClient()
@@ -203,7 +221,7 @@ export async function getBlogPost(
         tags:blog_post_tags(
           tag:tags(*)
         )
-      `,
+      `
       )
       .eq('slug', slug)
       .eq('locale', locale)
@@ -221,7 +239,11 @@ export async function getBlogPost(
     // Transform tags structure
     const post = {
       ...data,
-      tags: data.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<BlogPostWithRelations['tags'][number]>(
+        data.tags as unknown as Array<
+          TagJoinRow<BlogPostWithRelations['tags'][number]>
+        >
+      ),
     } as BlogPostWithRelations
 
     return { data: post, error: null }
@@ -241,7 +263,7 @@ export async function getBlogPost(
 export async function getBlogPostsByTag(
   tagSlug: string,
   locale: string,
-  pagination?: PaginationParams,
+  pagination?: PaginationParams
 ): Promise<PaginatedResponse<BlogPostListItem>> {
   try {
     const supabase = await createClient()
@@ -322,11 +344,11 @@ export async function getBlogPostsByTag(
             color
           )
         )
-      `,
+      `
       )
       .in(
         'id',
-        postIds.map((p) => p.blog_post_id),
+        postIds.map(p => p.blog_post_id)
       )
       .eq('locale', locale)
       .eq('status', 'published')
@@ -337,16 +359,21 @@ export async function getBlogPostsByTag(
     }
 
     // Transform tags structure
-    const transformedPosts = (posts || []).map((post) => ({
+    const transformedPosts = (posts || []).map(post => ({
       ...post,
-      tags: post.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<BlogPostListItem['tags'][number]>(
+        post.tags as unknown as Array<
+          TagJoinRow<BlogPostListItem['tags'][number]>
+        >
+      ),
     })) as BlogPostListItem[]
 
     // Calculate pagination
     const totalItems = count || 0
     const currentPage = pagination?.page || 1
     const currentPageSize = pagination?.pageSize || transformedPosts.length
-    const totalPages = currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
+    const totalPages =
+      currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
 
     return {
       data: transformedPosts,
@@ -372,7 +399,7 @@ export async function getBlogPostsByTag(
  */
 export async function getFeaturedBlogPosts(
   locale: string,
-  limit = 3,
+  limit = 3
 ): Promise<QueryListResult<BlogPostListItem>> {
   try {
     const supabase = await createClient()
@@ -399,7 +426,7 @@ export async function getFeaturedBlogPosts(
             color
           )
         )
-      `,
+      `
       )
       .eq('locale', locale)
       .eq('status', 'published')
@@ -412,9 +439,13 @@ export async function getFeaturedBlogPosts(
     }
 
     // Transform tags structure
-    const posts = (data || []).map((post) => ({
+    const posts = (data || []).map(post => ({
       ...post,
-      tags: post.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<BlogPostListItem['tags'][number]>(
+        post.tags as unknown as Array<
+          TagJoinRow<BlogPostListItem['tags'][number]>
+        >
+      ),
     })) as BlogPostListItem[]
 
     return { data: posts, error: null }
@@ -434,7 +465,7 @@ export async function getFeaturedBlogPosts(
 export async function getRelatedBlogPosts(
   postId: string,
   locale: string,
-  limit = 3,
+  limit = 3
 ): Promise<QueryListResult<BlogPostListItem>> {
   try {
     const supabase = await createClient()
@@ -449,7 +480,7 @@ export async function getRelatedBlogPosts(
       return { data: [], error: null }
     }
 
-    const tagIds = currentPostTags.map((t) => t.tag_id)
+    const tagIds = currentPostTags.map(t => t.tag_id)
 
     // Get posts with same tags
     const { data: relatedPostIds } = await supabase
@@ -462,7 +493,7 @@ export async function getRelatedBlogPosts(
       return { data: [], error: null }
     }
 
-    const uniquePostIds = [...new Set(relatedPostIds.map((p) => p.blog_post_id))]
+    const uniquePostIds = [...new Set(relatedPostIds.map(p => p.blog_post_id))]
 
     // Get full posts
     const { data, error } = await supabase
@@ -487,7 +518,7 @@ export async function getRelatedBlogPosts(
             color
           )
         )
-      `,
+      `
       )
       .in('id', uniquePostIds)
       .eq('locale', locale)
@@ -500,9 +531,13 @@ export async function getRelatedBlogPosts(
     }
 
     // Transform tags structure
-    const posts = (data || []).map((post) => ({
+    const posts = (data || []).map(post => ({
       ...post,
-      tags: post.tags?.map((t: any) => t.tag).filter(Boolean) || [],
+      tags: flattenTags<BlogPostListItem['tags'][number]>(
+        post.tags as unknown as Array<
+          TagJoinRow<BlogPostListItem['tags'][number]>
+        >
+      ),
     })) as BlogPostListItem[]
 
     return { data: posts, error: null }
