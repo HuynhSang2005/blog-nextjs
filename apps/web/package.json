@@ -18,7 +18,7 @@
   "dependencies": {
     "@emotion/is-prop-valid": "^1.4.0",
     "@hookform/resolvers": "^5.2.2",
-    "@mdxeditor/editor": "3.50.0",
+    "@mdxeditor/editor": "3.52.3",
     "@radix-ui/react-accordion": "^1.2.12",
     "@radix-ui/react-alert-dialog": "^1.1.15",
     "@radix-ui/react-aspect-ratio": "^1.1.8",
@@ -80,7 +80,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.28.5",
-    "@biomejs/biome": "^2.3.10",
+    "@biomejs/biome": "2.3.10",
     "@huynhsang-blog/biome-config": "workspace:*",
     "@huynhsang-blog/typescript-config": "workspace:*",
     "@playwright/test": "^1.57.0",
