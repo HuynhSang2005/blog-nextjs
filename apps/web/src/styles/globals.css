@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@import "./mdx-editor.css";
+
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
@@ -179,6 +181,3 @@
     @apply bg-background text-foreground;
   }
 }
-
-/* MDX Editor Styling */
-@import "./mdx-editor.css";
