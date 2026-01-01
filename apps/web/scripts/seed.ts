@@ -1,5 +1,8 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '../src/lib/supabase/database.types'
+import { readdir, readFile } from 'node:fs/promises'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
 /**
  * Seed Script cho Database
@@ -165,6 +168,167 @@ async function seedDocsTopics() {
   }
 
   console.log(`\n✨ Docs topics seeding complete: ${inserted} inserted, ${skipped} skipped`)
+}
+
+interface MdxFrontmatter {
+  title?: string
+  description?: string
+}
+
+function parseMdxFrontmatter(raw: string): { frontmatter: MdxFrontmatter; body: string } {
+  const match = raw.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/)
+  if (!match) {
+    return { frontmatter: {}, body: raw }
+  }
+
+  const yaml = match[1] ?? ''
+  const body = raw.slice(match[0].length)
+
+  const frontmatter: MdxFrontmatter = {}
+  for (const line of yaml.split('\n')) {
+    const trimmed = line.trim()
+    if (!trimmed || trimmed.startsWith('#')) continue
+
+    const colonIndex = trimmed.indexOf(':')
+    if (colonIndex === -1) continue
+
+    const key = trimmed.slice(0, colonIndex).trim()
+    const value = trimmed.slice(colonIndex + 1).trim()
+
+    if (key === 'title') frontmatter.title = value
+    if (key === 'description') frontmatter.description = value
+  }
+
+  return { frontmatter, body }
+}
+
+async function getAllMdxFiles(dirPath: string): Promise<string[]> {
+  const entries = await readdir(dirPath, { withFileTypes: true })
+  const results: string[] = []
+
+  for (const entry of entries) {
+    const fullPath = path.join(dirPath, entry.name)
+    if (entry.isDirectory()) {
+      results.push(...(await getAllMdxFiles(fullPath)))
+      continue
+    }
+    if (entry.isFile() && entry.name.endsWith('.mdx')) {
+      results.push(fullPath)
+    }
+  }
+
+  return results
+}
+
+function mdxFileToSlug(filePath: string, baseDir: string): string {
+  const rel = path.relative(baseDir, filePath)
+  const normalized = rel.split(path.sep).join('/')
+  return normalized.replace(/\.mdx$/i, '')
+}
+
+function inferTitleFromBody(body: string): string | undefined {
+  const match = body.match(/^#\s+(.+)$/m)
+  return match?.[1]?.trim() || undefined
+}
+
+async function getDefaultDocsTopicId(): Promise<string> {
+  const preferredSlug = 'nextjs'
+
+  const preferred = await supabase
+    .from('docs_topics')
+    .select('id')
+    .eq('slug', preferredSlug)
+    .single()
+
+  if (!preferred.error && preferred.data?.id) {
+    return preferred.data.id
+  }
+
+  const fallback = await supabase
+    .from('docs_topics')
+    .select('id')
+    .order('order_index', { ascending: true })
+    .limit(1)
+    .single()
+
+  if (fallback.error || !fallback.data?.id) {
+    throw new Error('Không tìm thấy docs topic để seed (docs_topics trống).')
+  }
+
+  return fallback.data.id
+}
+
+/**
+ * Seed Docs từ các file MDX trong `apps/content/docs/vi`.
+ * - Strips YAML frontmatter và lưu body vào `docs.content`
+ * - Đảm bảo có doc `slug = "index"` cho route `/[locale]/docs`
+ */
+async function seedDocsFromMdx() {
+  console.log('\n🧾 Seeding docs từ MDX files...')
+
+  const scriptDir = path.dirname(fileURLToPath(import.meta.url))
+  const docsDir = path.resolve(scriptDir, '../../content/docs/vi')
+
+  const topicId = await getDefaultDocsTopicId()
+  const mdxFiles = await getAllMdxFiles(docsDir)
+
+  if (mdxFiles.length === 0) {
+    console.log(`   ⏭️  Không tìm thấy file .mdx trong: ${docsDir}`)
+    return
+  }
+
+  const rows: Database['public']['Tables']['docs']['Insert'][] = []
+
+  for (const filePath of mdxFiles) {
+    const raw = await readFile(filePath, 'utf8')
+    const { frontmatter, body } = parseMdxFrontmatter(raw)
+
+    const slug = mdxFileToSlug(filePath, docsDir)
+    const title = frontmatter.title || inferTitleFromBody(body) || slug.split('/').pop() || slug
+
+    rows.push({
+      topic_id: topicId,
+      locale: 'vi',
+      slug,
+      title,
+      description: frontmatter.description || null,
+      content: body.trim(),
+      show_toc: true,
+      order_index: 0,
+      parent_id: null,
+    })
+  }
+
+  // Sort: index trước, sau đó theo slug
+  rows.sort((a, b) => {
+    const aSlug = a.slug
+    const bSlug = b.slug
+    if (aSlug === 'index' && bSlug !== 'index') return -1
+    if (bSlug === 'index' && aSlug !== 'index') return 1
+    return aSlug.localeCompare(bSlug)
+  })
+
+  rows.forEach((row, i) => {
+    row.order_index = i
+  })
+
+  const hasIndex = rows.some((r) => r.slug === 'index')
+  if (!hasIndex) {
+    console.warn('   ⚠️  Không có file index.mdx; `/vi/docs` sẽ fallback sang doc đầu tiên.')
+  }
+
+  const { error } = await supabase
+    .from('docs')
+    .upsert(rows, {
+      onConflict: 'topic_id,slug,locale',
+    })
+
+  if (error) {
+    console.error('   ❌ Failed to upsert docs:', error.message)
+    throw new Error(error.message)
+  }
+
+  console.log(`   ✅ Upserted ${rows.length} docs (topic_id=${topicId})`)
 }
 
 /**
@@ -340,6 +504,7 @@ async function main() {
     // Run seed functions
     await seedBlogTags()
     await seedDocsTopics()
+    await seedDocsFromMdx()
     await seedSkills()
     await seedAboutSections()
 
