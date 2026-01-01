@@ -19,6 +19,7 @@ import {
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { toast } from 'sonner'
+import { useLocale } from 'next-intl'
 
 type NavUserProps = {
   user: {
@@ -31,6 +32,7 @@ type NavUserProps = {
 export function NavUser({ user }: NavUserProps) {
   const { isMobile } = useSidebar()
   const router = useRouter()
+  const locale = useLocale()
   const supabase = createClient()
 
   const handleSignOut = async () => {
@@ -40,7 +42,7 @@ export function NavUser({ user }: NavUserProps) {
       return
     }
     toast.success('Đã đăng xuất')
-    router.push('/vi/login')
+    router.push(`/${locale}/login`)
     router.refresh()
   }
 
@@ -95,7 +97,7 @@ export function NavUser({ user }: NavUserProps) {
               </div>
             </DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.push(`/${locale}/admin/settings`)}>
               <Settings className="mr-2 h-4 w-4" />
               Cài đặt
             </DropdownMenuItem>

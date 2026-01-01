@@ -245,7 +245,15 @@
         "create_success": "Đã tạo bài viết thành công",
         "update_success": "Đã cập nhật bài viết thành công",
         "publish_success": "Đã xuất bản bài viết",
-        "unpublish_success": "Đã hủy xuất bản bài viết"
+        "unpublish_success": "Đã hủy xuất bản bài viết",
+        "editor_initializing": "Đang khởi tạo trình soạn thảo...",
+        "cloudinary_missing_config": "Thiếu cấu hình Cloudinary. Vui lòng kiểm tra biến môi trường.",
+        "image_upload_failed": "Không thể tải ảnh lên. Vui lòng thử lại."
+      },
+      "form": {
+        "placeholders": {
+          "content": "Nhập nội dung..."
+        }
       }
     },
     "docs": {
@@ -419,6 +427,128 @@
       "save": "Lưu",
       "saving": "Đang lưu...",
       "deleting": "Đang xóa..."
+    },
+    "about": {
+      "title": "Quản lý trang Giới thiệu",
+      "description": "Tạo, chỉnh sửa và quản lý nội dung trang Giới thiệu",
+      "common": {
+        "actions": "Thao tác",
+        "open_menu": "Mở menu",
+        "empty": "Chưa có dữ liệu.",
+        "yes": "Có",
+        "no": "Không",
+        "na": "N/A"
+      },
+      "actions": {
+        "create_section": "Thêm mục nội dung",
+        "create_timeline": "Thêm timeline",
+        "create_skill": "Thêm kỹ năng",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "cancel": "Hủy",
+        "save": "Lưu",
+        "saving": "Đang lưu..."
+      },
+      "messages": {
+        "required_fields": "Vui lòng nhập đầy đủ các trường bắt buộc",
+        "invalid_skill_category": "Category chỉ cho phép: frontend, backend, tools",
+        "create_success": "Đã tạo thành công",
+        "update_success": "Đã cập nhật thành công",
+        "save_error": "Không thể lưu thay đổi",
+        "delete_success": "Đã xóa thành công",
+        "delete_error": "Không thể xóa"
+      },
+      "delete": {
+        "confirm_title": "Xác nhận xóa",
+        "confirm_description": "Bạn có chắc muốn xóa: {title}? Hành động này không thể hoàn tác."
+      },
+      "sections": {
+        "title": "Nội dung",
+        "description": "Quản lý các block nội dung (bio, contact, ...)",
+        "table": {
+          "section_key": "Khóa",
+          "title": "Tiêu đề",
+          "visible": "Hiển thị"
+        },
+        "dialog": {
+          "create_title": "Thêm mục nội dung",
+          "edit_title": "Chỉnh sửa mục nội dung",
+          "description": "Các mục này sẽ được dùng để render trang /about."
+        },
+        "form": {
+          "section_key": "Khóa (section_key)",
+          "title": "Tiêu đề",
+          "content": "Nội dung",
+          "order_index": "Thứ tự",
+          "visible": "Hiển thị",
+          "visible_hint": "Bật để hiện trên trang public",
+          "title_placeholder": "Nhập tiêu đề...",
+          "content_placeholder": "Nhập nội dung..."
+        }
+      },
+      "timeline": {
+        "title": "Timeline",
+        "description": "Quản lý hành trình, kinh nghiệm và các cột mốc",
+        "table": {
+          "title": "Tiêu đề",
+          "type": "Loại",
+          "start_date": "Bắt đầu",
+          "current": "Hiện tại"
+        },
+        "dialog": {
+          "create_title": "Thêm timeline",
+          "edit_title": "Chỉnh sửa timeline",
+          "description": "Timeline sẽ hiển thị ở trang Giới thiệu."
+        },
+        "form": {
+          "title": "Tiêu đề",
+          "subtitle": "Phụ đề",
+          "description": "Mô tả",
+          "event_type": "Loại",
+          "start_date": "Ngày bắt đầu",
+          "end_date": "Ngày kết thúc",
+          "is_current": "Đang diễn ra",
+          "is_current_hint": "Bật nếu sự kiện đang diễn ra (end_date sẽ trống)",
+          "order_index": "Thứ tự",
+          "title_placeholder": "Nhập tiêu đề...",
+          "subtitle_placeholder": "Nhập phụ đề (tùy chọn)...",
+          "description_placeholder": "Nhập mô tả (tùy chọn)..."
+        }
+      },
+      "skills": {
+        "title": "Kỹ năng",
+        "description": "Quản lý danh sách kỹ năng theo nhóm",
+        "table": {
+          "name": "Tên",
+          "proficiency": "Độ thành thạo"
+        },
+        "dialog": {
+          "create_title": "Thêm kỹ năng",
+          "edit_title": "Chỉnh sửa kỹ năng",
+          "description": "Kỹ năng sẽ được nhóm theo category khi hiển thị."
+        },
+        "form": {
+          "name": "Tên kỹ năng",
+          "category": "Nhóm (category)",
+          "proficiency": "Độ thành thạo (%)",
+          "order_index": "Thứ tự",
+          "icon": "Icon (tùy chọn)",
+          "color": "Màu (tùy chọn)",
+          "name_placeholder": "Ví dụ: Next.js",
+          "category_placeholder": "Ví dụ: frontend",
+          "icon_placeholder": "Ví dụ: nextjs",
+          "color_placeholder": "Ví dụ: var(--primary)"
+        }
+      }
+    },
+    "help": {
+      "title": "Trợ giúp",
+      "description": "Hướng dẫn nhanh cho module Admin",
+      "tips": {
+        "locale_prefix": "Đang ở locale: {locale}. Các đường dẫn Admin nên có dạng /{locale}/admin/...",
+        "auth": "Nếu gặp 401/403 hoặc dữ liệu không tải được, hãy kiểm tra đăng nhập và RLS policies trong Supabase.",
+        "support": "Nếu cần hỗ trợ thêm, hãy tạo issue hoặc liên hệ qua kênh nội bộ của dự án."
+      }
     }
   },
 

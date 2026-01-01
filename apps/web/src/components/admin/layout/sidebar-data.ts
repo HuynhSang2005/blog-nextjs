@@ -23,67 +23,69 @@ export type NavGroup = {
   items: NavItem[]
 }
 
-export const adminSidebarData = {
-  navGroups: [
-    {
-      title: 'Quản lý nội dung',
-      items: [
-        {
-          title: 'Dashboard',
-          url: '/vi/admin',
-          icon: LayoutGrid,
-        },
-        {
-          title: 'Blog Posts',
-          url: '/vi/admin/blog',
-          icon: FileText,
-        },
-        {
-          title: 'Docs',
-          url: '/vi/admin/docs',
-          icon: BookOpen,
-        },
-        {
-          title: 'Projects',
-          url: '/vi/admin/projects',
-          icon: FolderKanban,
-        },
-      ],
-    },
-    {
-      title: 'Cấu hình',
-      items: [
-        {
-          title: 'About',
-          url: '/vi/admin/about',
-          icon: User,
-        },
-        {
-          title: 'Tags',
-          url: '/vi/admin/tags',
-          icon: Tags,
-        },
-        {
-          title: 'Media',
-          url: '/vi/admin/media',
-          icon: Image,
-        },
-      ],
-    },
-    {
-      title: 'Khác',
-      items: [
-        {
-          title: 'Settings',
-          url: '/vi/admin/settings',
-          icon: Settings,
-        },
-        {
-          title: 'Help',
-          url: '/vi/admin/help',
-          icon: HelpCircle,
-        },
-      ],
-    },
-  ] as NavGroup[],
+export function getAdminSidebarData(locale: string): { navGroups: NavGroup[] } {
+  return {
+    navGroups: [
+      {
+        title: 'Quản lý nội dung',
+        items: [
+          {
+            title: 'Tổng quan',
+            url: `/${locale}/admin`,
+            icon: LayoutGrid,
+          },
+          {
+            title: 'Bài viết',
+            url: `/${locale}/admin/blog`,
+            icon: FileText,
+          },
+          {
+            title: 'Tài liệu',
+            url: `/${locale}/admin/docs`,
+            icon: BookOpen,
+          },
+          {
+            title: 'Dự án',
+            url: `/${locale}/admin/projects`,
+            icon: FolderKanban,
+          },
+        ],
+      },
+      {
+        title: 'Cấu hình',
+        items: [
+          {
+            title: 'Giới thiệu',
+            url: `/${locale}/admin/about`,
+            icon: User,
+          },
+          {
+            title: 'Thẻ',
+            url: `/${locale}/admin/tags`,
+            icon: Tags,
+          },
+          {
+            title: 'Media',
+            url: `/${locale}/admin/media`,
+            icon: Image,
+          },
+        ],
+      },
+      {
+        title: 'Khác',
+        items: [
+          {
+            title: 'Cài đặt',
+            url: `/${locale}/admin/settings`,
+            icon: Settings,
+          },
+          {
+            title: 'Trợ giúp',
+            url: `/${locale}/admin/help`,
+            icon: HelpCircle,
+          },
+        ],
+      },
+    ],
+  }
 }
