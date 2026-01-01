@@ -16,7 +16,14 @@ interface ProjectInfoProps {
     github_url: string | null
     project_tech_stack?: Array<{
       name: string
-      category: 'frontend' | 'backend' | 'database' | 'devops' | 'tools' | 'other' | null
+      category:
+        | 'frontend'
+        | 'backend'
+        | 'database'
+        | 'devops'
+        | 'tools'
+        | 'other'
+        | null
       icon: string | null
       order_index: number | null
     }> | null
@@ -30,7 +37,11 @@ export async function ProjectInfo({ project }: ProjectInfoProps) {
   const techByCategory = groupTechByCategory(project.project_tech_stack || [])
 
   // Format duration
-  const duration = formatDuration(project.start_date, project.end_date, t('present'))
+  const duration = formatDuration(
+    project.start_date,
+    project.end_date,
+    t('present')
+  )
 
   // Get status label
   const statusLabel = getStatusLabel(project.status)
@@ -53,7 +64,9 @@ export async function ProjectInfo({ project }: ProjectInfoProps) {
           {/* Duration */}
           {duration && (
             <div className="flex items-start justify-between gap-4 text-sm">
-              <span className="text-muted-foreground">{t('duration_label')}</span>
+              <span className="text-muted-foreground">
+                {t('duration_label')}
+              </span>
               <span className="font-medium text-right">{duration}</span>
             </div>
           )}
@@ -70,7 +83,7 @@ export async function ProjectInfo({ project }: ProjectInfoProps) {
 
             <div className="space-y-6">
               {techByCategory.map(({ category, techs }) => (
-                <div key={category} className="space-y-2">
+                <div className="space-y-2" key={category}>
                   {/* Category Heading */}
                   <h3 className="text-sm font-medium text-muted-foreground">
                     {getCategoryLabel(category)}
@@ -78,11 +91,11 @@ export async function ProjectInfo({ project }: ProjectInfoProps) {
 
                   {/* Technology Badges */}
                   <div className="flex flex-wrap gap-2">
-                    {techs.map((tech, index) => (
+                    {techs.map(tech => (
                       <Badge
-                        key={index}
-                        variant="secondary"
                         className="gap-1.5"
+                        key={`${tech.name}-${tech.icon ?? ''}`}
+                        variant="secondary"
                       >
                         {tech.icon && (
                           <span className="text-xs">{tech.icon}</span>
@@ -109,13 +122,13 @@ export async function ProjectInfo({ project }: ProjectInfoProps) {
             {project.demo_url && (
               <Button
                 asChild
-                variant="outline"
                 className="w-full justify-start gap-2"
+                variant="outline"
               >
                 <a
                   href={project.demo_url}
-                  target="_blank"
                   rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <ExternalLink className="h-4 w-4" />
                   {t('demo_link')}
@@ -126,13 +139,13 @@ export async function ProjectInfo({ project }: ProjectInfoProps) {
             {project.github_url && (
               <Button
                 asChild
-                variant="outline"
                 className="w-full justify-start gap-2"
+                variant="outline"
               >
                 <a
                   href={project.github_url}
-                  target="_blank"
                   rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <Github className="h-4 w-4" />
                   {t('github_link')}
@@ -163,21 +176,24 @@ function groupTechByCategory(
   )
 
   // Group by category
-  const grouped = sorted.reduce((acc, tech) => {
-    const category = tech.category || 'other'
-    const existing = acc.find((item) => item.category === category)
+  const grouped = sorted.reduce(
+    (acc, tech) => {
+      const category = tech.category || 'other'
+      const existing = acc.find(item => item.category === category)
 
-    if (existing) {
-      existing.techs.push(tech)
-    } else {
-      acc.push({
-        category,
-        techs: [tech],
-      })
-    }
+      if (existing) {
+        existing.techs.push(tech)
+      } else {
+        acc.push({
+          category,
+          techs: [tech],
+        })
+      }
 
-    return acc
-  }, [] as Array<{ category: string; techs: typeof techStack }>)
+      return acc
+    },
+    [] as Array<{ category: string; techs: typeof techStack }>
+  )
 
   // Sort categories by predefined order
   const categoryOrder = [

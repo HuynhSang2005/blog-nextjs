@@ -5,7 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Progress } from '@/components/ui/progress'
 import { useTranslations } from 'next-intl'
 import { cn } from '@/lib/utils'
-import * as LucideIcons from 'lucide-react'
+import { DynamicIcon, iconNames, type IconName } from 'lucide-react/dynamic'
 
 interface Skill {
   id: string
@@ -29,10 +29,10 @@ interface SkillCardProps {
 function SkillCard({ skill }: SkillCardProps) {
   const t = useTranslations('about.skills')
 
-  // Try to get Lucide icon dynamically
-  const IconComponent = skill.icon
-    ? (LucideIcons[skill.icon as keyof typeof LucideIcons] as React.ElementType)
-    : null
+  const iconName =
+    skill.icon && iconNames.includes(skill.icon as IconName)
+      ? (skill.icon as IconName)
+      : null
 
   // Default color if none specified
   const badgeStyle = skill.color
@@ -50,7 +50,7 @@ function SkillCard({ skill }: SkillCardProps) {
           <CardTitle className="text-base font-semibold leading-tight">
             {skill.name}
           </CardTitle>
-          {IconComponent && (
+          {iconName && (
             <div
               className={cn(
                 'rounded-lg p-2 transition-colors',
@@ -65,7 +65,7 @@ function SkillCard({ skill }: SkillCardProps) {
                   : undefined
               }
             >
-              <IconComponent className="h-5 w-5" />
+              <DynamicIcon className="h-5 w-5" name={iconName} />
             </div>
           )}
         </div>
@@ -75,12 +75,11 @@ function SkillCard({ skill }: SkillCardProps) {
         <CardContent className="space-y-2">
           <div className="flex items-center justify-between text-sm">
             <span className="text-muted-foreground">{t('proficiency')}</span>
-            <Badge variant="secondary" style={badgeStyle}>
+            <Badge style={badgeStyle} variant="secondary">
               {skill.proficiency}%
             </Badge>
           </div>
           <Progress
-            value={skill.proficiency}
             className="h-2"
             style={
               skill.color
@@ -89,6 +88,7 @@ function SkillCard({ skill }: SkillCardProps) {
                   } as React.CSSProperties)
                 : undefined
             }
+            value={skill.proficiency}
           />
         </CardContent>
       )}
@@ -97,14 +97,17 @@ function SkillCard({ skill }: SkillCardProps) {
 }
 
 function groupSkillsByCategory(skills: Skill[]) {
-  return skills.reduce((acc, skill) => {
-    const category = skill.category || 'other'
-    if (!acc[category]) {
-      acc[category] = []
-    }
-    acc[category].push(skill)
-    return acc
-  }, {} as Record<string, Skill[]>)
+  return skills.reduce(
+    (acc, skill) => {
+      const category = skill.category || 'other'
+      if (!acc[category]) {
+        acc[category] = []
+      }
+      acc[category].push(skill)
+      return acc
+    },
+    {} as Record<string, Skill[]>
+  )
 }
 
 export function SkillsGrid({ skills }: SkillsGridProps) {
@@ -120,12 +123,12 @@ export function SkillsGrid({ skills }: SkillsGridProps) {
 
   const groupedSkills = groupSkillsByCategory(skills)
   const categories = Object.keys(groupedSkills).filter(
-    (key) => groupedSkills[key] && groupedSkills[key].length > 0
+    key => groupedSkills[key] && groupedSkills[key].length > 0
   ) as Array<'frontend' | 'backend' | 'tools' | 'soft_skills' | 'other'>
 
   return (
     <div className="space-y-12">
-      {categories.map((category) => {
+      {categories.map(category => {
         const categorySkills = groupedSkills[category]
         if (!categorySkills || categorySkills.length === 0) {
           return null
@@ -138,7 +141,7 @@ export function SkillsGrid({ skills }: SkillsGridProps) {
             </h3>
 
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {categorySkills.map((skill) => (
+              {categorySkills.map(skill => (
                 <SkillCard key={skill.id} skill={skill} />
               ))}
             </div>

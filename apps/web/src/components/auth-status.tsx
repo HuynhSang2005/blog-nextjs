@@ -2,7 +2,7 @@
 
 import { useRouter } from 'next/navigation'
 import { useTranslations } from 'next-intl'
-import { User } from '@supabase/supabase-js'
+import type { User } from '@supabase/supabase-js'
 import { Button } from '@/components/ui/button'
 import { signOut } from '@/app/actions/auth'
 
@@ -32,10 +32,7 @@ export function AuthStatus({ user }: AuthStatusProps) {
 
   if (!user) {
     return (
-      <Button
-        variant="outline"
-        onClick={() => router.push('/login')}
-      >
+      <Button onClick={() => router.push('/login')} variant="outline">
         {t('login.title')}
       </Button>
     )
@@ -43,14 +40,8 @@ export function AuthStatus({ user }: AuthStatusProps) {
 
   return (
     <div className="flex items-center gap-3">
-      <span className="text-sm text-muted-foreground">
-        {user.email}
-      </span>
-      <Button
-        variant="outline"
-        size="sm"
-        onClick={handleLogout}
-      >
+      <span className="text-sm text-muted-foreground">{user.email}</span>
+      <Button onClick={handleLogout} size="sm" variant="outline">
         {t('logout')}
       </Button>
     </div>

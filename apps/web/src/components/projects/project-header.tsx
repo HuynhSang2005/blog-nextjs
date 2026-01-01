@@ -46,16 +46,13 @@ export async function ProjectHeader({ project }: ProjectHeaderProps) {
     <header className="space-y-6">
       {/* Breadcrumb Navigation */}
       <nav className="flex items-center space-x-2 text-sm text-muted-foreground">
-        <Link
-          href="/vi"
-          className="hover:text-foreground transition-colors"
-        >
+        <Link className="hover:text-foreground transition-colors" href="/vi">
           {t('breadcrumb_home')}
         </Link>
         <ChevronRight className="h-4 w-4" />
         <Link
-          href="/vi/projects"
           className="hover:text-foreground transition-colors"
+          href="/vi/projects"
         >
           {t('breadcrumb_projects')}
         </Link>
@@ -83,7 +80,7 @@ export async function ProjectHeader({ project }: ProjectHeaderProps) {
       <div className="flex flex-wrap items-center gap-4">
         {/* Status Badge */}
         {project.status && (
-          <Badge variant={statusConfig.variant} className="gap-1.5">
+          <Badge className="gap-1.5" variant={statusConfig.variant}>
             <statusConfig.icon className="h-3.5 w-3.5" />
             {statusConfig.label}
           </Badge>
@@ -103,9 +100,8 @@ export async function ProjectHeader({ project }: ProjectHeaderProps) {
         <div className="flex flex-wrap gap-2">
           {project.project_tags.map(({ tag }) => (
             <Badge
-              key={tag.id}
-              variant="secondary"
               className="hover:bg-secondary/80 transition-colors"
+              key={tag.id}
               style={
                 tag.color
                   ? {
@@ -114,6 +110,7 @@ export async function ProjectHeader({ project }: ProjectHeaderProps) {
                     }
                   : undefined
               }
+              variant="secondary"
             >
               {tag.name}
             </Badge>
@@ -127,11 +124,11 @@ export async function ProjectHeader({ project }: ProjectHeaderProps) {
           <Separator className="my-6" />
           <div className="flex flex-wrap gap-4">
             {project.demo_url && (
-              <Button asChild size="lg" className="gap-2">
+              <Button asChild className="gap-2" size="lg">
                 <a
                   href={project.demo_url}
-                  target="_blank"
                   rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <ExternalLink className="h-4 w-4" />
                   {t('view_demo')}
@@ -140,11 +137,11 @@ export async function ProjectHeader({ project }: ProjectHeaderProps) {
             )}
 
             {project.github_url && (
-              <Button asChild size="lg" variant="outline" className="gap-2">
+              <Button asChild className="gap-2" size="lg" variant="outline">
                 <a
                   href={project.github_url}
-                  target="_blank"
                   rel="noopener noreferrer"
+                  target="_blank"
                 >
                   <Github className="h-4 w-4" />
                   {t('view_code')}
@@ -200,14 +197,15 @@ function getStatusConfig(
           <svg
             className={className}
             fill="none"
-            viewBox="0 0 24 24"
             stroke="currentColor"
+            viewBox="0 0 24 24"
           >
+            <title>Hoàn thành</title>
             <path
+              d="M5 13l4 4L19 7"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M5 13l4 4L19 7"
             />
           </svg>
         )
@@ -216,14 +214,15 @@ function getStatusConfig(
           <svg
             className={className}
             fill="none"
-            viewBox="0 0 24 24"
             stroke="currentColor"
+            viewBox="0 0 24 24"
           >
+            <title>Đã lưu trữ</title>
             <path
+              d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
               strokeLinecap="round"
               strokeLinejoin="round"
               strokeWidth={2}
-              d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"
             />
           </svg>
         )

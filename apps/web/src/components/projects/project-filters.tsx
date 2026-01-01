@@ -54,7 +54,7 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
 
   function updateFilters(key: string, value: string | null) {
     const params = new URLSearchParams(searchParams.toString())
-    
+
     if (value === null) {
       params.delete(key)
     } else {
@@ -75,7 +75,7 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
       <div className="container py-4">
         {/* Status Filters */}
         <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
-          {filters.map((filter) => {
+          {filters.map(filter => {
             const isActive =
               filter.value === null
                 ? currentStatus === null
@@ -83,19 +83,16 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
 
             return (
               <Button
-                key={filter.value || 'all'}
-                variant={isActive ? 'default' : 'outline'}
-                size="sm"
                 className="shrink-0"
+                key={filter.value || 'all'}
                 onClick={() => updateFilters('status', filter.value)}
+                size="sm"
+                variant={isActive ? 'default' : 'outline'}
               >
                 {filter.label}
                 <Badge
+                  className={cn('ml-2', isActive && 'bg-primary-foreground/20')}
                   variant="secondary"
-                  className={cn(
-                    'ml-2',
-                    isActive && 'bg-primary-foreground/20'
-                  )}
                 >
                   {filter.count}
                 </Badge>
@@ -105,12 +102,15 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
 
           {/* Featured Filter */}
           <Button
-            variant={currentFeatured === 'true' ? 'default' : 'outline'}
-            size="sm"
             className="shrink-0"
             onClick={() =>
-              updateFilters('featured', currentFeatured === 'true' ? null : 'true')
+              updateFilters(
+                'featured',
+                currentFeatured === 'true' ? null : 'true'
+              )
             }
+            size="sm"
+            variant={currentFeatured === 'true' ? 'default' : 'outline'}
           >
             {t('filters.featured')}
           </Button>
@@ -124,33 +124,37 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
             </span>
             <div className="flex flex-wrap gap-2">
               {currentStatus && (
-                <Badge variant="secondary" className="gap-1">
-                  {filters.find((f) => f.value === currentStatus)?.label}
+                <Badge className="gap-1" variant="secondary">
+                  {filters.find(f => f.value === currentStatus)?.label}
                   <button
-                    onClick={() => updateFilters('status', null)}
                     className="ml-1 hover:text-foreground"
+                    onClick={() => updateFilters('status', null)}
+                    type="button"
                   >
                     <X className="h-3 w-3" />
+                    <span className="sr-only">Xóa bộ lọc trạng thái</span>
                   </button>
                 </Badge>
               )}
               {currentFeatured === 'true' && (
-                <Badge variant="secondary" className="gap-1">
+                <Badge className="gap-1" variant="secondary">
                   {t('filters.featured')}
                   <button
-                    onClick={() => updateFilters('featured', null)}
                     className="ml-1 hover:text-foreground"
+                    onClick={() => updateFilters('featured', null)}
+                    type="button"
                   >
                     <X className="h-3 w-3" />
+                    <span className="sr-only">Xóa bộ lọc nổi bật</span>
                   </button>
                 </Badge>
               )}
             </div>
             <Button
-              variant="ghost"
-              size="sm"
-              onClick={clearAllFilters}
               className="ml-auto"
+              onClick={clearAllFilters}
+              size="sm"
+              variant="ghost"
             >
               {t('clear_filters')}
             </Button>

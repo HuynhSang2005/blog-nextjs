@@ -72,7 +72,9 @@ function TimelineEventCard({ event, index, isLeft }: TimelineEventCardProps) {
   const colorClass = getEventColor(event.event_type)
 
   // Format dates
-  const startDate = format(new Date(event.start_date), 'MMM yyyy', { locale: vi })
+  const startDate = format(new Date(event.start_date), 'MMM yyyy', {
+    locale: vi,
+  })
   const endDate = event.is_current
     ? t('present')
     : event.end_date
@@ -106,7 +108,7 @@ function TimelineEventCard({ event, index, isLeft }: TimelineEventCardProps) {
                   </p>
                 )}
               </div>
-              <Badge variant="secondary" className="shrink-0">
+              <Badge className="shrink-0" variant="secondary">
                 {t(`types.${event.event_type}`)}
               </Badge>
             </div>
@@ -128,11 +130,11 @@ function TimelineEventCard({ event, index, isLeft }: TimelineEventCardProps) {
               {event.media && (
                 <div className="relative aspect-video overflow-hidden rounded-lg">
                   <CldImage
-                    src={event.media.public_id}
                     alt={event.media.alt_text || event.title}
-                    fill
                     className="object-cover"
+                    fill
                     sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 600px"
+                    src={event.media.public_id}
                   />
                 </div>
               )}
@@ -172,18 +174,18 @@ export function Timeline({ events }: TimelineProps) {
     <div className="relative">
       {/* Vertical line - Hidden on mobile */}
       <div
-        className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-border md:block"
         aria-hidden="true"
+        className="absolute left-1/2 top-0 hidden h-full w-px -translate-x-1/2 bg-border md:block"
       />
 
       {/* Timeline Events */}
       <div className="space-y-8">
         {events.map((event, index) => (
           <TimelineEventCard
-            key={event.id}
             event={event}
             index={index}
             isLeft={index % 2 === 0}
+            key={event.id}
           />
         ))}
       </div>

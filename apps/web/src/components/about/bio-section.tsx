@@ -1,13 +1,13 @@
-'use client'
-
 import { CldImage } from 'next-cloudinary'
 import { Card } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { MapPin, Briefcase, Mail, Calendar } from 'lucide-react'
-import { useTranslations } from 'next-intl'
+import { getTranslations } from 'next-intl/server'
 import { cn } from '@/lib/utils'
+import { MdxRemote } from '@/components/docs/mdx-remote'
 
 interface BioSectionProps {
+  locale: string
   content: string
   profile: {
     full_name: string | null
@@ -52,8 +52,12 @@ function InfoCard({ icon: Icon, label, value, className }: InfoCardProps) {
   )
 }
 
-export function BioSection({ content, profile }: BioSectionProps) {
-  const t = useTranslations('about.bio')
+export async function BioSection({
+  locale,
+  content,
+  profile,
+}: BioSectionProps) {
+  const t = await getTranslations({ locale, namespace: 'about.bio' })
 
   // Calculate years of experience (từ created_at)
   const createdDate = new Date(profile.created_at)
@@ -150,10 +154,9 @@ export function BioSection({ content, profile }: BioSectionProps) {
 
           {/* MDX content (nếu có) */}
           {content && (
-            <div
-              className="prose prose-gray dark:prose-invert max-w-none"
-              dangerouslySetInnerHTML={{ __html: content }}
-            />
+            <div className="prose prose-gray dark:prose-invert max-w-none">
+              <MdxRemote source={content} />
+            </div>
           )}
 
           {/* Info cards grid */}

@@ -19,7 +19,7 @@ interface BlogPaginationProps {
 
 /**
  * Client Component - Blog pagination controls
- * 
+ *
  * Sử dụng URL searchParams làm single source of truth
  * Preserve tất cả search params khác khi change page
  */
@@ -63,19 +63,20 @@ export function BlogPagination({
 
   // Generate page numbers to display
   const pageNumbers = generatePageNumbers(currentPage, totalPages)
+  let ellipsisIndex = 0
 
   return (
     <nav
+      aria-label="Phân trang blog"
       className="flex items-center justify-center gap-2 mt-8"
-      aria-label="Blog pagination"
     >
       {/* Previous button */}
       <Button
-        variant="outline"
-        size="sm"
-        onClick={() => goToPage(currentPage - 1)}
-        disabled={!hasPrevious}
         aria-label={messages.go_to_previous_page}
+        disabled={!hasPrevious}
+        onClick={() => goToPage(currentPage - 1)}
+        size="sm"
+        variant="outline"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
         {messages.previous}
@@ -83,12 +84,13 @@ export function BlogPagination({
 
       {/* Page numbers */}
       <div className="flex items-center gap-1">
-        {pageNumbers.map((pageNum, index) => {
+        {pageNumbers.map(pageNum => {
           if (pageNum === '...') {
+            ellipsisIndex += 1
             return (
               <span
-                key={`ellipsis-${index}`}
                 className="px-2 text-muted-foreground"
+                key={`ellipsis-${ellipsisIndex}`}
               >
                 ...
               </span>
@@ -100,17 +102,14 @@ export function BlogPagination({
 
           return (
             <Button
-              key={page}
-              variant={isActive ? 'default' : 'ghost'}
-              size="sm"
-              onClick={() => goToPage(page)}
-              disabled={isActive}
-              className={cn(
-                'min-w-[40px]',
-                isActive && 'pointer-events-none'
-              )}
-              aria-label={`Go to page ${page}`}
               aria-current={isActive ? 'page' : undefined}
+              aria-label={`Đi đến trang ${page}`}
+              className={cn('min-w-[40px]', isActive && 'pointer-events-none')}
+              disabled={isActive}
+              key={page}
+              onClick={() => goToPage(page)}
+              size="sm"
+              variant={isActive ? 'default' : 'ghost'}
             >
               {page}
             </Button>
@@ -120,11 +119,11 @@ export function BlogPagination({
 
       {/* Next button */}
       <Button
-        variant="outline"
-        size="sm"
-        onClick={() => goToPage(currentPage + 1)}
-        disabled={!hasNext}
         aria-label={messages.go_to_next_page}
+        disabled={!hasNext}
+        onClick={() => goToPage(currentPage + 1)}
+        size="sm"
+        variant="outline"
       >
         {messages.next}
         <ChevronRight className="h-4 w-4 ml-1" />

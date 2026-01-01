@@ -38,21 +38,24 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
         'md:grid-cols-1': posts.length < 2,
       })}
     >
-      {posts.map((post) => (
-        <Card key={post.id} className="overflow-hidden hover:shadow-lg transition-shadow">
+      {posts.map(post => (
+        <Card
+          className="overflow-hidden hover:shadow-lg transition-shadow"
+          key={post.id}
+        >
           <Link href={`/${locale}/blog/${post.slug}`}>
             {/* Cover Image */}
             {post.cover_media && (
               <div className="relative aspect-video overflow-hidden">
                 <CldImage
-                  src={post.cover_media.public_id}
                   alt={post.cover_media.alt_text || post.title}
-                  width={800}
-                  height={450}
+                  className="object-cover w-full h-full transition-transform hover:scale-105"
                   crop="fill"
                   gravity="auto"
-                  className="object-cover w-full h-full transition-transform hover:scale-105"
+                  height={450}
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
+                  src={post.cover_media.public_id}
+                  width={800}
                 />
               </div>
             )}
@@ -84,8 +87,8 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
                 )}
                 {post.read_time_minutes && (
                   <ReadTime
-                    time={post.read_time_minutes}
                     messages={{ min_read: messages.min_read }}
+                    time={post.read_time_minutes}
                   />
                 )}
               </div>
@@ -102,13 +105,13 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
               {/* Tags */}
               {post.tags && post.tags.length > 0 && (
                 <div className="flex flex-wrap gap-2 mb-4">
-                  {post.tags.map((tag) => (
+                  {post.tags.map(tag => (
                     <Badge
                       key={tag.id}
-                      variant="secondary"
                       style={{
                         backgroundColor: tag.color || undefined,
                       }}
+                      variant="secondary"
                     >
                       {tag.name}
                     </Badge>

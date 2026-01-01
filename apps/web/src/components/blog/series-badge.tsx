@@ -13,8 +13,8 @@ interface SeriesBadgeProps {
 export function SeriesBadge({ seriesOrder, className }: SeriesBadgeProps) {
   return (
     <Badge
-      variant="secondary"
       className={`${className} inline-flex items-center gap-1.5 bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300`}
+      variant="secondary"
     >
       <BookOpen className="h-3 w-3" />
       <span className="text-xs font-medium">Series</span>

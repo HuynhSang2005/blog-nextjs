@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, SlidersHorizontal, X, Calendar as CalendarIcon } from 'lucide-react'
+import { Search, X, Calendar as CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import type { DateRange } from 'react-day-picker'
 
@@ -51,17 +51,19 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
   // Filter states
   const [search, setSearch] = React.useState(searchParams.get('search') || '')
   const [sort, setSort] = React.useState(searchParams.get('sort') || 'newest')
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(() => {
-    const from = searchParams.get('from')
-    const to = searchParams.get('to')
-    if (from && to) {
-      return {
-        from: new Date(from),
-        to: new Date(to),
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
+    () => {
+      const from = searchParams.get('from')
+      const to = searchParams.get('to')
+      if (from && to) {
+        return {
+          from: new Date(from),
+          to: new Date(to),
+        }
       }
+      return undefined
     }
-    return undefined
-  })
+  )
 
   // Apply filters to URL
   const applyFilters = React.useCallback(() => {
@@ -124,32 +126,32 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
     <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
       {/* Search */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="search" className="text-sm">
+        <Label className="text-sm" htmlFor="search">
           {messages.search_placeholder}
         </Label>
         <div className="relative">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
+            className="pl-9"
             id="search"
-            placeholder={messages.search_placeholder}
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            onKeyDown={(e) => {
+            onChange={e => setSearch(e.target.value)}
+            onKeyDown={e => {
               if (e.key === 'Enter') {
                 applyFilters()
               }
             }}
-            className="pl-9"
+            placeholder={messages.search_placeholder}
+            value={search}
           />
         </div>
       </div>
 
       {/* Sort */}
       <div className="flex flex-col gap-2">
-        <Label htmlFor="sort" className="text-sm">
+        <Label className="text-sm" htmlFor="sort">
           {messages.sort_by}
         </Label>
-        <Select value={sort} onValueChange={setSort}>
+        <Select onValueChange={setSort} value={sort}>
           <SelectTrigger id="sort">
             <SelectValue />
           </SelectTrigger>
@@ -168,11 +170,11 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
         <Popover>
           <PopoverTrigger asChild>
             <Button
-              variant="outline"
               className={cn(
                 'justify-start text-left font-normal',
                 !dateRange && 'text-muted-foreground'
               )}
+              variant="outline"
             >
               <CalendarIcon className="mr-2 h-4 w-4" />
               {dateRange?.from ? (
@@ -189,13 +191,13 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
               )}
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="w-auto p-0" align="start">
+          <PopoverContent align="start" className="w-auto p-0">
             <Calendar
-              mode="range"
-              selected={dateRange}
-              onSelect={setDateRange}
-              numberOfMonths={2}
               initialFocus
+              mode="range"
+              numberOfMonths={2}
+              onSelect={setDateRange}
+              selected={dateRange}
             />
           </PopoverContent>
         </Popover>
@@ -205,16 +207,16 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
       <div className="flex flex-col gap-2">
         <div className="h-5" />
         <div className="flex gap-2">
-          <Button onClick={applyFilters} className="flex-1">
+          <Button className="flex-1" onClick={applyFilters}>
             {messages.apply_filters}
           </Button>
           {hasActiveFilters && (
             <Button
-              variant="ghost"
-              size="icon"
-              onClick={clearFilters}
               aria-label={messages.clear_filters}
+              onClick={clearFilters}
+              size="icon"
               title={messages.clear_filters}
+              variant="ghost"
             >
               <X className="h-4 w-4" />
             </Button>

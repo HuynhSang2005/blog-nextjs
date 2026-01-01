@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { CldImage } from 'next-cloudinary'
 import { X, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Button } from '@/components/ui/button'
@@ -34,6 +34,16 @@ export function ProjectGallery({ media }: ProjectGalleryProps) {
     (a, b) => (a.order_index || 0) - (b.order_index || 0)
   )
 
+  const total = sortedMedia.length
+
+  const handlePrevious = useCallback(() => {
+    setSelectedIndex(prev => (prev === 0 ? total - 1 : prev - 1))
+  }, [total])
+
+  const handleNext = useCallback(() => {
+    setSelectedIndex(prev => (prev === total - 1 ? 0 : prev + 1))
+  }, [total])
+
   // Keyboard navigation
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -57,49 +67,40 @@ export function ProjectGallery({ media }: ProjectGalleryProps) {
 
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [lightboxOpen, selectedIndex])
-
-  const handlePrevious = () => {
-    setSelectedIndex((prev) =>
-      prev === 0 ? sortedMedia.length - 1 : prev - 1
-    )
-  }
-
-  const handleNext = () => {
-    setSelectedIndex((prev) =>
-      prev === sortedMedia.length - 1 ? 0 : prev + 1
-    )
-  }
+  }, [lightboxOpen, handleNext, handlePrevious])
 
   // Ensure we have a valid selected media
   if (sortedMedia.length === 0) {
     return null
   }
 
-  const currentMedia = sortedMedia[selectedIndex]!
+  const currentMedia = sortedMedia[selectedIndex]
+  if (!currentMedia) {
+    return null
+  }
 
   return (
     <div className="space-y-6">
       {/* Main Image Viewer */}
-      <div
+      <button
+        aria-label="Xem ảnh lớn hơn"
         className="relative aspect-video overflow-hidden rounded-xl border bg-muted cursor-pointer group"
         onClick={() => setLightboxOpen(true)}
+        type="button"
       >
         <CldImage
-          src={currentMedia.media.public_id}
-          alt={currentMedia.media.alt_text || 'Project image'}
-          fill
+          alt={currentMedia.media.alt_text || 'Ảnh dự án'}
           className="object-cover transition-transform duration-300 group-hover:scale-105"
+          fill
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 80vw, 1200px"
+          src={currentMedia.media.public_id}
         />
 
         {/* Hover Overlay */}
         <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-          <p className="text-white text-sm font-medium">
-            Nhấn để xem lớn hơn
-          </p>
+          <p className="text-white text-sm font-medium">Nhấn để xem lớn hơn</p>
         </div>
-      </div>
+      </button>
 
       {/* Caption */}
       {currentMedia.caption && (
@@ -113,10 +114,10 @@ export function ProjectGallery({ media }: ProjectGalleryProps) {
         <div className="flex items-center gap-4">
           {/* Previous Button */}
           <Button
-            variant="outline"
-            size="icon"
+            aria-label="Ảnh trước"
             onClick={handlePrevious}
-            aria-label="Previous image"
+            size="icon"
+            variant="outline"
           >
             <ChevronLeft className="h-4 w-4" />
           </Button>
@@ -126,21 +127,22 @@ export function ProjectGallery({ media }: ProjectGalleryProps) {
             <div className="flex gap-3">
               {sortedMedia.map((item, index) => (
                 <button
-                  key={index}
-                  onClick={() => setSelectedIndex(index)}
                   className={cn(
                     'relative aspect-video w-24 flex-shrink-0 overflow-hidden rounded-lg border-2 transition-all',
                     selectedIndex === index
                       ? 'border-primary ring-2 ring-primary/20'
                       : 'border-transparent hover:border-primary/50'
                   )}
+                  key={`${item.media.public_id}-${item.order_index}`}
+                  onClick={() => setSelectedIndex(index)}
+                  type="button"
                 >
                   <CldImage
-                    src={item.media.public_id}
-                    alt={item.media.alt_text || `Thumbnail ${index + 1}`}
-                    fill
+                    alt={item.media.alt_text || `Ảnh thu nhỏ ${index + 1}`}
                     className="object-cover"
+                    fill
                     sizes="96px"
+                    src={item.media.public_id}
                   />
                 </button>
               ))}
@@ -149,10 +151,10 @@ export function ProjectGallery({ media }: ProjectGalleryProps) {
 
           {/* Next Button */}
           <Button
-            variant="outline"
-            size="icon"
+            aria-label="Ảnh sau"
             onClick={handleNext}
-            aria-label="Next image"
+            size="icon"
+            variant="outline"
           >
             <ChevronRight className="h-4 w-4" />
           </Button>
@@ -167,21 +169,21 @@ export function ProjectGallery({ media }: ProjectGalleryProps) {
       )}
 
       {/* Lightbox Dialog */}
-      <Dialog open={lightboxOpen} onOpenChange={setLightboxOpen}>
+      <Dialog onOpenChange={setLightboxOpen} open={lightboxOpen}>
         <DialogContent className="max-w-7xl p-0 bg-black/95">
           <DialogTitle className="sr-only">
-            {currentMedia.media.alt_text || 'Project image'}
+            {currentMedia.media.alt_text || 'Ảnh dự án'}
           </DialogTitle>
           <DialogDescription className="sr-only">
-            {currentMedia.caption || 'Full size project image'}
+            {currentMedia.caption || 'Ảnh dự án kích thước đầy đủ'}
           </DialogDescription>
 
           {/* Close Button */}
           <Button
-            variant="ghost"
-            size="icon"
             className="absolute right-4 top-4 z-50 text-white hover:bg-white/20"
             onClick={() => setLightboxOpen(false)}
+            size="icon"
+            variant="ghost"
           >
             <X className="h-6 w-6" />
           </Button>
@@ -190,25 +192,25 @@ export function ProjectGallery({ media }: ProjectGalleryProps) {
           {sortedMedia.length > 1 && (
             <>
               <Button
-                variant="ghost"
-                size="icon"
                 className="absolute left-4 top-1/2 -translate-y-1/2 z-50 text-white hover:bg-white/20"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   handlePrevious()
                 }}
+                size="icon"
+                variant="ghost"
               >
                 <ChevronLeft className="h-8 w-8" />
               </Button>
 
               <Button
-                variant="ghost"
-                size="icon"
                 className="absolute right-4 top-1/2 -translate-y-1/2 z-50 text-white hover:bg-white/20"
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   handleNext()
                 }}
+                size="icon"
+                variant="ghost"
               >
                 <ChevronRight className="h-8 w-8" />
               </Button>
@@ -218,11 +220,11 @@ export function ProjectGallery({ media }: ProjectGalleryProps) {
           {/* Large Image */}
           <div className="relative aspect-video w-full max-h-[90vh]">
             <CldImage
-              src={currentMedia.media.public_id}
-              alt={currentMedia.media.alt_text || 'Project image'}
-              fill
+              alt={currentMedia.media.alt_text || 'Ảnh dự án'}
               className="object-contain"
+              fill
               sizes="100vw"
+              src={currentMedia.media.public_id}
             />
           </div>
 
