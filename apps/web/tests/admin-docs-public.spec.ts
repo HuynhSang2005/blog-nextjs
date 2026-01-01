@@ -6,7 +6,10 @@ function escapeRegExp(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
 
-test('Admin tạo Docs → public truy cập được theo slug', async ({ page, baseURL }) => {
+test('Admin tạo Docs → public truy cập được theo slug', async ({
+  page,
+  baseURL,
+}) => {
   const resolvedBaseURL = baseURL ?? 'http://localhost:3000'
   const locale = 'vi'
 
@@ -16,7 +19,12 @@ test('Admin tạo Docs → public truy cập được theo slug', async ({ page,
   const description = 'Trang test e2e để xác nhận public docs không 404.'
   const content = `# Nội dung test\n\nSlug: ${slug}`
 
-  await gotoProtected(page, resolvedBaseURL, locale, `/${locale}/admin/docs/new`)
+  await gotoProtected(
+    page,
+    resolvedBaseURL,
+    locale,
+    `/${locale}/admin/docs/new`
+  )
 
   await expect(
     page.getByRole('heading', { name: 'Tạo tài liệu mới', level: 1 })
@@ -32,7 +40,7 @@ test('Admin tạo Docs → public truy cập được theo slug', async ({ page,
   // Submit chắc chắn: form.requestSubmit() + đợi POST 200 + đợi redirect sang trang edit.
   const postUrl = `${resolvedBaseURL}/${locale}/admin/docs/new`
 
-  const postResponsePromise = page.waitForResponse((resp) => {
+  const postResponsePromise = page.waitForResponse(resp => {
     const request = resp.request()
     return (
       request.method() === 'POST' &&
@@ -66,7 +74,9 @@ test('Admin tạo Docs → public truy cập được theo slug', async ({ page,
   await expect(page.getByText('# Nội dung test')).toBeVisible()
 
   // Extra guard: ensure we're not on the not-found UI.
-  await expect(page.getByText('Không tìm thấy', { exact: false })).not.toBeVisible()
+  await expect(
+    page.getByText('Không tìm thấy', { exact: false })
+  ).not.toBeVisible()
 
   // Optional: ensure slug is present in rendered content.
   await expect(page.getByText(new RegExp(escapeRegExp(slug)))).toBeVisible()

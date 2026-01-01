@@ -43,7 +43,10 @@ async function ensureTagExistsAndGetUsageCount(
   return Number.isFinite(usage) ? usage : 0
 }
 
-test('Projects ↔ Tags: create + edit (usageCount tăng/giảm)', async ({ page, baseURL }) => {
+test('Projects ↔ Tags: create + edit (usageCount tăng/giảm)', async ({
+  page,
+  baseURL,
+}) => {
   const resolvedBaseURL = baseURL ?? 'http://localhost:3000'
   const locale = 'vi'
 
@@ -60,7 +63,12 @@ test('Projects ↔ Tags: create + edit (usageCount tăng/giảm)', async ({ page
   const projectTitle = `E2E Project Tags ${now}`
 
   // Create project with the tag.
-  await gotoProtected(page, resolvedBaseURL, locale, `/${locale}/admin/projects/new`)
+  await gotoProtected(
+    page,
+    resolvedBaseURL,
+    locale,
+    `/${locale}/admin/projects/new`
+  )
 
   await page.getByLabel('Tiêu đề').fill(projectTitle)
 
@@ -79,7 +87,9 @@ test('Projects ↔ Tags: create + edit (usageCount tăng/giảm)', async ({ page
   await page.keyboard.press('Escape')
 
   await page.getByRole('button', { name: 'Lưu' }).click()
-  await page.waitForURL(`${resolvedBaseURL}/${locale}/admin/projects`, { timeout: 20_000 })
+  await page.waitForURL(`${resolvedBaseURL}/${locale}/admin/projects`, {
+    timeout: 20_000,
+  })
 
   const afterCreate = await ensureTagExistsAndGetUsageCount(
     page,
@@ -91,19 +101,29 @@ test('Projects ↔ Tags: create + edit (usageCount tăng/giảm)', async ({ page
   expect(afterCreate).toBe(before + 1)
 
   // Edit project: remove the tag.
-  await gotoProtected(page, resolvedBaseURL, locale, `/${locale}/admin/projects`)
+  await gotoProtected(
+    page,
+    resolvedBaseURL,
+    locale,
+    `/${locale}/admin/projects`
+  )
 
   await page.getByPlaceholder('Tìm kiếm dự án...').fill(projectTitle)
 
-  const projectRow = page.getByRole('row', { name: new RegExp(projectTitle) }).first()
+  const projectRow = page
+    .getByRole('row', { name: new RegExp(projectTitle) })
+    .first()
   await expect(projectRow).toBeVisible()
 
   await projectRow.getByRole('button', { name: 'Mở menu' }).click()
   await page.getByRole('menuitem', { name: 'Chỉnh sửa' }).click()
 
-  await page.waitForURL(new RegExp(`${resolvedBaseURL}/${locale}/admin/projects/[0-9a-f-]{36}`), {
-    timeout: 20_000,
-  })
+  await page.waitForURL(
+    new RegExp(`${resolvedBaseURL}/${locale}/admin/projects/[0-9a-f-]{36}`),
+    {
+      timeout: 20_000,
+    }
+  )
 
   // Deselect the tag.
   await page.getByRole('combobox', { name: /Chọn thẻ|Đã chọn/ }).click()
@@ -119,7 +139,9 @@ test('Projects ↔ Tags: create + edit (usageCount tăng/giảm)', async ({ page
   await page.keyboard.press('Escape')
 
   await page.getByRole('button', { name: 'Lưu' }).click()
-  await page.waitForURL(`${resolvedBaseURL}/${locale}/admin/projects`, { timeout: 20_000 })
+  await page.waitForURL(`${resolvedBaseURL}/${locale}/admin/projects`, {
+    timeout: 20_000,
+  })
 
   const afterEdit = await ensureTagExistsAndGetUsageCount(
     page,

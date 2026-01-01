@@ -1,7 +1,7 @@
 import { expect, test, type Locator, type Page } from '@playwright/test'
 
 function sleep(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms))
+  return new Promise(resolve => setTimeout(resolve, ms))
 }
 
 async function setInputValueStable(locator: Locator, value: string) {
@@ -33,16 +33,13 @@ async function setInputValueStable(locator: Locator, value: string) {
   }
 
   // Fallback: set via DOM events.
-  await locator.evaluate(
-    (el, nextValue) => {
-      const input = el as HTMLInputElement
-      input.focus()
-      input.value = nextValue
-      input.dispatchEvent(new Event('input', { bubbles: true }))
-      input.dispatchEvent(new Event('change', { bubbles: true }))
-    },
-    value
-  )
+  await locator.evaluate((el, nextValue) => {
+    const input = el as HTMLInputElement
+    input.focus()
+    input.value = nextValue
+    input.dispatchEvent(new Event('input', { bubbles: true }))
+    input.dispatchEvent(new Event('change', { bubbles: true }))
+  }, value)
 
   await expect(locator).toHaveValue(value)
 }
@@ -56,11 +53,16 @@ export async function gotoProtected(
   const adminEmail = process.env.E2E_ADMIN_EMAIL
   const adminPassword = process.env.E2E_ADMIN_PASSWORD
   if (!adminEmail || !adminPassword) {
-    test.skip(true, 'Thiếu E2E_ADMIN_EMAIL/E2E_ADMIN_PASSWORD trong env để đăng nhập admin')
+    test.skip(
+      true,
+      'Thiếu E2E_ADMIN_EMAIL/E2E_ADMIN_PASSWORD trong env để đăng nhập admin'
+    )
     return
   }
 
-  await page.goto(`${resolvedBaseURL}${targetPath}`, { waitUntil: 'domcontentloaded' })
+  await page.goto(`${resolvedBaseURL}${targetPath}`, {
+    waitUntil: 'domcontentloaded',
+  })
 
   // Already allowed in.
   if (!page.url().startsWith(`${resolvedBaseURL}/${locale}/login`)) return
@@ -85,12 +87,12 @@ export async function gotoProtected(
 
   // Wait for either navigation (router.push) or an inline error.
   const inlineError = page
-    .locator('form >> div[class*="bg-destructive"], form >> div[class*="text-destructive"]')
+    .locator(
+      'form >> div[class*="bg-destructive"], form >> div[class*="text-destructive"]'
+    )
     .first()
 
-  const outcome = await Promise.race<
-    'navigated' | 'error' | 'timeout'
-  >([
+  const outcome = await Promise.race<'navigated' | 'error' | 'timeout'>([
     page
       .waitForURL(`${resolvedBaseURL}${targetPath}`, { timeout: 15_000 })
       .then(() => 'navigated' as const)
@@ -112,7 +114,9 @@ export async function gotoProtected(
   // Some environments can be flaky with client-side router.push; enforce navigation.
   for (let attempt = 0; attempt < 3; attempt += 1) {
     await sleep(500)
-    await page.goto(`${resolvedBaseURL}${targetPath}`, { waitUntil: 'domcontentloaded' })
+    await page.goto(`${resolvedBaseURL}${targetPath}`, {
+      waitUntil: 'domcontentloaded',
+    })
 
     if (!page.url().startsWith(`${resolvedBaseURL}/${locale}/login`)) return
   }
