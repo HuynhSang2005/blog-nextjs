@@ -31,7 +31,6 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Card, CardContent } from '@/components/ui/card'
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Popover,
   PopoverContent,
@@ -52,9 +51,7 @@ import {
   updateBlogPost,
   updateBlogPostTags,
 } from '@/app/actions/blog'
-import {
-  MDXEditorWrapper,
-} from '@/components/admin/shared/mdx-editor'
+import { MDXEditorWrapper } from '@/components/admin/shared/mdx-editor'
 import type { Database } from '@/lib/supabase/database.types'
 import { cn } from '@/lib/utils'
 
