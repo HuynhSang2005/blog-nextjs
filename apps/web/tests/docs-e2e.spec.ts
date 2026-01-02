@@ -8,10 +8,18 @@ test('create doc via admin UI with MDX editor (keyboard typing) and verify publi
   const loginUrl = `${base}/${locale}/login`
   const newDocUrl = `${base}/${locale}/admin/docs/new`
 
+  const adminEmail = process.env.E2E_ADMIN_EMAIL
+  const adminPassword = process.env.E2E_ADMIN_PASSWORD
+
+  test.skip(
+    !adminEmail || !adminPassword,
+    'Thiếu E2E_ADMIN_EMAIL/E2E_ADMIN_PASSWORD trong env để đăng nhập admin'
+  )
+
   // Login
   await page.goto(loginUrl, { waitUntil: 'networkidle' })
-  await page.fill('input[type="email"]', 'admin@huynhsang.blog')
-  await page.fill('input[type="password"]', 'Admin@123456')
+  await page.fill('input[type="email"]', adminEmail)
+  await page.fill('input[type="password"]', adminPassword)
   await Promise.all([
     page.waitForNavigation({ waitUntil: 'networkidle' }).catch(() => null),
     page.click('button[type="submit"]'),

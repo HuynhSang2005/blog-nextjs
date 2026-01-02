@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -45,6 +45,8 @@ export function TagDialog({
 }: TagDialogProps) {
   const isEditing = !!tag
 
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false)
+
   const form = useForm<TagFormData, unknown, TagFormData>({
     resolver: zodResolver(tagSchema),
     defaultValues: {
@@ -59,6 +61,7 @@ export function TagDialog({
   useEffect(() => {
     if (open) {
       if (tag) {
+        setIsSlugManuallyEdited(true)
         form.reset({
           name: tag.name,
           slug: tag.slug,
@@ -66,6 +69,7 @@ export function TagDialog({
           description: tag.description || '',
         })
       } else {
+        setIsSlugManuallyEdited(false)
         form.reset({
           name: '',
           slug: '',
@@ -122,7 +126,7 @@ export function TagDialog({
 
     // Keep auto-updating until the user manually edits the slug.
     // (Otherwise it would get stuck at the first typed character.)
-    if (!form.formState.dirtyFields.slug) {
+    if (!isSlugManuallyEdited) {
       form.setValue('slug', slugify(name), { shouldDirty: false })
     }
   }
@@ -174,6 +178,10 @@ export function TagDialog({
                     <Input
                       placeholder="nextjs"
                       {...field}
+                      onChange={e => {
+                        setIsSlugManuallyEdited(true)
+                        field.onChange(e)
+                      }}
                       value={field.value || ''}
                     />
                   </FormControl>

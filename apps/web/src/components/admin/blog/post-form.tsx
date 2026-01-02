@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useRouter } from 'next/navigation'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Check, ChevronsUpDown, Loader2, Save, Send } from 'lucide-react'
 import { useLocale, useTranslations } from 'next-intl'
@@ -31,7 +31,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Separator } from '@/components/ui/separator'
 import { Card, CardContent } from '@/components/ui/card'
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs'
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs'
 import {
   Popover,
   PopoverContent,
@@ -53,7 +53,6 @@ import {
   updateBlogPostTags,
 } from '@/app/actions/blog'
 import {
-  MDXEditorPreview,
   MDXEditorWrapper,
 } from '@/components/admin/shared/mdx-editor'
 import type { Database } from '@/lib/supabase/database.types'
@@ -74,6 +73,12 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
   const t = useTranslations('admin.blog')
   const [isSaving, setIsSaving] = useState(false)
   const [isPublishing, setIsPublishing] = useState(false)
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false)
+  const [lastSavedContent, setLastSavedContent] = useState(post?.content || '')
+
+  useEffect(() => {
+    setLastSavedContent(post?.content || '')
+  }, [post?.content])
 
   const form = useForm<BlogPostFormData, unknown, BlogPostFormData>({
     resolver: zodResolver(blogPostSchema),
@@ -129,7 +134,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
   // Auto-generate slug from title (until the user edits slug manually)
   const handleTitleChange = (value: string) => {
     if (mode !== 'create') return
-    if (form.formState.dirtyFields.slug) return
+    if (isSlugManuallyEdited) return
 
     const slug = generateSlugFromTitle(value)
     form.setValue('slug', slug, {
@@ -157,11 +162,13 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
       if (mode === 'create') {
         const result = await createBlogPost(rest)
         await updateBlogPostTags(result.id, tag_ids)
+        setLastSavedContent(rest.content)
         toast.success('Đã lưu nháp thành công')
         router.push(`/${locale}/admin/blog/${result.id}`)
       } else if (post) {
         await updateBlogPost(post.id, rest)
         await updateBlogPostTags(post.id, tag_ids)
+        setLastSavedContent(rest.content)
         toast.success('Đã cập nhật bài viết')
         router.refresh()
       }
@@ -193,12 +200,14 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
         const result = await createBlogPost(rest)
         await updateBlogPostTags(result.id, tag_ids)
         await publishBlogPost(result.id)
+        setLastSavedContent(rest.content)
         toast.success('Đã xuất bản bài viết')
         router.push(`/${locale}/admin/blog`)
       } else if (post) {
         await updateBlogPost(post.id, rest)
         await updateBlogPostTags(post.id, tag_ids)
         await publishBlogPost(post.id)
+        setLastSavedContent(rest.content)
         toast.success('Đã xuất bản bài viết')
         router.push(`/${locale}/admin/blog`)
       }
@@ -249,7 +258,14 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                     <FormItem>
                       <FormLabel>Slug *</FormLabel>
                       <FormControl>
-                        <Input placeholder="duong-dan-bai-viet" {...field} />
+                        <Input
+                          placeholder="duong-dan-bai-viet"
+                          {...field}
+                          onChange={e => {
+                            setIsSlugManuallyEdited(true)
+                            field.onChange(e)
+                          }}
+                        />
                       </FormControl>
                       <FormDescription>
                         URL của bài viết (chỉ chữ thường, số và dấu gạch ngang)
@@ -327,54 +343,6 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
                       />
                       <FormDescription>
                         Nếu không chọn, sẽ sử dụng ảnh bìa làm OG image
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </CardContent>
-            </Card>
-
-            {/* Content Card */}
-            <Card>
-              <CardContent className="pt-6">
-                <FormField
-                  control={form.control}
-                  name="content"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Nội dung *</FormLabel>
-                      <FormControl>
-                        <Tabs className="w-full" defaultValue="editor">
-                          <TabsList className="w-full justify-start">
-                            <TabsTrigger value="editor">Soạn thảo</TabsTrigger>
-                            <TabsTrigger value="preview">Xem trước</TabsTrigger>
-                          </TabsList>
-
-                          <TabsContent value="editor">
-                            <div className="min-h-[500px] rounded-md border">
-                              <MDXEditorWrapper
-                                i18nNamespace="admin.blog"
-                                onChange={field.onChange}
-                                placeholder={t('form.placeholders.content')}
-                                value={field.value}
-                              />
-                            </div>
-                          </TabsContent>
-
-                          <TabsContent value="preview">
-                            <div className="min-h-[500px] rounded-md border">
-                              <MDXEditorPreview
-                                className="min-h-[500px]"
-                                i18nNamespace="admin.blog"
-                                value={field.value}
-                              />
-                            </div>
-                          </TabsContent>
-                        </Tabs>
-                      </FormControl>
-                      <FormDescription>
-                        Hỗ trợ Markdown/MDX (code block, bảng, ảnh).
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -649,6 +617,38 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
             </Card>
           </div>
         </div>
+
+        {/* Content Card (Full width like docs-admin) */}
+        <Card>
+          <CardContent className="p-0">
+            <div className="p-6 pt-6 space-y-2">
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Nội dung *</FormLabel>
+                    <FormControl>
+                      <div className="min-h-[500px] rounded-md border">
+                        <MDXEditorWrapper
+                          diffMarkdown={lastSavedContent}
+                          i18nNamespace="admin.blog"
+                          onChange={field.onChange}
+                          placeholder={t('form.placeholders.content')}
+                          value={field.value}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormDescription>
+                      Hỗ trợ Markdown/MDX (code block, bảng, ảnh).
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </CardContent>
+        </Card>
 
         {/* Action Buttons */}
         <div className="flex justify-end gap-4">
