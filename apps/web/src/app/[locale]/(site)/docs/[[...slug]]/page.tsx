@@ -21,134 +21,134 @@ import { getPublicDocBySlug } from '@/lib/queries/docs'
 export const dynamicParams = true
 
 export async function generateMetadata(props: {
-	params: Promise<{ locale?: string; slug?: string[] }>
+  params: Promise<{ locale?: string; slug?: string[] }>
 }): Promise<Metadata> {
-	const params = await props.params
-	const locale = params.locale || defaultLocale
+  const params = await props.params
+  const locale = params.locale || defaultLocale
 
-	setRequestLocale(locale)
+  setRequestLocale(locale)
 
-	const doc = await getPublicDocBySlug({
-		locale,
-		slugParts: params.slug,
-	})
+  const doc = await getPublicDocBySlug({
+    locale,
+    slugParts: params.slug,
+  })
 
-	if (!doc) {
-		return {}
-	}
+  if (!doc) {
+    return {}
+  }
 
-	const docSlug = params.slug?.join('/') || ''
-	const urlPath = docSlug ? `/${locale}/docs/${docSlug}` : `/${locale}/docs`
+  const docSlug = params.slug?.join('/') || ''
+  const urlPath = docSlug ? `/${locale}/docs/${docSlug}` : `/${locale}/docs`
 
-	return {
-		title: doc.title,
-		description: doc.description || undefined,
+  return {
+    title: doc.title,
+    description: doc.description || undefined,
 
-		openGraph: {
-			type: 'article',
-			title: doc.title,
-			url: absoluteUrl(urlPath),
-			description: doc.description || undefined,
+    openGraph: {
+      type: 'article',
+      title: doc.title,
+      url: absoluteUrl(urlPath),
+      description: doc.description || undefined,
 
-			images: [
-				{
-					...siteConfig.og.size,
-					url: siteConfig.og.image,
-					alt: siteConfig.name,
-				},
-			],
-		},
+      images: [
+        {
+          ...siteConfig.og.size,
+          url: siteConfig.og.image,
+          alt: siteConfig.name,
+        },
+      ],
+    },
 
-		twitter: {
-			card: 'summary_large_image',
-			title: doc.title,
-			description: doc.description || undefined,
-			images: [siteConfig.og.image],
-			creator: siteConfig.links.twitter.username,
-		},
-	}
+    twitter: {
+      card: 'summary_large_image',
+      title: doc.title,
+      description: doc.description || undefined,
+      images: [siteConfig.og.image],
+      creator: siteConfig.links.twitter.username,
+    },
+  }
 }
 
 export default async function DocPage(props: {
-	params: Promise<{ locale?: string; slug?: string[] }>
+  params: Promise<{ locale?: string; slug?: string[] }>
 }) {
-	const params = await props.params
-	const locale = (params.locale || defaultLocale) as LocaleOptions
-	setRequestLocale(locale)
+  const params = await props.params
+  const locale = (params.locale || defaultLocale) as LocaleOptions
+  setRequestLocale(locale)
 
-	const doc = await getPublicDocBySlug({
-		locale,
-		slugParts: params.slug,
-	})
-	const t = await getTranslations('docs')
+  const doc = await getPublicDocBySlug({
+    locale,
+    slugParts: params.slug,
+  })
+  const t = await getTranslations('docs')
 
-	if (!doc) {
-		return (
-			<DocumentNotFound
-				messages={{
-					title: t('not_found.title'),
-					description: t('not_found.description'),
-				}}
-			/>
-		)
-	}
+  if (!doc) {
+    return (
+      <DocumentNotFound
+        messages={{
+          title: t('not_found.title'),
+          description: t('not_found.description'),
+        }}
+      />
+    )
+  }
 
-	const toc = await getTableOfContents(doc.content)
-	const slugPath = params.slug?.join('/') || ''
-	const docHref = slugPath ? `/docs/${slugPath}` : '/docs'
-	const docSlugForPager = slugPath
-		? `/docs/${locale}/${slugPath}`
-		: `/docs/${locale}`
+  const toc = await getTableOfContents(doc.content)
+  const slugPath = params.slug?.join('/') || ''
+  const docHref = slugPath ? `/docs/${slugPath}` : '/docs'
+  const docSlugForPager = slugPath
+    ? `/docs/${locale}/${slugPath}`
+    : `/docs/${locale}`
 
-	return (
-		<main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
-			<div className="mx-auto w-full min-w-0">
-				<DocBreadcrumb
-					doc={{
-						title: doc.title,
-						href: docHref,
-					}}
-					messages={{
-						docs: t('docs'),
-					}}
-				/>
+  return (
+    <main className="relative py-6 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
+      <div className="mx-auto w-full min-w-0">
+        <DocBreadcrumb
+          doc={{
+            title: doc.title,
+            href: docHref,
+          }}
+          messages={{
+            docs: t('docs'),
+          }}
+        />
 
-				<DocHeading
-					doc={{
-						title: doc.title,
-						description: doc.description,
-						notAvailable: false,
-					}}
-					locale={locale}
-				/>
-				<DocLinks doc={doc} />
+        <DocHeading
+          doc={{
+            title: doc.title,
+            description: doc.description,
+            notAvailable: false,
+          }}
+          locale={locale}
+        />
+        <DocLinks doc={doc} />
 
-				<div className="pb-12 pt-8">
-					<MdxRemote source={doc.content} />
-				</div>
+        <div className="pb-12 pt-8">
+          <MdxRemote source={doc.content} />
+        </div>
 
-				<DocsPager doc={{ slug: docSlugForPager }} locale={locale} />
-			</div>
+        <DocsPager doc={{ slug: docSlugForPager }} locale={locale} />
+      </div>
 
-			{doc.show_toc && (
-				<div className="hidden text-sm xl:block">
-					<div className="sticky top-16 -mt-10 pt-4">
-						<ScrollArea className="pb-10">
-							<div className="sticky top-16 -mt-10 h-fit py-12">
-								<DashboardTableOfContents
-									messages={{
-										onThisPage: t('on_this_page'),
-										editPageOnGitHub: t('edit_page_on_github'),
-										startDiscussionOnGitHub: t('start_discussion_on_github'),
-									}}
-									sourceFilePath=""
-									toc={toc}
-								/>
-							</div>
-						</ScrollArea>
-					</div>
-				</div>
-			)}
-		</main>
-	)
+      {doc.show_toc && (
+        <div className="hidden text-sm xl:block">
+          <div className="sticky top-16 -mt-10 pt-4">
+            <ScrollArea className="pb-10">
+              <div className="sticky top-16 -mt-10 h-fit py-12">
+                <DashboardTableOfContents
+                  messages={{
+                    onThisPage: t('on_this_page'),
+                    editPageOnGitHub: t('edit_page_on_github'),
+                    startDiscussionOnGitHub: t('start_discussion_on_github'),
+                  }}
+                  sourceFilePath=""
+                  toc={toc}
+                />
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
+      )}
+    </main>
+  )
 }

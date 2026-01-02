@@ -29,10 +29,10 @@
 
 /* Editor content area */
 .mdxeditor-root-contenteditable {
+  width: 100%;
   min-height: 400px;
   padding: 1rem;
   overflow: visible;
-  width: 100%;
 }
 
 /* Dark mode support */

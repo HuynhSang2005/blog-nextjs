@@ -12,131 +12,131 @@ import { siteConfig } from '@/config/site'
 import { absoluteUrl } from '@/lib/utils'
 
 function generateWebsiteFeeds({
-	file,
-	posts,
-	locale,
+  file,
+  posts,
+  locale,
 }: {
-	posts: Blog[]
-	file: RSSFeed['file']
-	locale: LocaleOptions
+  posts: Blog[]
+  file: RSSFeed['file']
+  locale: LocaleOptions
 }) {
-	const feed = new Feed({
-		id: file,
-		generator: siteConfig.name,
-		copyright: siteConfig.name,
-		image: siteConfig.og.image,
-		language: locale || defaultLocale,
-		title: `Blog - ${siteConfig.name}`,
-		favicon: absoluteUrl('/favicon.ico'),
-		link: absoluteUrl(`/${locale}/feed/${file}`),
-		description: getObjectValueByLocale(siteConfig.description, locale),
-	})
+  const feed = new Feed({
+    id: file,
+    generator: siteConfig.name,
+    copyright: siteConfig.name,
+    image: siteConfig.og.image,
+    language: locale || defaultLocale,
+    title: `Blog - ${siteConfig.name}`,
+    favicon: absoluteUrl('/favicon.ico'),
+    link: absoluteUrl(`/${locale}/feed/${file}`),
+    description: getObjectValueByLocale(siteConfig.description, locale),
+  })
 
-	const blogFeedEntries = posts
-		.filter(post => {
-			const [postLocale] = post.slugAsParams.split('/')
+  const blogFeedEntries = posts
+    .filter(post => {
+      const [postLocale] = post.slugAsParams.split('/')
 
-			return postLocale === locale
-		})
-		.map(post => {
-			const [postLocale, ...postSlugList] = post.slugAsParams.split('/')
-			const postSlug = postSlugList.join('/') || ''
+      return postLocale === locale
+    })
+    .map(post => {
+      const [postLocale, ...postSlugList] = post.slugAsParams.split('/')
+      const postSlug = postSlugList.join('/') || ''
 
-			const postLink =
-				postLocale === defaultLocale
-					? `/blog/${postSlug}`
-					: `/${locale}/blog/${postSlug}`
+      const postLink =
+        postLocale === defaultLocale
+          ? `/blog/${postSlug}`
+          : `/${locale}/blog/${postSlug}`
 
-			const link = absoluteUrl(postLink)
+      const link = absoluteUrl(postLink)
 
-			return {
-				id: link,
-				link,
-				title: post.title,
-				description: post.excerpt,
-				date: new Date(post.date || Date.now()),
+      return {
+        id: link,
+        link,
+        title: post.title,
+        description: post.excerpt,
+        date: new Date(post.date || Date.now()),
 
-				author: [
-					{
-						name: post.author?.name,
-						link: post.author?.site,
-						email: post.author?.email || ' ',
-					},
-				],
-			} as Item
-		})
+        author: [
+          {
+            name: post.author?.name,
+            link: post.author?.site,
+            email: post.author?.email || ' ',
+          },
+        ],
+      } as Item
+    })
 
-	for (const blogFeedEntry of blogFeedEntries) {
-		feed.addItem(blogFeedEntry)
-	}
+  for (const blogFeedEntry of blogFeedEntries) {
+    feed.addItem(blogFeedEntry)
+  }
 
-	return new Map<string, Feed>([[file, feed]])
+  return new Map<string, Feed>([[file, feed]])
 }
 
 const provideWebsiteFeeds = cache(
-	({ feed, locale }: { feed: string; locale: LocaleOptions }) => {
-		const websiteFeeds = generateWebsiteFeeds({
-			locale,
-			file: feed,
-			posts: allBlogs,
-		})
+  ({ feed, locale }: { feed: string; locale: LocaleOptions }) => {
+    const websiteFeeds = generateWebsiteFeeds({
+      locale,
+      file: feed,
+      posts: allBlogs,
+    })
 
-		switch (feed) {
-			case 'blog.xml':
-				return websiteFeeds.get(feed)?.rss2()
+    switch (feed) {
+      case 'blog.xml':
+        return websiteFeeds.get(feed)?.rss2()
 
-			case 'blog.json':
-				return websiteFeeds.get(feed)?.json1()
+      case 'blog.json':
+        return websiteFeeds.get(feed)?.json1()
 
-			default:
-				return undefined
-		}
-	}
+      default:
+        return undefined
+    }
+  }
 )
 
 type StaticParams = {
-	params: Promise<{ feed: RSSFeed['file']; locale: LocaleOptions }>
+  params: Promise<{ feed: RSSFeed['file']; locale: LocaleOptions }>
 }
 
 export const generateStaticParams = async (): Promise<
-	StaticParams['params'][]
+  StaticParams['params'][]
 > => {
-	return blogConfig.rss.flatMap(({ file }) =>
-		locales.map(locale => ({ feed: file, locale }))
-	) as unknown as StaticParams['params'][]
+  return blogConfig.rss.flatMap(({ file }) =>
+    locales.map(locale => ({ feed: file, locale }))
+  ) as unknown as StaticParams['params'][]
 }
 
 export const GET = async (
-	_: Request,
-	context: { params: Promise<{ feed: string; locale: string }> }
+  _: Request,
+  context: { params: Promise<{ feed: string; locale: string }> }
 ) => {
-	const params = await context.params
+  const params = await context.params
 
-	const staticProps: StaticParams = {
-		params: Promise.resolve({
-			feed: params.feed as RSSFeed['file'],
-			locale: params.locale as LocaleOptions,
-		}),
-	}
+  const staticProps: StaticParams = {
+    params: Promise.resolve({
+      feed: params.feed as RSSFeed['file'],
+      locale: params.locale as LocaleOptions,
+    }),
+  }
 
-	const typedParams = await staticProps.params
-	const websiteFeed = provideWebsiteFeeds({
-		feed: typedParams.feed,
-		locale: typedParams.locale || defaultLocale,
-	})
+  const typedParams = await staticProps.params
+  const websiteFeed = provideWebsiteFeeds({
+    feed: typedParams.feed,
+    locale: typedParams.locale || defaultLocale,
+  })
 
-	const feed = blogConfig.rss.find(rss => rss.file === params.feed)
+  const feed = blogConfig.rss.find(rss => rss.file === params.feed)
 
-	const contentType = String(
-		feed?.contentType || blogConfig.rss?.[0]?.contentType
-	)
+  const contentType = String(
+    feed?.contentType || blogConfig.rss?.[0]?.contentType
+  )
 
-	return new NextResponse(websiteFeed, {
-		status: websiteFeed ? 200 : 404,
-		headers: {
-			'Content-Type': contentType,
-		},
-	})
+  return new NextResponse(websiteFeed, {
+    status: websiteFeed ? 200 : 404,
+    headers: {
+      'Content-Type': contentType,
+    },
+  })
 }
 
 export const dynamicParams = true

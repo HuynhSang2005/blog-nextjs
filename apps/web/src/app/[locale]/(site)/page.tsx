@@ -1,10 +1,10 @@
 import { setRequestLocale, getTranslations } from 'next-intl/server'
 
 import {
-	PageHeader,
-	PageActions,
-	PageHeaderHeading,
-	PageHeaderDescription,
+  PageHeader,
+  PageActions,
+  PageHeaderHeading,
+  PageHeaderDescription,
 } from '@/components/page-header'
 
 import { TextGenerateEffect } from '@/components/ui/text-generate-effect'
@@ -23,74 +23,74 @@ import { defaultLocale, locales } from '@/config/i18n'
 export const dynamicParams = true
 
 export default async function IndexPage(props: {
-	params: Promise<{ locale: LocaleOptions }>
+  params: Promise<{ locale: LocaleOptions }>
 }) {
-	const params = await props.params
-	const currentLocale = locales.includes(params.locale)
-		? params.locale
-		: defaultLocale
-	setRequestLocale(currentLocale)
+  const params = await props.params
+  const currentLocale = locales.includes(params.locale)
+    ? params.locale
+    : defaultLocale
+  setRequestLocale(currentLocale)
 
-	const t = await getTranslations('site')
+  const t = await getTranslations('site')
 
-	return (
-		<div className="container relative">
-			<PageHeader>
-				<Announcement href="/docs" title={t('announcement')} />
+  return (
+    <div className="container relative">
+      <PageHeader>
+        <Announcement href="/docs" title={t('announcement')} />
 
-				<PageHeaderHeading>
-					<FlipWords
-						className="text-9xl -z-10 mb-12 md:mb-10"
-						words={['Site', 'Blog', 'Docs']}
-					/>
+        <PageHeaderHeading>
+          <FlipWords
+            className="text-9xl -z-10 mb-12 md:mb-10"
+            words={['Site', 'Blog', 'Docs']}
+          />
 
-					<TextGenerateEffect words={t('heading')} />
-				</PageHeaderHeading>
+          <TextGenerateEffect words={t('heading')} />
+        </PageHeaderHeading>
 
-				<PageHeaderDescription>{t('description')}</PageHeaderDescription>
+        <PageHeaderDescription>{t('description')}</PageHeaderDescription>
 
-				<PageActions className="flex-wrap gap-3 sm:gap-0">
-					<Link className={cn(buttonVariants())} href="/docs">
-						{t('buttons.get_started')}
-					</Link>
+        <PageActions className="flex-wrap gap-3 sm:gap-0">
+          <Link className={cn(buttonVariants())} href="/docs">
+            {t('buttons.get_started')}
+          </Link>
 
-					<Link
-						className={cn(buttonVariants({ variant: 'outline' }))}
-						href={siteConfig.links.github.url}
-						rel="noreferrer"
-						target="_blank"
-						title={siteConfig.links.github.label}
-					>
-						<Icons.gitHub className="mr-2 size-4" />
-						{siteConfig.links.github.label}
-					</Link>
-				</PageActions>
+          <Link
+            className={cn(buttonVariants({ variant: 'outline' }))}
+            href={siteConfig.links.github.url}
+            rel="noreferrer"
+            target="_blank"
+            title={siteConfig.links.github.label}
+          >
+            <Icons.gitHub className="mr-2 size-4" />
+            {siteConfig.links.github.label}
+          </Link>
+        </PageActions>
 
-				<InstallationBox
-					__rawString__="npx degit HuynhSang2005/blog-nextjs project_name"
-					className="w-full relative max-w-140 flex flex-wrap items-center pl-4! pr-12! mb-[6px]"
-				/>
+        <InstallationBox
+          __rawString__="npx degit HuynhSang2005/blog-nextjs project_name"
+          className="w-full relative max-w-140 flex flex-wrap items-center pl-4! pr-12! mb-[6px]"
+        />
 
-				<div className="w-full text-center my-2 font-semibold text-sm">
-					"Sử dụng NPM hoặc BunJS"
-				</div>
+        <div className="w-full text-center my-2 font-semibold text-sm">
+          "Sử dụng NPM hoặc BunJS"
+        </div>
 
-				<InstallationBox
-					__rawString__="bunx degit HuynhSang2005/blog-nextjs project_name"
-					className="w-full relative max-w-140 flex flex-wrap items-center pl-4! pr-12! mt-[4px]"
-				/>
+        <InstallationBox
+          __rawString__="bunx degit HuynhSang2005/blog-nextjs project_name"
+          className="w-full relative max-w-140 flex flex-wrap items-center pl-4! pr-12! mt-[4px]"
+        />
 
-				<div className="fixed left-0 -top-40 size-full -z-10 overflow-hidden">
-					<Vortex
-						backgroundColor="transparent"
-						baseRadius={2}
-						className="flex size-full"
-						particleCount={20}
-						rangeSpeed={1.5}
-						rangeY={300}
-					/>
-				</div>
-			</PageHeader>
-		</div>
-	)
+        <div className="fixed left-0 -top-40 size-full -z-10 overflow-hidden">
+          <Vortex
+            backgroundColor="transparent"
+            baseRadius={2}
+            className="flex size-full"
+            particleCount={20}
+            rangeSpeed={1.5}
+            rangeY={300}
+          />
+        </div>
+      </PageHeader>
+    </div>
+  )
 }

@@ -71,7 +71,9 @@ test('Admin tạo Docs → public truy cập được theo slug', async ({
 
   await expect(page.getByText(description)).toBeVisible()
   // Public docs renders MDX -> HTML (heading is parsed, no leading '#').
-  await expect(page.getByRole('heading', { name: 'Nội dung test' })).toBeVisible()
+  await expect(
+    page.getByRole('heading', { name: 'Nội dung test' })
+  ).toBeVisible()
 
   // Extra guard: ensure we're not on the not-found UI.
   await expect(

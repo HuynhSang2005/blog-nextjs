@@ -7,19 +7,19 @@ import type { ComponentProps } from 'react'
 import { useMounted } from '@/lib/core/hooks/use-mounted'
 
 export default function Template({ children }: ComponentProps<'div'>) {
-	const isMounted = useMounted()
+  const isMounted = useMounted()
 
-	if (!isMounted) {
-		return <>{children}</>
-	}
+  if (!isMounted) {
+    return <>{children}</>
+  }
 
-	return (
-		<motion.div
-			animate={{ y: 0, opacity: 1 }}
-			initial={{ y: 20, opacity: 0 }}
-			transition={{ ease: 'easeInOut', duration: 0.7 }}
-		>
-			{children}
-		</motion.div>
-	)
+  return (
+    <motion.div
+      animate={{ y: 0, opacity: 1 }}
+      initial={{ y: 20, opacity: 0 }}
+      transition={{ ease: 'easeInOut', duration: 0.7 }}
+    >
+      {children}
+    </motion.div>
+  )
 }

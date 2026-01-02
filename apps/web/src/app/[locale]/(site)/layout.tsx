@@ -1,9 +1,7 @@
 import { SiteFooter } from '@/components/site-footer'
 import { SiteHeader } from '@/components/site-header'
 
-export default async function SiteLayout(props: {
-  children: React.ReactNode
-}) {
+export default async function SiteLayout(props: { children: React.ReactNode }) {
   const { children } = props
 
   return (
