@@ -15,6 +15,7 @@ import { CodeBlockWrapper } from '@/components/docs/mdx-components/code-block-wr
 import { Callout } from '@/components/callout'
 import { Link } from '@/navigation'
 import { cn } from '@/lib/utils'
+import { stripMdxEsm } from '@/lib/mdx/strip-mdx-esm'
 
 import { blockquote } from './mdx-components/blockquote'
 import { table } from './mdx-components/table'
@@ -150,9 +151,11 @@ const components = {
 }
 
 export function MdxRemote({ source }: { source: string }) {
+  const sanitizedSource = stripMdxEsm(source)
+
   return (
     <div className="mdx">
-      <MDXRemote components={components} source={source} />
+      <MDXRemote components={components} source={sanitizedSource} />
     </div>
   )
 }

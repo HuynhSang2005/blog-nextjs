@@ -202,6 +202,13 @@
     "blog": {
       "title": "Quản lý Blog Posts",
       "description": "Tạo, chỉnh sửa và quản lý các bài viết blog",
+      "editor": {
+        "toolbar": {
+          "insert_callout": "Chú thích",
+          "insert_steps": "Các bước",
+          "insert_tabs": "Tabs"
+        }
+      },
       "list": {
         "title": "Danh sách bài viết",
         "description": "Xem và quản lý tất cả bài viết blog",
@@ -259,6 +266,13 @@
     "docs": {
       "title": "Quản lý Tài liệu",
       "description": "Tạo, chỉnh sửa và quản lý các trang tài liệu",
+      "editor": {
+        "toolbar": {
+          "insert_callout": "Chú thích",
+          "insert_steps": "Các bước",
+          "insert_tabs": "Tabs"
+        }
+      },
       "actions": {
         "create": "Tạo tài liệu mới",
         "edit": "Chỉnh sửa",

@@ -1,0 +1,9 @@
+/*
+ * MDXEditor overrides that must load AFTER `@mdxeditor/editor/style.css`.
+ * We import this from the editor component module to guarantee ordering.
+ */
+
+body .mdxeditor-popup-container {
+  position: relative;
+  z-index: 1000;
+}
