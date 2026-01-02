@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { usePathname, useRouter } from 'next/navigation'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
@@ -53,7 +53,12 @@ export function DocForm({ doc, topics, mode }: DocFormProps) {
   }, [pathname])
   const [isSaving, setIsSaving] = useState(false)
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false)
+  const [lastSavedContent, setLastSavedContent] = useState(doc?.content || '')
   const t = useTranslations('admin.docs')
+
+  useEffect(() => {
+    setLastSavedContent(doc?.content || '')
+  }, [doc?.content])
 
   const form = useForm<DocFormData>({
     resolver: zodResolver(docSchema),
@@ -108,10 +113,12 @@ export function DocForm({ doc, topics, mode }: DocFormProps) {
 
       if (mode === 'create') {
         const created = await createDoc(payload)
+        setLastSavedContent(payload.content)
         toast.success(t('messages.create_success'))
         router.push(`/${currentLocale}/admin/docs/${created.id}`)
       } else if (doc) {
         await updateDoc(doc.id, payload)
+        setLastSavedContent(payload.content)
         toast.success(t('messages.update_success'))
         router.refresh()
       }
@@ -305,26 +312,29 @@ export function DocForm({ doc, topics, mode }: DocFormProps) {
         </Card>
 
         <Card>
-          <CardContent className="pt-6 space-y-2">
-            <FormField
-              control={form.control}
-              name="content"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>{t('form.labels.content')} *</FormLabel>
-                  <FormControl>
-                    <div className="min-h-[500px] rounded-md border">
-                      <MDXEditorWrapper
-                        onChange={field.onChange}
-                        placeholder={t('form.placeholders.content')}
-                        value={field.value}
-                      />
-                    </div>
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+          <CardContent className="p-0">
+            <div className="p-6 pt-6 space-y-2">
+              <FormField
+                control={form.control}
+                name="content"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('form.labels.content')} *</FormLabel>
+                    <FormControl>
+                      <div className="min-h-[500px] rounded-md border">
+                        <MDXEditorWrapper
+                          diffMarkdown={lastSavedContent}
+                          onChange={field.onChange}
+                          placeholder={t('form.placeholders.content')}
+                          value={field.value}
+                        />
+                      </div>
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
           </CardContent>
         </Card>
 

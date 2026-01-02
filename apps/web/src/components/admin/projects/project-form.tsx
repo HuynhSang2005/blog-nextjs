@@ -108,6 +108,9 @@ export function ProjectForm({ project, mode, tags }: ProjectFormProps) {
   const locale = useLocale()
   const t = useTranslations('admin.projects')
   const [isCreating, setIsCreating] = useState(false)
+  const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(
+    mode !== 'create'
+  )
 
   const form = useForm<ProjectFormData, unknown, ProjectFormData>({
     resolver: zodResolver(projectSchema),
@@ -156,14 +159,14 @@ export function ProjectForm({ project, mode, tags }: ProjectFormProps) {
   const watchTitle = form.watch('title')
   useEffect(() => {
     if (mode === 'create' && watchTitle) {
-      if (form.formState.dirtyFields.slug) return
+      if (isSlugManuallyEdited) return
       const slug = removeVietnameseTones(watchTitle)
       form.setValue('slug', slug, {
         shouldValidate: true,
         shouldDirty: false,
       })
     }
-  }, [watchTitle, mode, form])
+  }, [watchTitle, mode, form, isSlugManuallyEdited])
 
   const onSubmit = async (data: ProjectFormData) => {
     setIsCreating(true)
@@ -303,7 +306,14 @@ export function ProjectForm({ project, mode, tags }: ProjectFormProps) {
             <FormItem>
               <FormLabel>{t('form.slug')}</FormLabel>
               <FormControl>
-                <Input placeholder="project-slug" {...field} />
+                <Input
+                  placeholder="project-slug"
+                  {...field}
+                  onChange={e => {
+                    setIsSlugManuallyEdited(true)
+                    field.onChange(e)
+                  }}
+                />
               </FormControl>
               <FormDescription>
                 URL-friendly identifier (tự động tạo từ tiêu đề)
