@@ -9,7 +9,7 @@ applyTo: "apps/web/src/app/**"
 ### Important Rules
 - ✅ **All UI text in Vietnamese** via `next-intl`
 - ✅ **Fetch blog posts from Supabase** (not Contentlayer)
-- ✅ **Use Contentlayer for docs only** (MDX files)
+- ✅ **Fetch docs from Supabase** (MDX string, render runtime)
 - ✅ **Await params and searchParams** (Next.js 16 requirement)
 - ✅ **Cloudinary for media** (metadata in database)
 
@@ -64,32 +64,29 @@ export default async function BlogPostPage({
 }
 ```
 
-**Documentation (from MDX via Contentlayer):**
+**Documentation (from Supabase + runtime MDX):**
 ```tsx
 // apps/web/src/app/[locale]/docs/[...slug]/page.tsx
-import { allDocs } from 'contentlayer/generated'
+import { getPublicDocBySlug } from '@/lib/queries/docs'
+import { MdxRemote } from '@/components/mdx/MdxRemote'
 import { getTranslations } from 'next-intl/server'
 
-export default async function DocPage({ 
-  params 
-}: { 
+export default async function DocPage({
+  params,
+}: {
   params: Promise<{ locale: string; slug: string[] }>
 }) {
   const { locale, slug } = await params
   const t = await getTranslations('docs')
-  
-  // Find doc from Contentlayer (MDX)
-  const doc = allDocs.find(d => 
-    d.locale === locale && 
-    d.slugAsParams === slug.join('/')
-  )
-  
+
+  const doc = await getPublicDocBySlug({ locale, slug: slug.join('/') })
+
   if (!doc) return <div>{t('notFound')}</div>
-  
+
   return (
     <article>
       <h1>{doc.title}</h1>
-      <div dangerouslySetInnerHTML={{ __html: doc.body.html }} />
+      <MdxRemote source={doc.content} />
     </article>
   )
 }
@@ -238,19 +235,9 @@ export default async function BlogPage() {
 }
 ```
 
-**With Contentlayer (static data):**
-```tsx
-import { allBlogPosts } from 'contentlayer/generated'
+**Legacy: Contentlayer (seed/backup only)**
 
-export default function BlogPage() {
-  // No async needed - Contentlayer data is synchronous
-  const posts = allBlogPosts
-    .filter(p => p.locale === 'vi')
-    .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
-  
-  return <div>{posts.map(...)}</div>
-}
-```
+Nếu bạn đang làm phần legacy MDX pipeline (không phải source of truth), bạn có thể gặp Contentlayer. Mặc định hiện tại: blog/docs/projects đều lấy từ Supabase.
 
 ### Layouts
 
@@ -329,9 +316,9 @@ export default function Error({
 }) {
   return (
     <div className="container flex h-screen flex-col items-center justify-center">
-      <h2 className="mb-4 text-2xl font-bold">Something went wrong!</h2>
+      <h2 className="mb-4 text-2xl font-bold">Đã xảy ra lỗi!</h2>
       <p className="mb-4 text-muted-foreground">{error.message}</p>
-      <button onClick={reset}>Try again</button>
+      <button onClick={reset}>Thử lại</button>
     </div>
   )
 }
@@ -346,9 +333,9 @@ export default function NotFound() {
   return (
     <div className="container flex h-screen flex-col items-center justify-center">
       <h1 className="mb-4 text-4xl font-bold">404</h1>
-      <p className="mb-4 text-muted-foreground">Page not found</p>
+      <p className="mb-4 text-muted-foreground">Không tìm thấy trang</p>
       <Button asChild>
-        <Link href="/">Go home</Link>
+        <Link href="/">Về trang chủ</Link>
       </Button>
     </div>
   )
@@ -384,7 +371,7 @@ export async function POST(request: NextRequest) {
 **app/[locale]/feed/[format]/route.ts:**
 ```tsx
 import { Feed } from 'feed'
-import { allBlogPosts } from 'contentlayer/generated'
+import { getBlogPosts } from '@/lib/queries/blog'
 
 export async function GET(
   request: NextRequest,
@@ -398,16 +385,16 @@ export async function GET(
     link: 'https://example.com',
   })
   
-  allBlogPosts
-    .filter(p => p.locale === locale)
-    .forEach(post => {
-      feed.addItem({
-        title: post.title,
-        id: post.url,
-        link: post.url,
-        date: new Date(post.date),
-      })
+  const posts = await getBlogPosts({ locale })
+
+  posts.forEach((post) => {
+    feed.addItem({
+      title: post.title,
+      id: post.slug,
+      link: post.slug,
+      date: new Date(post.published_at ?? post.created_at),
     })
+  })
   
   if (format === 'xml') {
     return new NextResponse(feed.rss2(), {

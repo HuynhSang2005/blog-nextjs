@@ -239,20 +239,30 @@ export async function getBlogPost(slug: string, locale: string) {
 }
 ```
 
-### Contentlayer Helpers (for Docs only)
+### Supabase Helpers (Docs)
 ```typescript
-import { allDocs, type Doc } from 'contentlayer/generated'
+import { createClient } from '@/lib/supabase/server'
 
 /**
- * Lấy tất cả docs theo locale (MDX files).
- * Gets all docs for a locale (static MDX files).
- * @param locale - Locale code (e.g., 'vi')
- * @returns Sorted docs
+ * Lấy một docs public theo slug và locale.
+ * Nội dung là MDX string và sẽ render runtime.
  */
-export function getDocs(locale: string): Doc[] {
-  return allDocs
-    .filter(doc => doc.locale === locale)
-    .sort((a, b) => a.title.localeCompare(b.title))
+export async function getPublicDocBySlug(params: {
+  locale: string
+  slug?: string
+}) {
+  const supabase = createClient()
+
+  const { data, error } = await supabase
+    .from('docs')
+    .select('*')
+    .eq('locale', params.locale)
+    .eq('slug', params.slug ?? '')
+    .eq('status', 'published')
+    .single()
+
+  if (error) throw error
+  return data
 }
 ```
 

@@ -3,27 +3,36 @@
 > Custom instructions for GitHub Copilot when working on Huỳnh Sang Blog
 
 **Project**: Next.js 16 Blog-Portfolio Monorepo  
-**Tech Stack**: Next.js 16, React 19, TypeScript, Contentlayer, Turborepo, Supabase, Cloudinary, Shadcn UI  
-**Primary Language**: Vietnamese (vi)  
-**Content Strategy**: Hybrid (Database for blog, MDX for docs)
+**Tech Stack**: Next.js 16, React 19, TypeScript, Turborepo, Supabase, Cloudinary, Shadcn UI  
+**Primary Language**: Vietnamese (vi)
 
 ---
 
 ## 🎯 Project Context
 
-This is a **monorepo blog-portfolio platform** built with Next.js 16 App Router. Uses hybrid content strategy:
-- **Blog posts**: Supabase database with admin CRUD interface
-- **Documentation**: MDX files (Git-based, Contentlayer2 processing)
-- **Media**: Cloudinary CDN (not database storage)
+This is a **monorepo blog-portfolio platform** built with Next.js 16 App Router.
+
+**Source of truth (DB-first):**
+- **Blog posts**: Supabase database
+- **Docs**: Supabase database (lưu nội dung dạng MDX string, render runtime)
+- **Projects**: Supabase database
+- **Media**: Cloudinary (file) + Supabase `media` (metadata/reference)
 
 The project uses Bun as package manager and Biome for linting/formatting (not ESLint/Prettier).
 
 **Key architectural principles:**
 - Server Components by default (only use `'use client'` when necessary)
-- Type-safe content via Contentlayer + Supabase generated types
+- Supabase-first data access for dynamic content
 - Shadcn UI components (copy-paste, not npm packages)
 - Vietnamese-first UI with i18n support via next-intl
 - Strict TypeScript with no `any` types
+
+**MCP / tools workflow (bắt buộc):**
+- Repo ops (tìm file/đọc/sửa): ưu tiên Serena tools
+- DB schema/migrations: Supabase MCP `apply_migration`
+- DB queries/debug data: Supabase MCP `execute_sql`
+- Tra docs thư viện: Context7
+- Tra cứu web/so sánh: Perplexity
 
 **I18n & Content Rules:**
 - ✅ **All UI text MUST be in Vietnamese** (buttons, labels, messages)
@@ -104,8 +113,7 @@ import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { siteConfig } from '@/config/site'
 
-// Contentlayer types
-import { allBlogPosts, type BlogPost } from 'contentlayer/generated'
+// Prefer project-local types (DB-backed)
 ```
 
 ### Tailwind CSS
@@ -174,13 +182,17 @@ export default async function BlogPage({ params }: { params: Promise<{ locale: s
 
 **Documentation (from MDX):**
 ```tsx
-// Import Contentlayer types
-import { allDocs } from 'contentlayer/generated'
+import { getPublicDocBySlug } from '@/lib/queries/docs'
+import { MdxRemote } from '@/components/mdx/MdxRemote'
 
-// Server Component - static MDX content
-export default async function DocsPage() {
-  const docs = allDocs.filter(d => d.locale === 'vi')
-  return <div>{docs.map(doc => <DocCard key={doc._id} doc={doc} />)}</div>
+export default async function DocsPage({
+  params,
+}: {
+  params: Promise<{ locale: string; slug?: string[] }>
+}) {
+  const { locale, slug } = await params
+  const doc = await getPublicDocBySlug({ locale, slug: slug?.join('/') })
+  return <MdxRemote source={doc.content} />
 }
 ```
 
@@ -226,7 +238,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 - Use TypeScript strict mode (no `any` types)
 - Await `params` and `searchParams` in Next.js 16 pages
 - Use Supabase queries for blog posts (not MDX)
-- Use Contentlayer types from `contentlayer/generated` for docs only
+- Use Supabase queries for docs/projects (DB-first)
 - Store media references in database, files in Cloudinary
 - **Write ALL UI text in Vietnamese** (use `vi.json` translations)
 - Add JSDoc comments for complex functions
@@ -338,8 +350,8 @@ bun run tsc --noEmit
 # Lint & format
 bun run biome check --write .
 
-# Build Contentlayer types
-bun run contentlayer:build
+# (Legacy) Build Contentlayer types only if you are explicitly working on legacy MDX pipelines
+# bun run contentlayer:build
 ```
 
 ### Build
@@ -353,48 +365,16 @@ cd apps/web && bun run build
 
 ---
 
-## 📚 Documentation References
+## 📚 Documentation Notes
 
-For detailed information, refer to these files:
-- [AGENTS.md](../AGENTS.md) - Complete AI agent instructions
-- [docs/architecture.md](../docs/architecture.md) - Architecture overview
-- [docs/development.md](../docs/development.md) - Development workflow
-- [docs/dev-v1/](../docs/dev-v1/) - Phase implementation guides
-- [docs/dev-v1/PROJECT-ANALYSIS.md](../docs/dev-v1/PROJECT-ANALYSIS.md) - Current state analysis
-- [docs/dev-v1/TECH-STACK-RECOMMENDATIONS.md](../docs/dev-v1/TECH-STACK-RECOMMENDATIONS.md) - Library choices
-- [docs/dev-v1/I18N-CONTENT-GUIDELINES.md](../docs/dev-v1/I18N-CONTENT-GUIDELINES.md) - Vietnamese UI rules
-- [docs/dev-v1/MDX-CONTENT-STRATEGY.md](../docs/dev-v1/MDX-CONTENT-STRATEGY.md) - Hybrid content approach
-- [docs/dev-v1/database-schema-cloudinary.md](../docs/dev-v1/database-schema-cloudinary.md) - Database design
-- [docs/dev-v1/environment-variables.md](../docs/dev-v1/environment-variables.md) - Environment setup
-
----
-
-## 🎯 Current Development Phase
-
-**Status**: Phase 1 planning (Database & Auth setup)  
-**Next Steps**: Supabase integration, admin dashboard
-
-When implementing features, always consult the relevant phase guide in `docs/dev-v1/`.
-- [docs/development.md](../docs/development.md) - Development workflow
-- [docs/dev-v1/](../docs/dev-v1/) - Phase implementation guides
-- [docs/dev-v1/PROJECT-ANALYSIS.md](../docs/dev-v1/PROJECT-ANALYSIS.md) - Current state analysis
-- [docs/dev-v1/TECH-STACK-RECOMMENDATIONS.md](../docs/dev-v1/TECH-STACK-RECOMMENDATIONS.md) - Library choices
-
----
-
-## 🎯 Current Development Phase
-
-**Status**: Phase 1 planning (Database & Auth setup)  
-**Next Steps**: Supabase integration, admin dashboard
-
-When implementing features, always consult the relevant phase guide in `docs/dev-v1/`.
+- `docs/` có thể thay đổi/xoá/di chuyển. Khi cần, ưu tiên search trong workspace và đọc file liên quan trực tiếp đến feature đang sửa.
 
 ---
 
 ## 💡 Copilot Tips
 
 1. **Check existing patterns** before generating new code
-2. **Use Contentlayer types** for type-safe content access
+2. **Ưu tiên Supabase** cho dữ liệu dynamic (blog/docs/projects)
 3. **Prefer Server Components** unless interactivity is required
 4. **Follow file naming conventions** strictly
 5. **Use Tailwind CSS** for all styling
@@ -403,5 +383,5 @@ When implementing features, always consult the relevant phase guide in `docs/dev
 
 ---
 
-**Last Updated**: December 27, 2025  
+**Last Updated**: January 3, 2026  
 **Maintained by**: Huỳnh Sang

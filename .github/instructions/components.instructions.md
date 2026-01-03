@@ -11,7 +11,7 @@ applyTo: "apps/web/src/components/**/!(ui/**)"
 - ⚠️ **Keep technical terms in English** (Next.js, React, props, etc.)
 - ✅ Use `next-intl` translations from `i18n/locales/vi.json`
 - ❌ No hardcoded English strings in user-facing UI
-- ✅ Use Supabase for blog data, Contentlayer for docs only
+- ✅ Use Supabase for blog/docs/projects data (DB-first)
 
 ### Component Structure
 ```tsx
@@ -192,7 +192,7 @@ Add JSDoc comments for complex components:
 /**
  * Displays a blog post card with title, excerpt, and metadata.
  * 
- * @param post - Blog post data from Contentlayer
+ * @param post - Blog post data from Supabase
  * @param featured - Whether to highlight as featured post
  */
 export function BlogCard({ post, featured }: BlogCardProps) {
