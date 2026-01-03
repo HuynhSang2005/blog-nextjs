@@ -41,7 +41,9 @@ bun-debug.log*
 *.pem
 
 # Tooling
-.serena/
+# Serena: commit config, ignore runtime cache
+.serena/cache/
 
-# Documentation (internal only - root level)
+# Documentation
+# Ignore toàn bộ docs trong git (Serena vẫn có thể đọc nếu cấu hình không dùng gitignore)
 /docs/

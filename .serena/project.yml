@@ -22,13 +22,34 @@ encoding: "utf-8"
 
 # whether to use the project's gitignore file to ignore files
 # Added on 2025-04-07
-ignore_all_files_in_gitignore: true
+ignore_all_files_in_gitignore: false
 
 # list of additional paths to ignore
 # same syntax as gitignore, so you can use * and **
 # Was previously called `ignored_dirs`, please update your config if you are using that.
 # Added (renamed) on 2025-04-07
-ignored_paths: []
+ignored_paths:
+  # Dependencies
+  - node_modules/
+  # VCS
+  - .git/
+  # Build outputs
+  - .next/
+  - out/
+  - build/
+  - dist/
+  - apps/web/.next/
+  # Turbo/Vercel
+  - .turbo/
+  - .vercel/
+  # Test outputs
+  - playwright-report/
+  - test-results/
+  - apps/web/playwright-report/
+  - apps/web/test-results/
+  # Serena cache (keep config readable)
+  - .serena/cache/
+
 
 # whether the project is in read-only mode
 # If set to true, all editing tools will be disabled and attempts to use them will result in an error
@@ -81,4 +102,9 @@ excluded_tools: []
 initial_prompt: ""
 
 project_name: "blog-nextjs"
-included_optional_tools: []
+included_optional_tools:
+  - execute_shell_command
+  - read_file
+  - restart_language_server
+  - replace_lines
+  - delete_lines
