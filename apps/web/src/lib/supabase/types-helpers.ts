@@ -38,7 +38,7 @@ export type ProjectWithRelations = Tables<'projects'> & {
 }
 
 // Project cho listing
-export type ProjectListItem = Omit<Tables<'projects'>, 'long_description'> & {
+export type ProjectListItem = Tables<'projects'> & {
   cover_media: Pick<Tables<'media'>, 'id' | 'public_id' | 'alt_text'> | null
   tags: Pick<Tables<'tags'>, 'id' | 'name' | 'slug' | 'color'>[]
 }
@@ -79,7 +79,7 @@ export type DocsTopic = Tables<'docs_topics'>
 export type BlogPostStatus = 'draft' | 'published' | 'archived'
 export type ProjectStatus =
   | 'planning'
-  | 'in-progress'
+  | 'in_progress'
   | 'completed'
   | 'archived'
 export type EventType = 'work' | 'education' | 'project' | 'achievement'

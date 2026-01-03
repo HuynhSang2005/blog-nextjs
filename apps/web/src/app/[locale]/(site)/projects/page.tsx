@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
-import { getProjects, getProjectStats } from '@/app/actions/projects-queries'
+import { getProjectStats } from '@/app/actions/projects-queries'
+import { getProjects } from '@/lib/supabase/queries/projects'
 import {
   PageHeader,
   PageHeaderHeading,
@@ -8,6 +9,7 @@ import {
 } from '@/components/page-header'
 import { ProjectsGrid } from '@/components/projects/projects-grid'
 import { ProjectFilters } from '@/components/projects/project-filters'
+import { ProjectsPagination } from '@/components/projects/projects-pagination'
 
 interface ProjectsPageProps {
   params: Promise<{
@@ -16,8 +18,12 @@ interface ProjectsPageProps {
   searchParams: Promise<{
     status?: 'in_progress' | 'completed' | 'archived'
     featured?: string
+    q?: string
+    page?: string
   }>
 }
+
+const PROJECTS_PER_PAGE = 9
 
 export async function generateMetadata({
   params,
@@ -41,10 +47,32 @@ export default async function ProjectsPage({
   const search = await searchParams
   const t = await getTranslations({ locale, namespace: 'projects' })
 
-  const projects = await getProjects(locale, {
-    status: search.status,
-    featured: search.featured === 'true' ? true : undefined,
-  })
+  const currentPage = Math.max(1, Number.parseInt(search.page ?? '1', 10) || 1)
+
+  const projectsResult = await getProjects(
+    locale,
+    search.status,
+    {
+      page: currentPage,
+      pageSize: PROJECTS_PER_PAGE,
+    },
+    {
+      featured: search.featured === 'true' ? true : undefined,
+      search: search.q,
+    }
+  )
+
+  const projectsForGrid = projectsResult.data.map(project => ({
+    ...project,
+    cover_media: project.cover_media
+      ? {
+          ...project.cover_media,
+          width: null,
+          height: null,
+        }
+      : null,
+    project_tags: project.tags.map(tag => ({ tag })),
+  }))
 
   const stats = await getProjectStats(locale)
 
@@ -58,8 +86,25 @@ export default async function ProjectsPage({
       <ProjectFilters stats={stats} />
 
       <div className="py-12">
-        {projects.length > 0 ? (
-          <ProjectsGrid locale={locale} projects={projects} />
+        {projectsResult.data.length > 0 ? (
+          <>
+            <ProjectsGrid locale={locale} projects={projectsForGrid} />
+            {projectsResult.pagination.totalPages > 1 && (
+              <ProjectsPagination
+                currentPage={projectsResult.pagination.page}
+                messages={{
+                  next: t('pagination.next'),
+                  previous: t('pagination.previous'),
+                  go_to_next_page: t('pagination.go_to_next_page'),
+                  go_to_previous_page: t('pagination.go_to_previous_page'),
+                  go_to_page: t('pagination.go_to_page', { page: '{page}' }),
+                  aria_label: t('pagination.aria_label'),
+                }}
+                searchParams={search}
+                totalPages={projectsResult.pagination.totalPages}
+              />
+            )}
+          </>
         ) : (
           <div className="flex min-h-[400px] flex-col items-center justify-center gap-4 text-center">
             <div className="rounded-full bg-muted p-4">

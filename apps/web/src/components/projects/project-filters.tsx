@@ -1,9 +1,11 @@
 'use client'
 
+import { useEffect, useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
+import { Input } from '@/components/ui/input'
 import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -22,12 +24,15 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
   const searchParams = useSearchParams()
   const t = useTranslations('projects')
 
+  const [searchQuery, setSearchQuery] = useState(searchParams.get('q') ?? '')
+
   const currentStatus = searchParams.get('status') as
     | 'in_progress'
     | 'completed'
     | 'archived'
     | null
   const currentFeatured = searchParams.get('featured')
+  const currentSearchQuery = searchParams.get('q')
 
   const filters = [
     {
@@ -61,6 +66,24 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
       params.set(key, value)
     }
 
+    // Reset to first page when changing filters
+    params.delete('page')
+
+    router.push(`${pathname}?${params.toString()}`, { scroll: false })
+  }
+
+  function updateSearch(value: string) {
+    const params = new URLSearchParams(searchParams.toString())
+    const trimmed = value.trim()
+
+    if (!trimmed) {
+      params.delete('q')
+    } else {
+      params.set('q', trimmed)
+    }
+
+    // Reset to first page when changing search
+    params.delete('page')
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
@@ -68,11 +91,32 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
     router.push(pathname, { scroll: false })
   }
 
-  const hasActiveFilters = currentStatus !== null || currentFeatured !== null
+  const hasActiveFilters =
+    currentStatus !== null || currentFeatured !== null || currentSearchQuery !== null
+
+  useEffect(() => {
+    const handle = setTimeout(() => {
+      // Only update when local input differs from current URL param
+      if ((currentSearchQuery ?? '') !== searchQuery.trim()) {
+        updateSearch(searchQuery)
+      }
+    }, 300)
+
+    return () => clearTimeout(handle)
+  }, [searchQuery, currentSearchQuery, pathname, router, searchParams])
 
   return (
     <div className="sticky top-16 z-40 border-b bg-background/80 backdrop-blur-lg">
       <div className="container py-4">
+        {/* Search */}
+        <div className="mb-4">
+          <Input
+            onChange={e => setSearchQuery(e.target.value)}
+            placeholder={t('filters.search_placeholder')}
+            value={searchQuery}
+          />
+        </div>
+
         {/* Status Filters */}
         <div className="mb-4 flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
           {filters.map(filter => {
@@ -120,9 +164,25 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
         {hasActiveFilters && (
           <div className="flex items-center gap-2">
             <span className="text-sm text-muted-foreground">
-              Bộ lọc đang áp dụng:
+              {t('filters_applied')}
             </span>
             <div className="flex flex-wrap gap-2">
+              {currentSearchQuery && (
+                <Badge className="gap-1" variant="secondary">
+                  {currentSearchQuery}
+                  <button
+                    className="ml-1 hover:text-foreground"
+                    onClick={() => {
+                      setSearchQuery('')
+                      updateFilters('q', null)
+                    }}
+                    type="button"
+                  >
+                    <X className="h-3 w-3" />
+                    <span className="sr-only">{t('remove_search_filter')}</span>
+                  </button>
+                </Badge>
+              )}
               {currentStatus && (
                 <Badge className="gap-1" variant="secondary">
                   {filters.find(f => f.value === currentStatus)?.label}
@@ -132,7 +192,7 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
                     type="button"
                   >
                     <X className="h-3 w-3" />
-                    <span className="sr-only">Xóa bộ lọc trạng thái</span>
+                    <span className="sr-only">{t('remove_status_filter')}</span>
                   </button>
                 </Badge>
               )}
@@ -145,7 +205,7 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
                     type="button"
                   >
                     <X className="h-3 w-3" />
-                    <span className="sr-only">Xóa bộ lọc nổi bật</span>
+                    <span className="sr-only">{t('remove_featured_filter')}</span>
                   </button>
                 </Badge>
               )}

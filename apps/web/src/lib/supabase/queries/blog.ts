@@ -106,12 +106,15 @@ export async function getBlogPosts(
       query = query.eq('status', 'published')
     }
 
-    // Apply search filter (title + excerpt)
+    // Apply search filter (FTS: title + excerpt + content)
     if (filters?.search) {
       const searchTerm = filters.search.trim()
-      query = query.or(
-        `title.ilike.%${searchTerm}%,excerpt.ilike.%${searchTerm}%`
-      )
+      if (searchTerm) {
+        query = query.textSearch('search_vector', searchTerm, {
+          type: 'websearch',
+          config: 'simple',
+        })
+      }
     }
 
     // Apply date range filters (inclusive)

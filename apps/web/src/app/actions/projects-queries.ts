@@ -251,13 +251,36 @@ export const getFeaturedProjects = cache(
 export const getProjectStats = cache(async (locale: string) => {
   const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('projects')
-    .select('status')
-    .eq('locale', locale)
+  const [total, inProgress, completed, archived] = await Promise.all([
+    supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('locale', locale),
+    supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('locale', locale)
+      .eq('status', 'in_progress'),
+    supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('locale', locale)
+      .eq('status', 'completed'),
+    supabase
+      .from('projects')
+      .select('*', { count: 'exact', head: true })
+      .eq('locale', locale)
+      .eq('status', 'archived'),
+  ])
 
-  if (error) {
-    console.error('Error fetching project stats:', error)
+  if (total.error || inProgress.error || completed.error || archived.error) {
+    console.error('Error fetching project stats:', {
+      total: total.error,
+      in_progress: inProgress.error,
+      completed: completed.error,
+      archived: archived.error,
+    })
+
     return {
       total: 0,
       in_progress: 0,
@@ -266,12 +289,10 @@ export const getProjectStats = cache(async (locale: string) => {
     }
   }
 
-  const stats = {
-    total: data?.length || 0,
-    in_progress: data?.filter(p => p.status === 'in_progress').length || 0,
-    completed: data?.filter(p => p.status === 'completed').length || 0,
-    archived: data?.filter(p => p.status === 'archived').length || 0,
+  return {
+    total: total.count || 0,
+    in_progress: inProgress.count || 0,
+    completed: completed.count || 0,
+    archived: archived.count || 0,
   }
-
-  return stats
 })

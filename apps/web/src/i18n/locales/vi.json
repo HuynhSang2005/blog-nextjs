@@ -577,7 +577,17 @@
       "in_progress": "Đang phát triển",
       "completed": "Hoàn thành",
       "archived": "Lưu trữ",
-      "featured": "Nổi bật"
+      "featured": "Nổi bật",
+      "search_placeholder": "Tìm kiếm dự án..."
+    },
+
+    "pagination": {
+      "aria_label": "Phân trang dự án",
+      "previous": "Trước đó",
+      "next": "Tiếp theo",
+      "go_to_previous_page": "Trang trước đó",
+      "go_to_next_page": "Trang tiếp theo",
+      "go_to_page": "Đi đến trang {page}"
     },
 
     "sort": {
@@ -600,6 +610,10 @@
 
     "empty_state": "Chưa có dự án nào",
     "empty_state_description": "Các dự án sẽ được hiển thị tại đây khi có dữ liệu",
+    "filters_applied": "Bộ lọc đang áp dụng:",
+    "remove_status_filter": "Xóa bộ lọc trạng thái",
+    "remove_featured_filter": "Xóa bộ lọc nổi bật",
+    "remove_search_filter": "Xóa tìm kiếm",
     "clear_filters": "Xóa bộ lọc",
 
     "tech_stack": {

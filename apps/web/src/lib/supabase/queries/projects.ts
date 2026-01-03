@@ -31,15 +31,41 @@ function byOrderIndexAsc(
  * @param locale - Locale code (e.g., 'vi', 'en')
  * @param status - Project status filter (optional)
  * @param pagination - Pagination parameters (optional)
+ * @param filters - Additional filters (optional)
  * @returns Paginated projects
  */
 export async function getProjects(
   locale: string,
   status?: ProjectStatus,
-  pagination?: PaginationParams
+  pagination?: PaginationParams,
+  filters?: {
+    search?: string
+    featured?: boolean
+    tagSlug?: string
+  }
 ): Promise<PaginatedResponse<ProjectListItem>> {
   try {
     const supabase = await createClient()
+
+    // When filtering by tag, we must use an inner join so PostgREST can
+    // restrict projects rows based on the related tag.
+    const tagsSelect = filters?.tagSlug
+      ? `tags:project_tags!inner(
+          tag:tags!inner(
+            id,
+            name,
+            slug,
+            color
+          )
+        )`
+      : `tags:project_tags(
+          tag:tags(
+            id,
+            name,
+            slug,
+            color
+          )
+        )`
 
     // Build query
     let query = supabase
@@ -52,14 +78,7 @@ export async function getProjects(
           public_id,
           alt_text
         ),
-        tags:project_tags(
-          tag:tags(
-            id,
-            name,
-            slug,
-            color
-          )
-        )
+        ${tagsSelect}
       `,
         { count: 'exact' }
       )
@@ -68,6 +87,27 @@ export async function getProjects(
     // Apply status filter
     if (status) {
       query = query.eq('status', status)
+    }
+
+    // Apply featured filter
+    if (filters?.featured) {
+      query = query.eq('featured', true)
+    }
+
+    // Apply search filter (FTS)
+    if (filters?.search) {
+      const searchTerm = filters.search.trim()
+      if (searchTerm) {
+        query = query.textSearch('search_vector', searchTerm, {
+          type: 'websearch',
+          config: 'simple',
+        })
+      }
+    }
+
+    // Apply tag filter
+    if (filters?.tagSlug) {
+      query = query.eq('tags.tag.slug', filters.tagSlug)
     }
 
     // Apply pagination
