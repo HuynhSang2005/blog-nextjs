@@ -45,12 +45,5 @@ bun-debug.log*
 .serena/cache/
 
 # Documentation
-# Mặc định ignore docs (thay đổi thường xuyên), nhưng vẫn track các tài liệu kỹ thuật quan trọng.
-/docs/*
-
-!/docs/dev-mdx/
-!/docs/dev-mdx/**
-
-!/docs/knowledge-base/
-/docs/knowledge-base/*
-!/docs/knowledge-base/mdx.md
+# Ignore toàn bộ docs trong git (Serena vẫn có thể đọc nếu cấu hình không dùng gitignore)
+/docs/
