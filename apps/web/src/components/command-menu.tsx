@@ -19,7 +19,6 @@ import { useBlogConfig } from '@/lib/core/hooks/use-blog-config'
 import { useDocsConfig } from '@/lib/core/hooks/use-docs-config'
 import { getObjectValueByLocale } from '@/lib/core/utils/locale'
 import type { NavItemWithChildren } from '@/lib/core/types/nav'
-import { allBlogs } from 'contentlayer/generated'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
@@ -122,26 +121,81 @@ function BlogCommandMenu({
   const router = useRouter()
   const locale = useLocale()
 
-  const posts = useMemo(() => {
-    return allBlogs.filter(post => {
-      const [postLocale] = post.slugAsParams.split('/')
+  const [posts, setPosts] = useState<
+    {
+      id: string
+      slug: string
+      title: string
+      excerpt: string | null
+      tags: string[]
+    }[]
+  >([])
 
-      return postLocale === locale
-    })
+  useEffect(() => {
+    let cancelled = false
+
+    async function load() {
+      try {
+        const response = await fetch(
+          `/api/command-menu/blog-posts?locale=${encodeURIComponent(locale)}`,
+          {
+            method: 'GET',
+          }
+        )
+
+        if (!response.ok) return
+
+        const json: unknown = await response.json()
+        if (!json || typeof json !== 'object') return
+        if (!('posts' in json)) return
+
+        const maybePosts = (json as { posts: unknown }).posts
+        if (!Array.isArray(maybePosts)) return
+
+        const normalized = maybePosts
+          .map(item => {
+            if (!item || typeof item !== 'object') return null
+            const row = item as Record<string, unknown>
+            if (typeof row.id !== 'string') return null
+            if (typeof row.slug !== 'string') return null
+            if (typeof row.title !== 'string') return null
+            const excerpt = typeof row.excerpt === 'string' ? row.excerpt : null
+            const tags = Array.isArray(row.tags)
+              ? row.tags.filter((t): t is string => typeof t === 'string')
+              : []
+
+            return {
+              id: row.id,
+              slug: row.slug,
+              title: row.title,
+              excerpt,
+              tags,
+            }
+          })
+          .filter((p): p is NonNullable<typeof p> => Boolean(p))
+
+        if (!cancelled) setPosts(normalized)
+      } catch {
+        // Ignore fetch errors for command menu
+      }
+    }
+
+    load()
+
+    return () => {
+      cancelled = true
+    }
   }, [locale])
 
   return (
     <CommandGroup heading={messages.blog}>
       {posts.map(post => (
         <CommandItem
-          key={post._id}
+          key={post.id}
           onSelect={() => {
-            const [, ...slugs] = post.slugAsParams.split('/')
-            const slug = slugs.join('/')
-
-            runCommand(() => router.push(`/blog/${slug}`))
+            runCommand(() => router.push(`/blog/${post.slug}`))
           }}
-          value={`${post.title} ${post.excerpt} ${post.tags.join(' ')}`}
+          value={`${post.title} ${post.excerpt ?? ''} ${post.tags.join(' ')}`}
         >
           <div className="mx-1 flex size-4 items-center justify-center">
             <FileTextIcon className="size-4" />
@@ -149,7 +203,7 @@ function BlogCommandMenu({
 
           <div className="flex flex-col gap-1 p-2 w-full">
             <h1 className="text-lg">{post.title}</h1>
-            <p className="truncate">{post.excerpt}</p>
+            {post.excerpt && <p className="truncate">{post.excerpt}</p>}
           </div>
         </CommandItem>
       ))}
