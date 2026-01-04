@@ -4,19 +4,67 @@ import { cache } from 'react'
 
 import { getObjectValueByLocale } from '@/lib/core/utils/locale'
 import type { LocaleOptions } from '@/lib/core/types/i18n'
-import { allBlogs, type Blog } from 'contentlayer/generated'
 import type { RSSFeed } from '@/lib/core/types/blog'
 import { defaultLocale, locales } from '@/config/i18n'
 import { blogConfig } from '@/config/blog'
 import { siteConfig } from '@/config/site'
 import { absoluteUrl } from '@/lib/utils'
+import { createClient } from '@/lib/supabase/server'
+
+interface FeedAuthor {
+  full_name: string | null
+  website: string | null
+  email: string | null
+}
+
+interface FeedBlogPost {
+  slug: string
+  title: string
+  excerpt: string | null
+  locale: string
+  published_at: string | null
+  created_at: string | null
+  author: FeedAuthor | null
+}
+
+async function getFeedPosts(locale: LocaleOptions): Promise<FeedBlogPost[]> {
+  const supabase = await createClient()
+
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select(
+      `
+      slug,
+      title,
+      excerpt,
+      locale,
+      published_at,
+      created_at,
+      author:profiles!author_id(
+        full_name,
+        website,
+        email
+      )
+    `
+    )
+    .eq('status', 'published')
+    .eq('locale', locale)
+    .order('published_at', { ascending: false })
+
+  if (error) {
+    console.error('Error fetching blog posts for feed:', error)
+    throw error
+  }
+
+  return (data ?? []) as FeedBlogPost[]
+}
 
 function generateWebsiteFeeds({
   file,
   posts,
   locale,
 }: {
-  posts: Blog[]
+  posts: FeedBlogPost[]
   file: RSSFeed['file']
   locale: LocaleOptions
 }) {
@@ -32,39 +80,30 @@ function generateWebsiteFeeds({
     description: getObjectValueByLocale(siteConfig.description, locale),
   })
 
-  const blogFeedEntries = posts
-    .filter(post => {
-      const [postLocale] = post.slugAsParams.split('/')
+  const blogFeedEntries = posts.map(post => {
+    const postLink =
+      locale === defaultLocale
+        ? `/blog/${post.slug}`
+        : `/${locale}/blog/${post.slug}`
 
-      return postLocale === locale
-    })
-    .map(post => {
-      const [postLocale, ...postSlugList] = post.slugAsParams.split('/')
-      const postSlug = postSlugList.join('/') || ''
+    const link = absoluteUrl(postLink)
 
-      const postLink =
-        postLocale === defaultLocale
-          ? `/blog/${postSlug}`
-          : `/${locale}/blog/${postSlug}`
+    return {
+      id: link,
+      link,
+      title: post.title,
+      description: post.excerpt ?? undefined,
+      date: new Date(post.published_at ?? post.created_at ?? Date.now()),
 
-      const link = absoluteUrl(postLink)
-
-      return {
-        id: link,
-        link,
-        title: post.title,
-        description: post.excerpt,
-        date: new Date(post.date || Date.now()),
-
-        author: [
-          {
-            name: post.author?.name,
-            link: post.author?.site,
-            email: post.author?.email || ' ',
-          },
-        ],
-      } as Item
-    })
+      author: [
+        {
+          name: post.author?.full_name ?? siteConfig.author.name,
+          link: post.author?.website ?? siteConfig.links.github.url,
+          email: post.author?.email || ' ',
+        },
+      ],
+    } as Item
+  })
 
   for (const blogFeedEntry of blogFeedEntries) {
     feed.addItem(blogFeedEntry)
@@ -74,11 +113,12 @@ function generateWebsiteFeeds({
 }
 
 const provideWebsiteFeeds = cache(
-  ({ feed, locale }: { feed: string; locale: LocaleOptions }) => {
+  async ({ feed, locale }: { feed: string; locale: LocaleOptions }) => {
+    const posts = await getFeedPosts(locale || defaultLocale)
     const websiteFeeds = generateWebsiteFeeds({
-      locale,
+      locale: locale || defaultLocale,
       file: feed,
-      posts: allBlogs,
+      posts,
     })
 
     switch (feed) {
@@ -120,7 +160,7 @@ export const GET = async (
   }
 
   const typedParams = await staticProps.params
-  const websiteFeed = provideWebsiteFeeds({
+  const websiteFeed = await provideWebsiteFeeds({
     feed: typedParams.feed,
     locale: typedParams.locale || defaultLocale,
   })
