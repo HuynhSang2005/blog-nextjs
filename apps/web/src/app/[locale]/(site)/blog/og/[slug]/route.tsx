@@ -1,9 +1,9 @@
 /** biome-ignore-all lint/performance/noImgElement: Using img elements for OG image generation */
-import { allBlogs, type Blog } from 'contentlayer/generated'
 import type { NextRequest } from 'next/server'
 import { ImageResponse } from 'next/og'
 
 import type { LocaleOptions } from '@/lib/core/types/i18n'
+import { createClient } from '@/lib/supabase/server'
 import { absoluteUrl, truncateText } from '@/lib/utils'
 import { siteConfig } from '@/config/site'
 import { getFonts } from '@/lib/fonts'
@@ -13,6 +13,16 @@ export const dynamicParams = true
 
 interface BlogOgProps {
   params: Promise<{ slug: string; locale: LocaleOptions }>
+}
+
+interface OgPost {
+  title: string
+  author: {
+    full_name: string | null
+    avatar_media: {
+      public_id: string | null
+    } | null
+  } | null
 }
 
 export async function GET(
@@ -28,7 +38,10 @@ export async function GET(
     }),
   }
   const typedParams = await blogProps.params
-  const post = getBlogPostBySlugAndLocale(typedParams.slug, typedParams.locale)
+  const post = await getBlogPostBySlugAndLocale(
+    typedParams.slug,
+    typedParams.locale
+  )
 
   if (!post) {
     return new ImageResponse(<Fallback src="/og.jpg" />, {
@@ -78,18 +91,27 @@ export async function GET(
   )
 }
 
-function Author({ post }: { post: Blog }) {
+function Author({ post }: { post: OgPost }) {
+  const cloudName = process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME
+  const avatarPublicId = post.author?.avatar_media?.public_id
+  const avatarUrl =
+    cloudName && avatarPublicId
+      ? `https://res.cloudinary.com/${cloudName}/image/upload/c_fill,w_160,h_160,g_auto/${avatarPublicId}`
+      : undefined
+
   return (
     <div tw="flex items-center pt-10">
-      {post.author?.image && (
+      {avatarUrl && (
         <img
           alt=""
-          src={absoluteUrl(post.author?.image)}
+          src={avatarUrl}
           tw="w-20 h-20 rounded-full border-gray-800 border-4"
         />
       )}
 
-      <span tw="ml-3 text-gray-400 text-3xl">{post.author?.name}</span>
+      <span tw="ml-3 text-gray-400 text-3xl">
+        {post.author?.full_name || siteConfig.author.name}
+      </span>
     </div>
   )
 }
@@ -124,10 +146,34 @@ function Fallback({ src }: { src: string }) {
   )
 }
 
-function getBlogPostBySlugAndLocale(slug: string, locale: LocaleOptions) {
-  return allBlogs.find(post => {
-    const [postLocale, ...slugs] = post.slugAsParams.split('/')
+async function getBlogPostBySlugAndLocale(
+  slug: string,
+  locale: LocaleOptions
+): Promise<OgPost | null> {
+  const supabase = await createClient()
 
-    return slugs.join('/') === slug && postLocale === locale
-  })
+  const { data, error } = await supabase
+    .from('blog_posts')
+    .select(
+      `
+        title,
+        author:profiles!author_id(
+          full_name,
+          avatar_media:media!avatar_media_id(
+            public_id
+          )
+        )
+      `
+    )
+    .eq('slug', slug)
+    .eq('locale', locale)
+    .eq('status', 'published')
+    .maybeSingle()
+
+  if (error) {
+    console.error('Error fetching blog post OG data:', error)
+    return null
+  }
+
+  return data ?? null
 }
