@@ -1,7 +1,7 @@
 'use client'
 
-import type { Blog } from 'contentlayer/generated'
 import { useSearchParams } from 'next/navigation'
+import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
 
 import { PaginationEllipsis } from '../ui/pagination'
 import { Link } from '@/navigation'
@@ -11,7 +11,7 @@ export function BlogPostItemTags({
   post,
   limitOfTagsToDisplay = 5,
 }: {
-  post: Blog
+  post: LegacyBlog
   limitOfTagsToDisplay?: number
 }) {
   const searchParams = useSearchParams()

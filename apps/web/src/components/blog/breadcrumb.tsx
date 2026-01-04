@@ -1,10 +1,10 @@
-import type { Blog } from 'contentlayer/generated'
 import { ChevronRightIcon } from 'lucide-react'
 
 import { Link } from '@/navigation'
+import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
 
 interface BlogPostBreadcrumbProps {
-  post: Blog
+  post: LegacyBlog
 
   messages: {
     posts: string

@@ -27,6 +27,16 @@ interface FeedBlogPost {
   author: FeedAuthor | null
 }
 
+interface FeedBlogPostRow {
+  slug: string
+  title: string
+  excerpt: string | null
+  locale: string
+  published_at: string | null
+  created_at: string | null
+  author: FeedAuthor[] | null
+}
+
 async function getFeedPosts(locale: LocaleOptions): Promise<FeedBlogPost[]> {
   const supabase = await createClient()
 
@@ -56,7 +66,15 @@ async function getFeedPosts(locale: LocaleOptions): Promise<FeedBlogPost[]> {
     throw error
   }
 
-  return (data ?? []) as FeedBlogPost[]
+  return ((data ?? []) as unknown as FeedBlogPostRow[]).map(post => ({
+    slug: post.slug,
+    title: post.title,
+    excerpt: post.excerpt,
+    locale: post.locale,
+    published_at: post.published_at,
+    created_at: post.created_at,
+    author: post.author?.[0] ?? null,
+  }))
 }
 
 function generateWebsiteFeeds({

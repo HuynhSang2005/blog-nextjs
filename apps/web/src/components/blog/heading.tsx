@@ -3,14 +3,14 @@ import { Balancer } from '@/components/ui/balancer'
 import { DocNotAvailableInThisLanguage } from '../docs/not-available'
 import { getObjectValueByLocale } from '@/lib/core/utils/locale'
 import type { LocaleOptions } from '@/lib/core/types/i18n'
-import type { Blog } from 'contentlayer/generated'
 import { cn, formatDate } from '@/lib/utils'
 import { dateLocales } from '@/config/i18n'
 import { ReadTime } from './read-time'
+import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
 
 interface BlogPostHeadingProps {
   locale: LocaleOptions
-  post: Blog & { notAvailable: boolean }
+  post: LegacyBlog & { notAvailable: boolean }
 
   messages: {
     by: string

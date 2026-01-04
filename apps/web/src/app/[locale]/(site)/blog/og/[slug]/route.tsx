@@ -25,6 +25,16 @@ interface OgPost {
   } | null
 }
 
+interface OgPostRow {
+  title: string
+  author:
+    | {
+        full_name: string | null
+        avatar_media: { public_id: string | null }[] | null
+      }[]
+    | null
+}
+
 export async function GET(
   _: NextRequest,
   context: { params: Promise<{ locale: string; slug: string }> }
@@ -175,5 +185,27 @@ async function getBlogPostBySlugAndLocale(
     return null
   }
 
-  return data ?? null
+  const row = (data ?? null) as unknown as OgPostRow | null
+  if (!row) return null
+
+  const authorRow = Array.isArray(row.author) ? row.author[0] : null
+  const avatarMediaRow = authorRow?.avatar_media
+    ? Array.isArray(authorRow.avatar_media)
+      ? authorRow.avatar_media[0]
+      : null
+    : null
+
+  return {
+    title: row.title,
+    author: authorRow
+      ? {
+          full_name: authorRow.full_name ?? null,
+          avatar_media: avatarMediaRow
+            ? {
+                public_id: avatarMediaRow.public_id ?? null,
+              }
+            : null,
+        }
+      : null,
+  }
 }

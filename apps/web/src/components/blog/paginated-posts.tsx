@@ -13,7 +13,6 @@ import {
 import type { LocaleOptions } from '@/lib/core/types/i18n'
 import { cn, formatDate, truncateText } from '@/lib/utils'
 import { BlogPostItemTags } from './post-item-tags'
-import type { Blog } from 'contentlayer/generated'
 import { buttonVariants } from '../ui/button'
 import { dateLocales } from '@/config/i18n'
 import { Pagination } from './pagination'
@@ -21,9 +20,10 @@ import { RSSToggle } from './rss-toggle'
 import { ReadTime } from './read-time'
 import { Link } from '@/navigation'
 import { Card } from '../ui/card'
+import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
 
 interface PaginatedBlogPostsProps {
-  posts: Blog[]
+  posts: LegacyBlog[]
   perPage?: number
   locale: LocaleOptions
 

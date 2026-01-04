@@ -7,8 +7,7 @@
       }
     ],
     "paths": {
-      "@/*": ["./src/*"],
-      "contentlayer/generated": ["./.contentlayer/generated"]
+      "@/*": ["./src/*"]
     },
     "baseUrl": ".",
     "rootDir": "."
@@ -20,9 +19,14 @@
     "next-env.d.ts",
     "next.config.ts",
     "postcss.config.mjs",
-    ".next/types/**/*.ts",
-    "contentlayer.config.ts",
-    ".contentlayer/generated"
+    ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules",
+    ".contentlayer/**",
+    "contentlayer.config.ts",
+    "src/components/docs/mdx.tsx",
+    "src/lib/core/utils/blog.ts",
+    "src/lib/core/utils/doc.ts"
+  ]
 }

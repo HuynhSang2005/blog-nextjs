@@ -1,8 +1,9 @@
 import { LinkedInLogoIcon, TwitterLogoIcon } from '@radix-ui/react-icons'
-import type { Blog } from 'contentlayer/generated'
 import { Globe, Mail } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+
+import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
 
 import {
   Card,
@@ -16,7 +17,7 @@ import { buttonVariants } from '../ui/button'
 import { cn } from '@/lib/utils'
 import { Icons } from '../icons'
 
-export function AuthorCard({ post }: { post: Blog }) {
+export function AuthorCard({ post }: { post: LegacyBlog }) {
   const { author } = post
 
   return (
