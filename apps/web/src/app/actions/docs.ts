@@ -3,6 +3,7 @@
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/database.types'
+import { precomputeArtifacts } from '@/lib/mdx/precompute'
 
 type DocInsert = Database['public']['Tables']['docs']['Insert']
 type DocUpdate = Database['public']['Tables']['docs']['Update']
@@ -28,12 +29,24 @@ export async function createDoc(data: DocInsert) {
     throw new Error('Unauthorized')
   }
 
+  // Precompute MDX artifacts if content is provided
+  const artifacts = data.content
+    ? await precomputeArtifacts(data.content, { computeToc: true })
+    : null
+
   const { data: doc, error } = await supabase
     .from('docs')
     .insert({
       ...data,
       locale: data.locale || 'vi',
       show_toc: data.show_toc ?? true,
+      // Add precomputed artifacts
+      ...(artifacts && {
+        toc: artifacts.toc,
+        reading_time_minutes: artifacts.reading_time_minutes,
+        search_text: artifacts.search_text,
+        content_hash: artifacts.content_hash,
+      }),
     })
     .select()
     .single()
@@ -55,11 +68,23 @@ export async function createDoc(data: DocInsert) {
 export async function updateDoc(id: string, data: DocUpdate) {
   const supabase = await createClient()
 
+  // Precompute MDX artifacts if content is being updated
+  const artifacts = data.content
+    ? await precomputeArtifacts(data.content, { computeToc: true })
+    : null
+
   const { data: doc, error } = await supabase
     .from('docs')
     .update({
       ...data,
       updated_at: new Date().toISOString(),
+      // Add precomputed artifacts
+      ...(artifacts && {
+        toc: artifacts.toc,
+        reading_time_minutes: artifacts.reading_time_minutes,
+        search_text: artifacts.search_text,
+        content_hash: artifacts.content_hash,
+      }),
     })
     .eq('id', id)
     .select()

@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/database.types'
 import { locales } from '@/config/i18n'
+import { precomputeArtifacts } from '@/lib/mdx/precompute'
 
 type BlogPostInsert = Database['public']['Tables']['blog_posts']['Insert']
 type BlogPostUpdate = Database['public']['Tables']['blog_posts']['Update']
@@ -26,10 +27,21 @@ export async function createBlogPost(data: BlogPostInsert) {
     throw new Error('Unauthorized')
   }
 
+  // Precompute MDX artifacts if content is provided (no TOC for blog)
+  const artifacts = data.content
+    ? await precomputeArtifacts(data.content, { computeToc: false })
+    : null
+
   // Set author_id to current user
   const postData = {
     ...data,
     author_id: user.id,
+    // Add precomputed artifacts
+    ...(artifacts && {
+      reading_time_minutes: artifacts.reading_time_minutes,
+      search_text: artifacts.search_text,
+      content_hash: artifacts.content_hash,
+    }),
   }
 
   const { data: post, error } = await supabase
@@ -60,11 +72,22 @@ export async function createBlogPost(data: BlogPostInsert) {
 export async function updateBlogPost(id: string, data: BlogPostUpdate) {
   const supabase = await createClient()
 
+  // Precompute MDX artifacts if content is being updated (no TOC for blog)
+  const artifacts = data.content
+    ? await precomputeArtifacts(data.content, { computeToc: false })
+    : null
+
   const { data: post, error } = await supabase
     .from('blog_posts')
     .update({
       ...data,
       updated_at: new Date().toISOString(),
+      // Add precomputed artifacts
+      ...(artifacts && {
+        reading_time_minutes: artifacts.reading_time_minutes,
+        search_text: artifacts.search_text,
+        content_hash: artifacts.content_hash,
+      }),
     })
     .eq('id', id)
     .select()
