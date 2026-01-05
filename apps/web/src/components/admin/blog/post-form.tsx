@@ -52,6 +52,7 @@ import {
   updateBlogPostTags,
 } from '@/app/actions/blog'
 import { MDXEditorWrapper } from '@/components/admin/shared/mdx-editor'
+import { MDXGuidelines } from '@/components/admin/shared/mdx-guidelines'
 import type { Database } from '@/lib/supabase/database.types'
 import { cn } from '@/lib/utils'
 
@@ -619,6 +620,8 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
         <Card>
           <CardContent className="p-0">
             <div className="p-6 pt-6 space-y-2">
+              <MDXGuidelines i18nNamespace="admin.blog" />
+
               <FormField
                 control={form.control}
                 name="content"

@@ -209,6 +209,16 @@
           "insert_tabs": "Tabs"
         }
       },
+      "mdx_guidelines": {
+        "title": "Quy chuẩn MDX",
+        "allowed_components": "Components được hỗ trợ",
+        "callout_desc": "hộp ghi chú/cảnh báo",
+        "steps_desc": "danh sách các bước",
+        "tabs_desc": "tab chuyển đổi nội dung",
+        "other_components": "và các components UI khác",
+        "restrictions": "Hạn chế",
+        "recommendations": "Khuyến nghị"
+      },
       "list": {
         "title": "Danh sách bài viết",
         "description": "Xem và quản lý tất cả bài viết blog",
@@ -272,6 +282,16 @@
           "insert_steps": "Các bước",
           "insert_tabs": "Tabs"
         }
+      },
+      "mdx_guidelines": {
+        "title": "Quy chuẩn MDX",
+        "allowed_components": "Components được hỗ trợ",
+        "callout_desc": "hộp ghi chú/cảnh báo",
+        "steps_desc": "danh sách các bước",
+        "tabs_desc": "tab chuyển đổi nội dung",
+        "other_components": "và các components UI khác",
+        "restrictions": "Hạn chế",
+        "recommendations": "Khuyến nghị"
       },
       "actions": {
         "create": "Tạo tài liệu mới",

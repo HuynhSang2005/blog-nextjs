@@ -30,6 +30,7 @@ import {
 import { Switch } from '@/components/ui/switch'
 import { Card, CardContent } from '@/components/ui/card'
 import { MDXEditorWrapper } from '@/components/admin/shared/mdx-editor'
+import { MDXGuidelines } from '@/components/admin/shared/mdx-guidelines'
 
 import { docSchema, type DocFormData } from '@/lib/validations/docs'
 import { createDoc, updateDoc } from '@/app/actions/docs'
@@ -314,6 +315,8 @@ export function DocForm({ doc, topics, mode }: DocFormProps) {
         <Card>
           <CardContent className="p-0">
             <div className="p-6 pt-6 space-y-2">
+              <MDXGuidelines i18nNamespace="admin.docs" />
+
               <FormField
                 control={form.control}
                 name="content"
