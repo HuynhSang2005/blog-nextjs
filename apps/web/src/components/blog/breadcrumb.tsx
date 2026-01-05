@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from 'lucide-react'
 
 import { Link } from '@/navigation'
-import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
+import type { LegacyBlog } from '@/lib/types/legacy-blog'
 
 interface BlogPostBreadcrumbProps {
   post: LegacyBlog

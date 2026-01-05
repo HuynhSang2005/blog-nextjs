@@ -39,7 +39,7 @@
 
       "more": {
         "title": "Open Source & Modern Stack",
-        "description": "Mã nguồn mở 100%! Next.js 16.1, React 19, TypeScript 5.9, Bun 1.3.5, Turborepo 2.7, Biome 2.3, MDX với Contentlayer2, syntax highlighting Shiki, RSS feed, sitemap tự động. Deploy lên Vercel trong vài phút. Fork và customize theo ý bạn!"
+        "description": "Mã nguồn mở 100%! Next.js 16.1, React 19, TypeScript 5.9, Bun 1.3.5, Turborepo 2.7, Biome 2.3, MDX runtime (Supabase-first), syntax highlighting Shiki, RSS feed, sitemap tự động. Deploy lên Vercel trong vài phút. Fork và customize theo ý bạn!"
       }
     },
 

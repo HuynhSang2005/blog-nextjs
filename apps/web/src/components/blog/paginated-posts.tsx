@@ -20,7 +20,7 @@ import { RSSToggle } from './rss-toggle'
 import { ReadTime } from './read-time'
 import { Link } from '@/navigation'
 import { Card } from '../ui/card'
-import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
+import type { LegacyBlog } from '@/lib/types/legacy-blog'
 
 interface PaginatedBlogPostsProps {
   posts: LegacyBlog[]

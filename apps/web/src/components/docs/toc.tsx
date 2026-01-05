@@ -82,7 +82,7 @@ function DefaultTableOfContentItems({
       {sourceFilePath ? (
         <a
           className="text-muted-foreground hover:text-foreground flex items-center gap-2 transition"
-          href={`${siteConfig.links.github.url}/edit/main/apps/content/${sourceFilePath}`}
+          href={`${siteConfig.links.github.url}/edit/main/${sourceFilePath}`}
         >
           {messages.editPageOnGitHub} <ExternalLink size={12} />
         </a>

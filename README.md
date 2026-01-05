@@ -11,7 +11,7 @@
 
 - 🚀 **Next.js 16.1** - App Router, React Server Components, Turbopack
 - ⚡ **Bun 1.3.5** - Lightning-fast package manager
-- 📝 **MDX Blog Posts** - Type-safe content with Contentlayer2
+- 📝 **MDX** - Runtime MDX (Supabase-first)
 - 🎨 **Tailwind CSS 4** - Modern utility-first styling
 - 🌙 **Dark Mode** - Seamless theme switching
 - 🔍 **SEO Optimized** - Meta tags, sitemap, RSS feeds

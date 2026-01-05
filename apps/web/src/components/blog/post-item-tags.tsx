@@ -1,7 +1,7 @@
 'use client'
 
 import { useSearchParams } from 'next/navigation'
-import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
+import type { LegacyBlog } from '@/lib/types/legacy-blog'
 
 import { PaginationEllipsis } from '../ui/pagination'
 import { Link } from '@/navigation'

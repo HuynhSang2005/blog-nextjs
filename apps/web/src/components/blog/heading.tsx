@@ -6,7 +6,7 @@ import type { LocaleOptions } from '@/lib/core/types/i18n'
 import { cn, formatDate } from '@/lib/utils'
 import { dateLocales } from '@/config/i18n'
 import { ReadTime } from './read-time'
-import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
+import type { LegacyBlog } from '@/lib/types/legacy-blog'
 
 interface BlogPostHeadingProps {
   locale: LocaleOptions

@@ -15,8 +15,8 @@ export interface LegacyBlogAuthor {
 }
 
 /**
- * Legacy shape used by pre-Supabase (Contentlayer) blog components.
- * Kept only to avoid breaking typechecking while we remove Contentlayer from the build.
+ * Legacy shape used by older blog components.
+ * Kept only to avoid breaking typechecking during migrations.
  */
 export interface LegacyBlog {
   _id: string

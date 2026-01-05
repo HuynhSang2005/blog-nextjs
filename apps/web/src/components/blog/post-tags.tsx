@@ -1,7 +1,7 @@
 import { badgeVariants } from '../ui/badge'
 import { Link } from '@/navigation'
 import { cn } from '@/lib/utils'
-import type { LegacyBlog } from '@/lib/types/legacy-contentlayer'
+import type { LegacyBlog } from '@/lib/types/legacy-blog'
 
 export async function BlogPostTags({ post }: { post: LegacyBlog }) {
   if (!post.tags) {
