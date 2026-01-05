@@ -6,7 +6,6 @@ import '@/styles/mdx.css'
 
 import { DashboardTableOfContents } from '@/components/docs/toc'
 import { DocumentNotFound } from '@/components/docs/not-found'
-import { getTableOfContents } from '@/lib/core/utils/toc'
 import { DocBreadcrumb } from '@/components/docs/breadcrumb'
 import { ScrollArea } from '@/components/ui/scroll-area'
 import { DocHeading } from '@/components/docs/heading'
@@ -17,6 +16,8 @@ import { MdxRemote } from '@/components/docs/mdx-remote'
 import { siteConfig } from '@/config/site'
 import { absoluteUrl } from '@/lib/utils'
 import { getPublicDocBySlug } from '@/lib/queries/docs'
+import type { TableOfContents } from '@/lib/core/utils/toc'
+import type { FlatTocItem } from '@/lib/mdx/precompute'
 
 export const dynamicParams = true
 
@@ -69,6 +70,27 @@ export async function generateMetadata(props: {
   }
 }
 
+/**
+ * Convert flat TOC from DB to nested TableOfContents format
+ * Phase 1.3D: Use precomputed TOC from database instead of runtime computation
+ */
+function convertFlatTocToNested(flatToc: FlatTocItem[] | null): TableOfContents {
+  if (!flatToc || flatToc.length === 0) {
+    return { items: [] }
+  }
+
+  // Convert flat items to nested structure
+  // For simplicity, we'll use a flat list with url/title format
+  // (TOC component can handle both flat and nested)
+  const items = flatToc.map(item => ({
+    url: `#${item.id}`,
+    title: item.value,
+    items: [], // Flat structure for now
+  }))
+
+  return { items }
+}
+
 export default async function DocPage(props: {
   params: Promise<{ locale?: string; slug?: string[] }>
 }) {
@@ -93,7 +115,8 @@ export default async function DocPage(props: {
     )
   }
 
-  const toc = await getTableOfContents(doc.content)
+  // Phase 1.3D: Use precomputed TOC from database (avoids runtime remark parsing)
+  const toc = convertFlatTocToNested(doc.toc as FlatTocItem[] | null)
   const slugPath = params.slug?.join('/') || ''
   const docHref = slugPath ? `/docs/${slugPath}` : '/docs'
   const docSlugForPager = slugPath
