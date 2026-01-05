@@ -85,10 +85,10 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
                     {formatDate(post.published_at, dateLocales[locale])}
                   </time>
                 )}
-                {post.read_time_minutes && (
+                {post.reading_time_minutes && (
                   <ReadTime
                     messages={{ min_read: messages.min_read }}
-                    time={post.read_time_minutes}
+                    time={post.reading_time_minutes}
                   />
                 )}
               </div>

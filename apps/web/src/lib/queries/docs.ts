@@ -167,12 +167,13 @@ export const getPublicDocBySlug = cache(async (params: {
 
       return null
     }
+    
     console.error('Error fetching public doc by slug:', error)
     throw error
   }
 
   return data as Doc
-}
+})
 
 export async function getDocByPath(
   params: DocPathParams

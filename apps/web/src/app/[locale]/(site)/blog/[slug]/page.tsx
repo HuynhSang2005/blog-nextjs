@@ -87,10 +87,10 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
                 )}
               </time>
             )}
-            {post.read_time_minutes && (
+            {post.reading_time_minutes && (
               <ReadTime
                 messages={{ min_read: t('min_read') }}
-                time={post.read_time_minutes}
+                time={post.reading_time_minutes}
               />
             )}
           </div>

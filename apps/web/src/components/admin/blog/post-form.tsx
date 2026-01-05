@@ -95,7 +95,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
       tag_ids: post?.tags?.map(t => t.id) || [],
       series_id: post?.series_id || null,
       series_order: post?.series_order || null,
-      read_time_minutes: post?.read_time_minutes || null,
+      reading_time_minutes: post?.reading_time_minutes || null,
     },
   })
 
@@ -150,7 +150,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
       const postData = {
         ...data,
         status: 'draft' as const,
-        read_time_minutes: readTime,
+        reading_time_minutes: readTime,
         series_id: null, // Hide series feature for now
         series_order: null,
       }
@@ -187,7 +187,7 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
       const postData = {
         ...data,
         status: 'published' as const,
-        read_time_minutes: readTime,
+        reading_time_minutes: readTime,
         series_id: null, // Hide series feature for now
         series_order: null,
       }

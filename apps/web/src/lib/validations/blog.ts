@@ -41,7 +41,7 @@ export const blogPostSchema = z.object({
 
   series_order: z.number().int().optional().nullable(),
 
-  read_time_minutes: z.number().int().optional().nullable(),
+  reading_time_minutes: z.number().int().optional().nullable(),
 })
 
 export type BlogPostFormData = z.infer<typeof blogPostSchema>
