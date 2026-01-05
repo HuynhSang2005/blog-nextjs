@@ -15,9 +15,7 @@
 				"serena==latest",
 				"--context",
 				"ide-assistant"
-			],
-			"gallery": "https://api.mcp.github.com",
-			"version": "1.0.0"
+			]
 		}
 	},
 	"inputs": []
