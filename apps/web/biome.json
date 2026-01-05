@@ -11,8 +11,7 @@
       "!**/build",
       "!**/coverage",
       "!**/*.config.js",
-      "!**/*.config.ts",
-      "!**/contentlayer.config.ts"
+      "!**/*.config.ts"
     ]
   }
 }

@@ -17,8 +17,7 @@
       "!**/build",
       "!**/coverage",
       "!**/*.config.js",
-      "!**/*.config.ts",
-      "!**/.contentlayer"
+      "!**/*.config.ts"
     ]
   },
   "formatter": {

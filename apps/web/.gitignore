@@ -40,9 +40,6 @@ bun-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
-# content layer
-.contentlayer/
-
 # playwright
 /test-results/
 /playwright-report/

@@ -23,8 +23,6 @@
   ],
   "exclude": [
     "node_modules",
-    ".contentlayer/**",
-    "contentlayer.config.ts",
     "src/components/docs/mdx.tsx",
     "src/lib/core/utils/blog.ts",
     "src/lib/core/utils/doc.ts"
