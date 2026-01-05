@@ -15,6 +15,8 @@
 # Note that when using the JetBrains backend, language servers are not used and this list is correspondingly ignored.
 languages:
 - typescript
+- markdown
+- yaml
 
 # the encoding used by text files in the project
 # For a list of possible encodings, see https://docs.python.org/3.11/library/codecs.html#standard-encodings
@@ -22,7 +24,7 @@ encoding: "utf-8"
 
 # whether to use the project's gitignore file to ignore files
 # Added on 2025-04-07
-ignore_all_files_in_gitignore: false
+ignore_all_files_in_gitignore: true
 
 # list of additional paths to ignore
 # same syntax as gitignore, so you can use * and **
@@ -47,6 +49,12 @@ ignored_paths:
   - test-results/
   - apps/web/playwright-report/
   - apps/web/test-results/
+  # Generated / transient
+  - .contentlayer/
+  - apps/web/.contentlayer/
+  - .cache/
+  - .idea/
+  - .vscode/.DS_Store
   # Serena cache (keep config readable)
   - .serena/cache/
 
@@ -99,7 +107,15 @@ excluded_tools: []
 
 # initial prompt for the project. It will always be given to the LLM upon activating the project
 # (contrary to the memories, which are loaded on demand).
-initial_prompt: ""
+initial_prompt: |
+  Bạn đang làm việc trong monorepo Next.js 16 (App Router) + React 19 + TypeScript strict + Bun + Biome.
+  Quy tắc bắt buộc:
+  - UI text luôn là Tiếng Việt qua next-intl; thuật ngữ kỹ thuật giữ tiếng Anh.
+  - Next.js 16: luôn await params/searchParams.
+  - Source of truth: Supabase (blog/docs/projects); không dùng Contentlayer.
+  - Không sửa: apps/web/src/lib/core/** và apps/web/src/components/ui/**.
+  - Không commit bất kỳ file nào trong docs/**.
+  Workflow tool: repo ops dùng Serena; tra docs dùng Context7; tra cứu web dùng Perplexity; DB dùng Supabase MCP.
 
 project_name: "blog-nextjs"
 included_optional_tools:
