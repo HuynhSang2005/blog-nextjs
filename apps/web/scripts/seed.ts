@@ -1,5 +1,6 @@
 import { createClient } from '@supabase/supabase-js'
 import type { Database } from '../src/lib/supabase/database.types'
+import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -299,6 +300,13 @@ async function seedDocsFromMdx() {
 
   const scriptDir = path.dirname(fileURLToPath(import.meta.url))
   const docsDir = path.resolve(scriptDir, '../../content/docs/vi')
+
+  if (!existsSync(docsDir)) {
+    console.log(
+      `   ⏭️  Bỏ qua: không tìm thấy thư mục docs MDX (legacy): ${docsDir}`
+    )
+    return
+  }
 
   const topicId = await getDefaultDocsTopicId()
   const mdxFiles = await getAllMdxFiles(docsDir)
