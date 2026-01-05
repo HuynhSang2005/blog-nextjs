@@ -121,10 +121,10 @@ export async function getDocsAdminList(): Promise<Doc[]> {
   return data as Doc[]
 }
 
-export async function getPublicDocBySlug(params: {
+export const getPublicDocBySlug = cache(async (params: {
   locale: string
   slugParts?: string[]
-}): Promise<Doc | null> {
+}): Promise<Doc | null> => {
   const supabase = await createClient()
 
   const slugPath = params.slugParts?.join('/') || ''

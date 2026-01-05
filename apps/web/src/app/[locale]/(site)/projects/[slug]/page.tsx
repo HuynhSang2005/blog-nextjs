@@ -8,6 +8,9 @@ import { ProjectHeader } from '@/components/projects/project-header'
 import { ProjectGallery } from '@/components/projects/project-gallery'
 import { ProjectInfo } from '@/components/projects/project-info'
 
+// Revalidate every 60 minutes (Phase 2: Runtime caching)
+export const revalidate = 3600
+
 interface ProjectPageProps {
   params: Promise<{
     locale: string

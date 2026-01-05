@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/database.types'
 
@@ -40,10 +41,10 @@ export async function getProjects(
  * Lấy một project theo slug và locale.
  * Get a single project by slug and locale.
  */
-export async function getProject(
+export const getProject = cache(async (
   slug: string,
   locale: string = 'vi'
-): Promise<ProjectWithRelations | null> {
+): Promise<ProjectWithRelations | null> => {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -69,7 +70,7 @@ export async function getProject(
   }
 
   return data as ProjectWithRelations
-}
+})
 
 /**
  * Lấy một project theo ID (cho editing).

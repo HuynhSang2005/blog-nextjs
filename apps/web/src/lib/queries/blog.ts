@@ -1,3 +1,4 @@
+import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/lib/supabase/database.types'
 
@@ -45,10 +46,10 @@ export async function getBlogPosts(locale: string = 'vi'): Promise<BlogPost[]> {
  * @param locale - Locale (default: 'vi')
  * @returns Blog post with relations or null
  */
-export async function getBlogPost(
+export const getBlogPost = cache(async (
   slug: string,
   locale: string = 'vi'
-): Promise<BlogPost | null> {
+): Promise<BlogPost | null> => {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -71,7 +72,7 @@ export async function getBlogPost(
   }
 
   return data as BlogPost
-}
+})
 
 /**
  * Get single blog post by ID (for admin editing)

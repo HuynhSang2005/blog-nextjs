@@ -25,6 +25,9 @@ import { TwitterLogoIcon, LinkedInLogoIcon } from '@radix-ui/react-icons'
 import { Icons } from '@/components/icons'
 import { MdxRemote } from '@/components/docs/mdx-remote'
 
+// Revalidate every 30 minutes (Phase 2: Runtime caching)
+export const revalidate = 1800
+
 interface BlogPostPageProps {
   params: Promise<{
     slug: string

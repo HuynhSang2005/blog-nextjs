@@ -19,6 +19,9 @@ import { getPublicDocBySlug } from '@/lib/queries/docs'
 import type { TableOfContents } from '@/lib/core/utils/toc'
 import type { FlatTocItem } from '@/lib/mdx/precompute'
 
+// Revalidate every 60 minutes (Phase 2: Runtime caching)
+export const revalidate = 3600
+
 export const dynamicParams = true
 
 export async function generateMetadata(props: {
