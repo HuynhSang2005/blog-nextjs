@@ -16,6 +16,14 @@
 				"--context",
 				"ide-assistant"
 			]
+		},
+		"shadcn": {
+			"command": "bunx",
+			"args": [
+				"shadcn@latest",
+				"mcp"
+			],
+			"type": "stdio"
 		}
 	},
 	"inputs": []
