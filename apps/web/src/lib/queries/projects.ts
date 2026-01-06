@@ -41,15 +41,16 @@ export async function getProjects(
  * Lấy một project theo slug và locale.
  * Get a single project by slug and locale.
  */
-export const getProject = cache(async (
-  slug: string,
-  locale: string = 'vi'
-): Promise<ProjectWithRelations | null> => {
-  const supabase = await createClient()
+export const getProject = cache(
+  async (
+    slug: string,
+    locale: string = 'vi'
+  ): Promise<ProjectWithRelations | null> => {
+    const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('projects')
-    .select(`
+    const { data, error } = await supabase
+      .from('projects')
+      .select(`
       *,
       cover_media:media!cover_media_id (*),
       og_media:media!og_media_id (*),
@@ -57,20 +58,21 @@ export const getProject = cache(async (
         tag_id
       )
     `)
-    .eq('slug', slug)
-    .eq('locale', locale)
-    .single()
+      .eq('slug', slug)
+      .eq('locale', locale)
+      .single()
 
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null // Not found
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null // Not found
+      }
+      console.error('Error fetching project:', error)
+      throw error
     }
-    console.error('Error fetching project:', error)
-    throw error
-  }
 
-  return data as ProjectWithRelations
-})
+    return data as ProjectWithRelations
+  }
+)
 
 /**
  * Lấy một project theo ID (cho editing).

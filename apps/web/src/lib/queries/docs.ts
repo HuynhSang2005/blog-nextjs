@@ -121,59 +121,61 @@ export async function getDocsAdminList(): Promise<Doc[]> {
   return data as Doc[]
 }
 
-export const getPublicDocBySlug = cache(async (params: {
-  locale: string
-  slugParts?: string[]
-}): Promise<Doc | null> => {
-  const supabase = await createClient()
+export const getPublicDocBySlug = cache(
+  async (params: {
+    locale: string
+    slugParts?: string[]
+  }): Promise<Doc | null> => {
+    const supabase = await createClient()
 
-  const slugPath = params.slugParts?.join('/') || ''
-  const normalizedSlug = slugPath === '' ? 'index' : slugPath
+    const slugPath = params.slugParts?.join('/') || ''
+    const normalizedSlug = slugPath === '' ? 'index' : slugPath
 
-  const { data, error } = await supabase
-    .from('docs')
-    .select(`
+    const { data, error } = await supabase
+      .from('docs')
+      .select(`
       *,
       topic:docs_topics!docs_topic_id_fkey(*)
     `)
-    .eq('locale', params.locale)
-    .eq('slug', normalizedSlug)
-    .single()
+      .eq('locale', params.locale)
+      .eq('slug', normalizedSlug)
+      .single()
 
-  if (error) {
-    if (error.code === 'PGRST116') {
-      if (slugPath === '') {
-        const { data: firstDoc, error: firstError } = await supabase
-          .from('docs')
-          .select(
-            `
+    if (error) {
+      if (error.code === 'PGRST116') {
+        if (slugPath === '') {
+          const { data: firstDoc, error: firstError } = await supabase
+            .from('docs')
+            .select(
+              `
               *,
               topic:docs_topics!docs_topic_id_fkey(*)
             `
-          )
-          .eq('locale', params.locale)
-          .order('order_index', { ascending: true })
-          .order('title', { ascending: true })
-          .limit(1)
-          .maybeSingle()
+            )
+            .eq('locale', params.locale)
+            .order('order_index', { ascending: true })
+            .order('title', { ascending: true })
+            .limit(1)
+            .maybeSingle()
 
-        if (firstError) {
-          console.error('Error fetching first doc for /docs:', firstError)
-          throw firstError
+          if (firstError) {
+            console.error('Error fetching first doc for /docs:', firstError)
+            throw firstError
+          }
+
+          return firstDoc as Doc | null
         }
 
-        return firstDoc as Doc | null
+        return null
       }
 
-      return null
+      console.error('Error fetching public doc by slug:', error)
+      throw error
     }
-    
-    console.error('Error fetching public doc by slug:', error)
-    throw error
-  }
 
-  return data as Doc
-})
+    return data as Doc
+  }
+)
 
 export async function getDocByPath(
   params: DocPathParams

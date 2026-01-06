@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: '14.1'
   }
   public: {
     Tables: {
@@ -65,18 +65,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "blog_post_tags_blog_post_id_fkey"
-            columns: ["blog_post_id"]
+            foreignKeyName: 'blog_post_tags_blog_post_id_fkey'
+            columns: ['blog_post_id']
             isOneToOne: false
-            referencedRelation: "blog_posts"
-            referencedColumns: ["id"]
+            referencedRelation: 'blog_posts'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "blog_post_tags_tag_id_fkey"
-            columns: ["tag_id"]
+            foreignKeyName: 'blog_post_tags_tag_id_fkey'
+            columns: ['tag_id']
             isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
+            referencedRelation: 'tags'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -158,32 +158,32 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "blog_posts_author_id_fkey"
-            columns: ["author_id"]
+            foreignKeyName: 'blog_posts_author_id_fkey'
+            columns: ['author_id']
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "blog_posts_cover_media_id_fkey"
-            columns: ["cover_media_id"]
+            foreignKeyName: 'blog_posts_cover_media_id_fkey'
+            columns: ['cover_media_id']
             isOneToOne: false
-            referencedRelation: "media"
-            referencedColumns: ["id"]
+            referencedRelation: 'media'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "blog_posts_og_media_id_fkey"
-            columns: ["og_media_id"]
+            foreignKeyName: 'blog_posts_og_media_id_fkey'
+            columns: ['og_media_id']
             isOneToOne: false
-            referencedRelation: "media"
-            referencedColumns: ["id"]
+            referencedRelation: 'media'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "blog_posts_series_id_fkey"
-            columns: ["series_id"]
+            foreignKeyName: 'blog_posts_series_id_fkey'
+            columns: ['series_id']
             isOneToOne: false
-            referencedRelation: "blog_posts"
-            referencedColumns: ["id"]
+            referencedRelation: 'blog_posts'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -244,18 +244,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "docs_parent_id_fkey"
-            columns: ["parent_id"]
+            foreignKeyName: 'docs_parent_id_fkey'
+            columns: ['parent_id']
             isOneToOne: false
-            referencedRelation: "docs"
-            referencedColumns: ["id"]
+            referencedRelation: 'docs'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "docs_topic_id_fkey"
-            columns: ["topic_id"]
+            foreignKeyName: 'docs_topic_id_fkey'
+            columns: ['topic_id']
             isOneToOne: false
-            referencedRelation: "docs_topics"
-            referencedColumns: ["id"]
+            referencedRelation: 'docs_topics'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -352,11 +352,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "media_created_by_fkey"
-            columns: ["created_by"]
+            foreignKeyName: 'media_created_by_fkey'
+            columns: ['created_by']
             isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["id"]
+            referencedRelation: 'profiles'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -405,11 +405,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "fk_profiles_avatar_media"
-            columns: ["avatar_media_id"]
+            foreignKeyName: 'fk_profiles_avatar_media'
+            columns: ['avatar_media_id']
             isOneToOne: false
-            referencedRelation: "media"
-            referencedColumns: ["id"]
+            referencedRelation: 'media'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -440,18 +440,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "project_media_media_id_fkey"
-            columns: ["media_id"]
+            foreignKeyName: 'project_media_media_id_fkey'
+            columns: ['media_id']
             isOneToOne: false
-            referencedRelation: "media"
-            referencedColumns: ["id"]
+            referencedRelation: 'media'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "project_media_project_id_fkey"
-            columns: ["project_id"]
+            foreignKeyName: 'project_media_project_id_fkey'
+            columns: ['project_id']
             isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            referencedRelation: 'projects'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -473,18 +473,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "project_tags_project_id_fkey"
-            columns: ["project_id"]
+            foreignKeyName: 'project_tags_project_id_fkey'
+            columns: ['project_id']
             isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            referencedRelation: 'projects'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "project_tags_tag_id_fkey"
-            columns: ["tag_id"]
+            foreignKeyName: 'project_tags_tag_id_fkey'
+            columns: ['tag_id']
             isOneToOne: false
-            referencedRelation: "tags"
-            referencedColumns: ["id"]
+            referencedRelation: 'tags'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -518,11 +518,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "project_tech_stack_project_id_fkey"
-            columns: ["project_id"]
+            foreignKeyName: 'project_tech_stack_project_id_fkey'
+            columns: ['project_id']
             isOneToOne: false
-            referencedRelation: "projects"
-            referencedColumns: ["id"]
+            referencedRelation: 'projects'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -598,18 +598,18 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "projects_cover_media_id_fkey"
-            columns: ["cover_media_id"]
+            foreignKeyName: 'projects_cover_media_id_fkey'
+            columns: ['cover_media_id']
             isOneToOne: false
-            referencedRelation: "media"
-            referencedColumns: ["id"]
+            referencedRelation: 'media'
+            referencedColumns: ['id']
           },
           {
-            foreignKeyName: "projects_og_media_id_fkey"
-            columns: ["og_media_id"]
+            foreignKeyName: 'projects_og_media_id_fkey'
+            columns: ['og_media_id']
             isOneToOne: false
-            referencedRelation: "media"
-            referencedColumns: ["id"]
+            referencedRelation: 'media'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -721,11 +721,11 @@ export type Database = {
         }
         Relationships: [
           {
-            foreignKeyName: "timeline_events_media_id_fkey"
-            columns: ["media_id"]
+            foreignKeyName: 'timeline_events_media_id_fkey'
+            columns: ['media_id']
             isOneToOne: false
-            referencedRelation: "media"
-            referencedColumns: ["id"]
+            referencedRelation: 'media'
+            referencedColumns: ['id']
           },
         ]
       }
@@ -737,7 +737,7 @@ export type Database = {
       is_admin: { Args: never; Returns: boolean }
       is_author: { Args: { author_id: string }; Returns: boolean }
       show_limit: { Args: never; Returns: number }
-      show_trgm: { Args: { "": string }; Returns: string[] }
+      show_trgm: { Args: { '': string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
@@ -748,33 +748,33 @@ export type Database = {
   }
 }
 
-type DatabaseWithoutInternals = Omit<Database, "__InternalSupabase">
+type DatabaseWithoutInternals = Omit<Database, '__InternalSupabase'>
 
-type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, "public">]
+type DefaultSchema = DatabaseWithoutInternals[Extract<keyof Database, 'public'>]
 
 export type Tables<
   DefaultSchemaTableNameOrOptions extends
-    | keyof (DefaultSchema["Tables"] & DefaultSchema["Views"])
+    | keyof (DefaultSchema['Tables'] & DefaultSchema['Views'])
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])
+    ? keyof (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+        DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"] &
-      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Views"])[TableName] extends {
+  ? (DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'] &
+      DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Views'])[TableName] extends {
       Row: infer R
     }
     ? R
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])
-    ? (DefaultSchema["Tables"] &
-        DefaultSchema["Views"])[DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])
+    ? (DefaultSchema['Tables'] &
+        DefaultSchema['Views'])[DefaultSchemaTableNameOrOptions] extends {
         Row: infer R
       }
       ? R
@@ -783,23 +783,23 @@ export type Tables<
 
 export type TablesInsert<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
+    | keyof DefaultSchema['Tables']
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Insert: infer I
     }
     ? I
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Insert: infer I
       }
       ? I
@@ -808,23 +808,23 @@ export type TablesInsert<
 
 export type TablesUpdate<
   DefaultSchemaTableNameOrOptions extends
-    | keyof DefaultSchema["Tables"]
+    | keyof DefaultSchema['Tables']
     | { schema: keyof DatabaseWithoutInternals },
   TableName extends DefaultSchemaTableNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables']
     : never = never,
 > = DefaultSchemaTableNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions["schema"]]["Tables"][TableName] extends {
+  ? DatabaseWithoutInternals[DefaultSchemaTableNameOrOptions['schema']]['Tables'][TableName] extends {
       Update: infer U
     }
     ? U
     : never
-  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema["Tables"]
-    ? DefaultSchema["Tables"][DefaultSchemaTableNameOrOptions] extends {
+  : DefaultSchemaTableNameOrOptions extends keyof DefaultSchema['Tables']
+    ? DefaultSchema['Tables'][DefaultSchemaTableNameOrOptions] extends {
         Update: infer U
       }
       ? U
@@ -833,36 +833,36 @@ export type TablesUpdate<
 
 export type Enums<
   DefaultSchemaEnumNameOrOptions extends
-    | keyof DefaultSchema["Enums"]
+    | keyof DefaultSchema['Enums']
     | { schema: keyof DatabaseWithoutInternals },
   EnumName extends DefaultSchemaEnumNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"]
+    ? keyof DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums']
     : never = never,
 > = DefaultSchemaEnumNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions["schema"]]["Enums"][EnumName]
-  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema["Enums"]
-    ? DefaultSchema["Enums"][DefaultSchemaEnumNameOrOptions]
+  ? DatabaseWithoutInternals[DefaultSchemaEnumNameOrOptions['schema']]['Enums'][EnumName]
+  : DefaultSchemaEnumNameOrOptions extends keyof DefaultSchema['Enums']
+    ? DefaultSchema['Enums'][DefaultSchemaEnumNameOrOptions]
     : never
 
 export type CompositeTypes<
   PublicCompositeTypeNameOrOptions extends
-    | keyof DefaultSchema["CompositeTypes"]
+    | keyof DefaultSchema['CompositeTypes']
     | { schema: keyof DatabaseWithoutInternals },
   CompositeTypeName extends PublicCompositeTypeNameOrOptions extends {
     schema: keyof DatabaseWithoutInternals
   }
-    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"]
+    ? keyof DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes']
     : never = never,
 > = PublicCompositeTypeNameOrOptions extends {
   schema: keyof DatabaseWithoutInternals
 }
-  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions["schema"]]["CompositeTypes"][CompositeTypeName]
-  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema["CompositeTypes"]
-    ? DefaultSchema["CompositeTypes"][PublicCompositeTypeNameOrOptions]
+  ? DatabaseWithoutInternals[PublicCompositeTypeNameOrOptions['schema']]['CompositeTypes'][CompositeTypeName]
+  : PublicCompositeTypeNameOrOptions extends keyof DefaultSchema['CompositeTypes']
+    ? DefaultSchema['CompositeTypes'][PublicCompositeTypeNameOrOptions]
     : never
 
 export const Constants = {

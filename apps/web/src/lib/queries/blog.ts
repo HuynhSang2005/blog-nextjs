@@ -46,33 +46,32 @@ export async function getBlogPosts(locale: string = 'vi'): Promise<BlogPost[]> {
  * @param locale - Locale (default: 'vi')
  * @returns Blog post with relations or null
  */
-export const getBlogPost = cache(async (
-  slug: string,
-  locale: string = 'vi'
-): Promise<BlogPost | null> => {
-  const supabase = await createClient()
+export const getBlogPost = cache(
+  async (slug: string, locale: string = 'vi'): Promise<BlogPost | null> => {
+    const supabase = await createClient()
 
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select(`
+    const { data, error } = await supabase
+      .from('blog_posts')
+      .select(`
       *,
       cover_media:media!blog_posts_cover_media_id_fkey(*),
       author:profiles!blog_posts_author_id_fkey(*)
     `)
-    .eq('slug', slug)
-    .eq('locale', locale)
-    .single()
+      .eq('slug', slug)
+      .eq('locale', locale)
+      .single()
 
-  if (error) {
-    if (error.code === 'PGRST116') {
-      return null // Not found
+    if (error) {
+      if (error.code === 'PGRST116') {
+        return null // Not found
+      }
+      console.error('Error fetching blog post:', error)
+      throw error
     }
-    console.error('Error fetching blog post:', error)
-    throw error
-  }
 
-  return data as BlogPost
-})
+    return data as BlogPost
+  }
+)
 
 /**
  * Get single blog post by ID (for admin editing)
