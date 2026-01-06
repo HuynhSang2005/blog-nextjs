@@ -10,6 +10,7 @@ import {
 export const InstallationBox = async ({
   theme,
   className,
+  wrapperClassName,
   __src__,
   __style__,
   __withMeta__,
@@ -23,6 +24,7 @@ export const InstallationBox = async ({
   __src__?: string
   __rawString__?: string
   __withMeta__?: boolean
+  wrapperClassName?: string
   __style__?: 'default' | 'new-york'
   theme?: Parameters<typeof highlightServerCode>[1]
 } & NpmCommands) => {
@@ -33,10 +35,10 @@ export const InstallationBox = async ({
   )
 
   return (
-    <div className="relative">
+    <div className={cn('relative mb-4 mt-6', wrapperClassName)}>
       <pre
         className={cn(
-          'mb-4 mt-6 max-h-162.5 overflow-x-auto rounded-lg border bg-zinc-950 py-4 text-white dark:bg-zinc-900',
+          'max-h-162.5 overflow-x-auto rounded-lg border bg-zinc-950 py-4 text-white dark:bg-zinc-900',
           className
         )}
         {...props}
@@ -46,7 +48,7 @@ export const InstallationBox = async ({
 
       {__rawString__ && !__npmCommand__ && (
         <CopyButton
-          className={cn('absolute right-4 top-10')}
+          className={cn('absolute right-4 top-4')}
           src={__src__}
           value={__rawString__}
         />
@@ -56,7 +58,7 @@ export const InstallationBox = async ({
         __pnpmCommand__ &&
         __bunCommand__ && (
           <CopyNpmCommandButton
-            className={cn('absolute right-4 top-10')}
+            className={cn('absolute right-4 top-4')}
             commands={{
               __bunCommand__,
               __npmCommand__,

@@ -19,13 +19,16 @@ import { siteConfig } from '@/config/site'
 import { Link } from '@/navigation'
 import { cn } from '@/lib/utils'
 import { defaultLocale, locales } from '@/config/i18n'
+import { GithubContributionGraph } from '@/components/github-contribution-graph'
 
 export const dynamicParams = true
 
 export default async function IndexPage(props: {
   params: Promise<{ locale: LocaleOptions }>
+  searchParams: Promise<{ year?: string }>
 }) {
   const params = await props.params
+  const searchParams = await props.searchParams
   const currentLocale = locales.includes(params.locale)
     ? params.locale
     : defaultLocale
@@ -68,7 +71,8 @@ export default async function IndexPage(props: {
 
         <InstallationBox
           __rawString__="npx degit HuynhSang2005/blog-nextjs project_name"
-          className="w-full relative max-w-140 flex flex-wrap items-center pl-4! pr-12! mb-[6px]"
+          className="w-full relative max-w-140 flex flex-wrap items-center pl-4! pr-12!"
+          wrapperClassName="mb-[6px]"
         />
 
         <div className="w-full text-center my-2 font-semibold text-sm">
@@ -77,7 +81,8 @@ export default async function IndexPage(props: {
 
         <InstallationBox
           __rawString__="bunx degit HuynhSang2005/blog-nextjs project_name"
-          className="w-full relative max-w-140 flex flex-wrap items-center pl-4! pr-12! mt-[4px]"
+          className="w-full relative max-w-140 flex flex-wrap items-center pl-4! pr-12!"
+          wrapperClassName="mt-[4px]"
         />
 
         <div className="fixed left-0 -top-40 size-full -z-10 overflow-hidden">
@@ -91,6 +96,11 @@ export default async function IndexPage(props: {
           />
         </div>
       </PageHeader>
+
+      <GithubContributionGraph
+        locale={currentLocale}
+        year={searchParams.year}
+      />
     </div>
   )
 }
