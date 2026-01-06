@@ -1,9 +1,9 @@
 /**
  * MDX Precompute Utilities - Phase 1.3B
- * 
+ *
  * Precomputes expensive MDX artifacts at publish-time to improve runtime performance.
  * Based on Phase 0 baseline analysis: TOC computation is Hotspot #2 (after MDX compile/render).
- * 
+ *
  * @see docs/dev-mdx/phase-0-mdx-baseline.md
  */
 
@@ -31,7 +31,7 @@ export interface TocItem {
  * Flat TOC item for JSONB storage
  */
 export interface FlatTocItem {
-  id: string    // Heading ID (URL without #)
+  id: string // Heading ID (URL without #)
   depth: number // Heading depth (1-6)
   value: string // Heading text
 }
@@ -40,10 +40,10 @@ export interface FlatTocItem {
  * Precomputed artifacts result
  */
 export interface PrecomputedArtifacts {
-  toc: FlatTocItem[] | null                    // For docs only
-  reading_time_minutes: number                 // For all content types
-  search_text: string                          // Plain text for FTS
-  content_hash: string                         // SHA-256 hash
+  toc: FlatTocItem[] | null // For docs only
+  reading_time_minutes: number // For all content types
+  search_text: string // Plain text for FTS
+  content_hash: string // SHA-256 hash
 }
 
 // ============================================
@@ -115,7 +115,7 @@ export async function computeToc(content: string): Promise<TocItem[]> {
 /**
  * Compute flat TOC for JSONB storage
  * Extracts headings directly from AST (simpler than nested structure)
- * 
+ *
  * @param content - MDX content string
  * @returns Flat array of heading items
  */
@@ -155,14 +155,14 @@ export async function computeFlatToc(content: string): Promise<FlatTocItem[]> {
 /**
  * Compute estimated reading time
  * Industry standard: 200 words per minute (WPM) for technical content
- * 
+ *
  * @param content - MDX content string
  * @returns Reading time in minutes (rounded up)
  */
 export function computeReadingTime(content: string): number {
   // Strip MDX/JSX syntax for accurate word count
   const plainText = stripMarkdownToText(content)
-  
+
   // Split by whitespace and filter empty strings
   const words = plainText.trim().split(/\s+/).filter(Boolean)
   const wordCount = words.length
@@ -170,7 +170,7 @@ export function computeReadingTime(content: string): number {
   // Calculate reading time (minimum 1 minute)
   const WPM = 200
   const minutes = Math.ceil(wordCount / WPM)
-  
+
   return Math.max(1, minutes)
 }
 
@@ -181,7 +181,7 @@ export function computeReadingTime(content: string): number {
 /**
  * Strip markdown/MDX syntax to get plain text for full-text search
  * Removes: code blocks, inline code, JSX tags, links, emphasis, etc.
- * 
+ *
  * @param content - MDX content string
  * @returns Plain text suitable for FTS indexing
  */
@@ -235,7 +235,7 @@ export function stripMarkdownToText(content: string): string {
 
 /**
  * Compute SHA-256 hash of content for cache invalidation
- * 
+ *
  * @param content - MDX content string
  * @returns SHA-256 hash (hex format)
  */
@@ -249,7 +249,7 @@ export function hashContent(content: string): string {
 
 /**
  * Precompute all MDX artifacts for a given content
- * 
+ *
  * @param content - MDX content string
  * @param options - Computation options
  * @returns All precomputed artifacts
