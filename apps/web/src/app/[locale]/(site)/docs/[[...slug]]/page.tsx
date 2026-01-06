@@ -77,7 +77,9 @@ export async function generateMetadata(props: {
  * Convert flat TOC from DB to nested TableOfContents format
  * Phase 1.3D: Use precomputed TOC from database instead of runtime computation
  */
-function convertFlatTocToNested(flatToc: FlatTocItem[] | null): TableOfContents {
+function convertFlatTocToNested(
+  flatToc: FlatTocItem[] | null
+): TableOfContents {
   if (!flatToc || flatToc.length === 0) {
     return { items: [] }
   }

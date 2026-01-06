@@ -14,6 +14,22 @@
     },
     "github_cta": "Fork, đóng góp hoặc phát hành bản tùy chỉnh: https://github.com/HuynhSang2005/blog-nextjs",
 
+    "github_contribution_graph": {
+      "title": "Hoạt động trên GitHub",
+      "description": "Biểu đồ đóng góp gần đây của mình (từ GitHub)",
+      "view_profile": "Xem hồ sơ",
+      "error": "Không thể tải dữ liệu GitHub lúc này.",
+      "years_aria_label": "Bộ lọc năm đóng góp",
+      "filter_last_year": "Năm qua",
+      "headline_last_year": "{count} đóng góp trong năm qua",
+      "headline_year": "{count} đóng góp trong {year}",
+      "legend_less": "Ít",
+      "legend_more": "Nhiều",
+      "total_count_template": "{{count}} hoạt động trong {{year}}",
+      "tooltip_count": "{count, plural, =0 {0 đóng góp} one {# đóng góp} other {# đóng góp}}",
+      "tooltip_full": "{count, plural, =0 {0 đóng góp} one {# đóng góp} other {# đóng góp}} vào ngày {day} - tháng {month}"
+    },
+
     "words": {
       "menu": "Menu",
       "docs": "Tài liệu",
