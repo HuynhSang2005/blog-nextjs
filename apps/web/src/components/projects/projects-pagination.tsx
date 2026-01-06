@@ -94,7 +94,10 @@ export function ProjectsPagination({
           return (
             <Button
               aria-current={isActive ? 'page' : undefined}
-              aria-label={messages.go_to_page.replace('{page}', page.toString())}
+              aria-label={messages.go_to_page.replace(
+                '{page}',
+                page.toString()
+              )}
               className={cn('min-w-[40px]', isActive && 'pointer-events-none')}
               disabled={isActive}
               key={page}

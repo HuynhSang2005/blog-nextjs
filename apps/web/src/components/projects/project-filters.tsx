@@ -92,7 +92,9 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
   }
 
   const hasActiveFilters =
-    currentStatus !== null || currentFeatured !== null || currentSearchQuery !== null
+    currentStatus !== null ||
+    currentFeatured !== null ||
+    currentSearchQuery !== null
 
   useEffect(() => {
     const handle = setTimeout(() => {
@@ -205,7 +207,9 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
                     type="button"
                   >
                     <X className="h-3 w-3" />
-                    <span className="sr-only">{t('remove_featured_filter')}</span>
+                    <span className="sr-only">
+                      {t('remove_featured_filter')}
+                    </span>
                   </button>
                 </Badge>
               )}
