@@ -11,7 +11,7 @@ import {
 } from '@/components/ui/card'
 import { ProjectForm } from '@/components/admin/projects/project-form'
 import { getTranslations } from 'next-intl/server'
-import { getTags } from '@/lib/queries/tags'
+import { getTags } from '@/services/tags-service'
 
 interface NewProjectPageProps {
   params: Promise<{ locale: string }>

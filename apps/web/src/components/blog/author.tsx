@@ -3,7 +3,7 @@ import { Globe, Mail } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 
-import type { LegacyBlog } from '@/lib/types/legacy-blog'
+import type { LegacyBlog } from '@/types/legacy-blog'
 
 import {
   Card,

@@ -1,4 +1,4 @@
-import type { CodeThemeConfig } from '@/lib/core/types/code-theme'
+import type { CodeThemeConfig } from '@/types/code-theme'
 
 export const localCodeThemes = ['Aura Theme'] as const
 

@@ -7,7 +7,7 @@
  * - src/lib/core/components/docs/pager.tsx
  */
 
-import type { DocsConfig } from '@/lib/core/types/docs'
+import type { DocsConfig } from '@/types/docs'
 
 export const docsConfig: DocsConfig = {
   mainNav: [

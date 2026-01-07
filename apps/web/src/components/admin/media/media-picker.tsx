@@ -15,7 +15,7 @@ import {
 import { Card } from '@/components/ui/card'
 import { cn } from '@/lib/utils'
 import { getAllMedia, getMediaById } from '@/app/actions/media'
-import type { Tables } from '@/lib/supabase/database.types'
+import type { Tables } from '@/types/database'
 
 type MediaItem = Tables<'media'>
 

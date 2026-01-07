@@ -1,7 +1,7 @@
 import type { Metadata } from 'next'
 import { getTranslations } from 'next-intl/server'
 import { getProjectStats } from '@/app/actions/projects-queries'
-import { getProjects } from '@/lib/supabase/queries/projects'
+import { getProjects } from '@/services/project-service'
 import {
   PageHeader,
   PageHeaderHeading,
@@ -62,18 +62,6 @@ export default async function ProjectsPage({
     }
   )
 
-  const projectsForGrid = projectsResult.data.map(project => ({
-    ...project,
-    cover_media: project.cover_media
-      ? {
-          ...project.cover_media,
-          width: null,
-          height: null,
-        }
-      : null,
-    project_tags: project.tags.map(tag => ({ tag })),
-  }))
-
   const stats = await getProjectStats(locale)
 
   return (
@@ -88,7 +76,7 @@ export default async function ProjectsPage({
       <div className="py-12">
         {projectsResult.data.length > 0 ? (
           <>
-            <ProjectsGrid locale={locale} projects={projectsForGrid} />
+            <ProjectsGrid locale={locale} projects={projectsResult.data} />
             {projectsResult.pagination.totalPages > 1 && (
               <ProjectsPagination
                 currentPage={projectsResult.pagination.page}

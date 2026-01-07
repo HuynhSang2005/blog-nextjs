@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { getTags } from '@/lib/queries/tags'
+import { getTags } from '@/services/tags-service'
 import { BlogPostForm } from '@/components/admin/blog/post-form'
 
 interface NewBlogPostPageProps {

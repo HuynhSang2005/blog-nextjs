@@ -4,8 +4,8 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { getBlogPostById } from '@/lib/queries/blog'
-import { getTags } from '@/lib/queries/tags'
+import { getBlogPostById } from '@/services/blog-service'
+import { getTags } from '@/services/tags-service'
 import { BlogPostForm } from '@/components/admin/blog/post-form'
 
 interface EditBlogPostPageProps {

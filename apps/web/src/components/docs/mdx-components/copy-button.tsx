@@ -11,7 +11,7 @@ import {
   DropdownMenuContent,
 } from '@/components/ui/dropdown-menu'
 
-import type { NpmCommands } from '@/lib/core/types/unist'
+import type { NpmCommands } from '@/types/unist'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 

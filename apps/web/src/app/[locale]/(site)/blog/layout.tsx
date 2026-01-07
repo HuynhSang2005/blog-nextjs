@@ -1,6 +1,6 @@
 import { setRequestLocale } from 'next-intl/server'
 
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 
 interface BlogLayoutProps {
   children: React.ReactNode

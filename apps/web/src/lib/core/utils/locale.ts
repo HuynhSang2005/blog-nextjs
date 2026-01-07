@@ -1,6 +1,6 @@
 import { defaultLocale, locales } from '@/config/i18n'
 
-import type { LocaleOptions } from '../types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 
 export function getObjectValueByLocale(
   obj: Record<string, string>,

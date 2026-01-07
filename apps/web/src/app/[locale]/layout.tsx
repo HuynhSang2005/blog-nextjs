@@ -5,7 +5,7 @@ import type { Metadata, Viewport } from 'next'
 import '@/styles/globals.css'
 
 import { getObjectValueByLocale } from '@/lib/core/utils/locale'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import { ThemeProvider } from '@/components/theme-provider'
 import { defaultLocale } from '@/config/i18n'
 import { siteConfig } from '@/config/site'

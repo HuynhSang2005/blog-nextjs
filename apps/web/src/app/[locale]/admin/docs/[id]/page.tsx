@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { getDocById, getDocsTopics } from '@/lib/queries/docs'
+import { getDocById, getDocsTopics } from '@/services/docs-service'
 import { DocForm } from '@/components/admin/docs/doc-form'
 
 interface EditDocPageProps {

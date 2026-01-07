@@ -1,4 +1,4 @@
-import type { BlogConfig } from '../lib/core/types/blog'
+import type { BlogConfig } from '@/types/blog'
 
 export const blogConfig: BlogConfig = {
   mainNav: [

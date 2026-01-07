@@ -1,33 +1,10 @@
 'use client'
 
 import { ProjectCard } from './project-card'
-import type { Database } from '@/lib/supabase/database.types'
-
-type Project = Database['public']['Tables']['projects']['Row'] & {
-  cover_media?: {
-    public_id: string
-    alt_text: string | null
-    width: number | null
-    height: number | null
-  } | null
-  project_tags?: Array<{
-    tag: {
-      id: string
-      name: string
-      slug: string
-      color: string | null
-    } | null
-  }>
-  project_tech_stack?: Array<{
-    name: string
-    category: string
-    icon: string | null
-    order_index: number
-  }>
-}
+import type { ProjectListItem } from '@/types/supabase-helpers'
 
 interface ProjectsGridProps {
-  projects: Project[]
+  projects: ProjectListItem[]
   locale: string
 }
 

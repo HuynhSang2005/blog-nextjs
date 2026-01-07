@@ -11,8 +11,8 @@ import {
 
 import { getObjectValueByLocale } from '@/lib/core/utils/locale'
 import { Link as DesktopLink, usePathname } from '@/navigation'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
-import type { SidebarNavItem } from '@/lib/core/types/nav'
+import type { LocaleOptions } from '@/types/i18n'
+import type { SidebarNavItem } from '@/types/nav'
 import { MobileLink } from '../mobile-link'
 import { cn } from '@/lib/utils'
 

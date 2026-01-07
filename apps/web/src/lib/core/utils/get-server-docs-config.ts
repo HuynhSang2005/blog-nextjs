@@ -1,6 +1,6 @@
 import { defaultLocale } from '@/config/i18n'
 
-import type { LocaleOptions } from '../types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 
 interface ServerDocsConfig {
   locale: LocaleOptions

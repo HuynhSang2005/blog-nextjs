@@ -44,7 +44,7 @@ import {
   CommandItem,
   CommandList,
 } from '@/components/ui/command'
-import { blogPostSchema, type BlogPostFormData } from '@/lib/validations/blog'
+import { blogPostSchema, type BlogPostFormData } from '@/schemas/blog'
 import {
   createBlogPost,
   publishBlogPost,
@@ -52,8 +52,7 @@ import {
   updateBlogPostTags,
 } from '@/app/actions/blog'
 import { MDXEditorWrapper } from '@/components/admin/shared/mdx-editor'
-import { MDXGuidelines } from '@/components/admin/shared/mdx-guidelines'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
 import { cn } from '@/lib/utils'
 
 type BlogPost = Database['public']['Tables']['blog_posts']['Row']
@@ -620,8 +619,6 @@ export function BlogPostForm({ post, tags, mode }: BlogPostFormProps) {
         <Card>
           <CardContent className="p-0">
             <div className="p-6 pt-6 space-y-2">
-              <MDXGuidelines i18nNamespace="admin.blog" />
-
               <FormField
                 control={form.control}
                 name="content"

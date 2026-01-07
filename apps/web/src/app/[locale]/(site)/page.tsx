@@ -9,7 +9,7 @@ import {
 
 import { TextGenerateEffect } from '@/components/ui/text-generate-effect'
 import { InstallationBox } from '@/components/installation-box'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import { Announcement } from '@/components/announcement'
 import { buttonVariants } from '@/components/ui/button'
 import { FlipWords } from '@/components/ui/flip-words'

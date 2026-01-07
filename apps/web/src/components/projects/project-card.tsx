@@ -8,33 +8,10 @@ import { ExternalLink, Github, Star } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { cn } from '@/lib/utils'
-import type { Database } from '@/lib/supabase/database.types'
-
-type Project = Database['public']['Tables']['projects']['Row'] & {
-  cover_media?: {
-    public_id: string
-    alt_text: string | null
-    width: number | null
-    height: number | null
-  } | null
-  project_tags?: Array<{
-    tag: {
-      id: string
-      name: string
-      slug: string
-      color: string | null
-    } | null
-  }>
-  project_tech_stack?: Array<{
-    name: string
-    category: string
-    icon: string | null
-    order_index: number
-  }>
-}
+import type { ProjectListItem } from '@/types/supabase-helpers'
 
 interface ProjectCardProps {
-  project: Project
+  project: ProjectListItem
   size: 'small' | 'medium' | 'wide' | 'large'
   locale: string
 }
@@ -51,10 +28,7 @@ export function ProjectCard({ project, size, locale }: ProjectCardProps) {
   const t = useTranslations('projects')
 
   // Extract tags (first 3 only)
-  const tags = project.project_tags
-    ?.map(pt => pt.tag)
-    .filter((tag): tag is NonNullable<typeof tag> => tag !== null)
-    .slice(0, 3)
+  const tags = project.tags?.slice(0, 3)
 
   return (
     <Link

@@ -6,7 +6,7 @@ import type {
   CodeTheme,
   LocalCodeThemes,
   CodeThemeLanguage,
-} from '@/lib/core/types/code-theme'
+} from '@/types/code-theme'
 
 import { codeThemeConfig, localCodeThemes } from '../../../config/code-theme'
 import { toKebabCase } from './to-kebab-case'

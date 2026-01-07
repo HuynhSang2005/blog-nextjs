@@ -13,7 +13,7 @@ import { Copy, ExternalLink } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { toast } from 'sonner'
 import type { SiteConfig } from '@/config/site'
-import type { BlogConfig } from '@/lib/core/types/blog'
+import type { BlogConfig } from '@/types/blog'
 
 interface SettingsClientProps {
   siteConfig: SiteConfig

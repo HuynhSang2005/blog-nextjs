@@ -2,7 +2,7 @@
 import type { NextRequest } from 'next/server'
 import { ImageResponse } from 'next/og'
 
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import { createClient } from '@/lib/supabase/server'
 import { absoluteUrl, truncateText } from '@/lib/utils'
 import { siteConfig } from '@/config/site'

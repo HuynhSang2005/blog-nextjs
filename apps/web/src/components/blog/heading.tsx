@@ -2,11 +2,11 @@ import { Balancer } from '@/components/ui/balancer'
 
 import { DocNotAvailableInThisLanguage } from '../docs/not-available'
 import { getObjectValueByLocale } from '@/lib/core/utils/locale'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import { cn, formatDate } from '@/lib/utils'
 import { dateLocales } from '@/config/i18n'
 import { ReadTime } from './read-time'
-import type { LegacyBlog } from '@/lib/types/legacy-blog'
+import type { LegacyBlog } from '@/types/legacy-blog'
 
 interface BlogPostHeadingProps {
   locale: LocaleOptions

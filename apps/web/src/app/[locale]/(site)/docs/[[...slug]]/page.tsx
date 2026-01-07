@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import type { Metadata } from 'next'
 
 import '@/styles/mdx.css'
@@ -15,7 +15,7 @@ import { defaultLocale } from '@/config/i18n'
 import { MdxRemote } from '@/components/docs/mdx-remote'
 import { siteConfig } from '@/config/site'
 import { absoluteUrl } from '@/lib/utils'
-import { getPublicDocBySlug } from '@/lib/queries/docs'
+import { getPublicDocBySlug } from '@/services/docs-service'
 import type { TableOfContents } from '@/lib/core/utils/toc'
 import type { FlatTocItem } from '@/lib/mdx/precompute'
 

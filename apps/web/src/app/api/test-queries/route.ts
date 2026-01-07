@@ -3,13 +3,13 @@ import {
   getBlogPosts,
   getBlogPost,
   getFeaturedBlogPosts,
-} from '@/lib/supabase/queries/blog'
+} from '@/services/blog-service'
 import {
   getProjects,
   getProject,
   getFeaturedProjects,
-} from '@/lib/supabase/queries/projects'
-import { getRecentMedia, getMediaStats } from '@/lib/supabase/queries/media'
+} from '@/services/project-service'
+import { getRecentMedia, getMediaStats } from '@/services/media-service'
 
 /**
  * Test API endpoint để verify all query functions

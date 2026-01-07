@@ -39,7 +39,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
-import { projectSchema, type ProjectFormData } from '@/lib/validations/project'
+import { projectSchema, type ProjectFormData } from '@/schemas/project'
 import {
   createProject,
   updateProject,
@@ -51,7 +51,7 @@ import { MediaPicker } from '@/components/admin/media/media-picker'
 import { GalleryManager } from '@/components/admin/projects/gallery-manager'
 import { TechStackManager } from '@/components/admin/projects/tech-stack-manager'
 import { cn } from '@/lib/utils'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
 
 interface ProjectFormProps {
   project?: ProjectWithAdminRelations

@@ -13,7 +13,7 @@ import {
 } from '@/components/ui/dropdown-menu'
 
 import { useIsMobile } from '@/lib/core/hooks/use-is-mobile'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import { Button } from '@/components/ui/button'
 import { labels } from '@/config/i18n'
 

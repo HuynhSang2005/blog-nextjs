@@ -11,9 +11,9 @@ import {
   CardTitle,
 } from '@/components/ui/card'
 import { ProjectForm } from '@/components/admin/projects/project-form'
-import { getProjectById } from '@/lib/queries/projects'
+import { getProjectById } from '@/services/project-service'
 import { getTranslations } from 'next-intl/server'
-import { getTags } from '@/lib/queries/tags'
+import { getTags } from '@/services/tags-service'
 
 interface EditProjectPageProps {
   params: Promise<{
@@ -58,7 +58,7 @@ export default async function EditProjectPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProjectForm mode="edit" project={project} tags={tags} />
+          <ProjectForm mode="edit" project={project as any} tags={tags} />
         </CardContent>
       </Card>
     </div>

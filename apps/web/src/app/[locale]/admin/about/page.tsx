@@ -1,7 +1,7 @@
 import { getTranslations } from 'next-intl/server'
 
 import { createClient } from '@/lib/supabase/server'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
 import { AboutAdminClient } from '@/components/admin/about/about-admin-client'
 
 type AboutSection = Database['public']['Tables']['about_sections']['Row']

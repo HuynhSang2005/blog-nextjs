@@ -4,8 +4,8 @@ import { notFound } from 'next/navigation'
 
 import '@/styles/mdx.css'
 
-import type { LocaleOptions } from '@/lib/core/types/i18n'
-import { getBlogPost } from '@/lib/supabase/queries/blog'
+import type { LocaleOptions } from '@/types/i18n'
+import { getBlogPost } from '@/services/blog-service'
 import { siteConfig } from '@/config/site'
 import { absoluteUrl, cn, formatDate } from '@/lib/utils'
 import { CldImage } from '@/components/ui/cld-image'

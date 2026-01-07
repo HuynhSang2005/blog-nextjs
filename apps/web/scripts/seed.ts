@@ -1,5 +1,5 @@
 import { createClient } from '@supabase/supabase-js'
-import type { Database } from '../src/lib/supabase/database.types'
+import type { Database } from '../src/types/database'
 import { existsSync } from 'node:fs'
 import { readdir, readFile } from 'node:fs/promises'
 import path from 'node:path'

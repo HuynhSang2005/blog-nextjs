@@ -2,7 +2,7 @@ import type { AbstractIntlMessages } from 'next-intl'
 import { getRequestConfig } from 'next-intl/server'
 import deepmerge from 'deepmerge'
 
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import { locales } from '@/config/i18n'
 import { routing } from '@/navigation'
 

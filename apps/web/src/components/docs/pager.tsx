@@ -1,8 +1,8 @@
 import { ChevronLeftIcon, ChevronRightIcon } from '@radix-ui/react-icons'
 
 import { getServerDocsConfig } from '@/lib/core/utils/get-server-docs-config'
-import type { NavItem, NavItemWithChildren } from '@/lib/core/types/nav'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { NavItem, NavItemWithChildren } from '@/types/nav'
+import type { LocaleOptions } from '@/types/i18n'
 import { buttonVariants } from '../ui/button'
 import { Link } from '@/navigation'
 import { cn } from '@/lib/utils'

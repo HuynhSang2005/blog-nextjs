@@ -4,7 +4,7 @@ import { useMemo, useState } from 'react'
 import { Plus, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
 
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
 import {
   createAboutSection,
   createSkill,

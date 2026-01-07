@@ -1,7 +1,7 @@
 import { Balancer } from '@/components/ui/balancer'
 
 import { DocNotAvailableInThisLanguage } from './not-available'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 
 interface DocHeadingProps {
   doc: {

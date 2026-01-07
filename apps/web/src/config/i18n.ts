@@ -1,4 +1,4 @@
-import type { Locales, LocalizedRecord } from '@/lib/core/types/i18n'
+import type { Locales, LocalizedRecord } from '@/types/i18n'
 
 export const defaultLocale = 'vi' as const
 

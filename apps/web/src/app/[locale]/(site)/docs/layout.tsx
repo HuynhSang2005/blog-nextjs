@@ -1,9 +1,9 @@
 import { setRequestLocale } from 'next-intl/server'
 
 import { DocsSidebarNav } from '@/components/docs/sidebar-nav'
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import { ScrollArea } from '@/components/ui/scroll-area'
-import { getDocsSidebarNav } from '@/lib/queries/docs'
+import { getDocsSidebarNav } from '@/services/docs-service'
 
 interface DocsLayoutProps {
   children: React.ReactNode

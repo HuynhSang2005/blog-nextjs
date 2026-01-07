@@ -3,7 +3,7 @@ import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { getDocsTopics } from '@/lib/queries/docs'
+import { getDocsTopics } from '@/services/docs-service'
 import { DocForm } from '@/components/admin/docs/doc-form'
 
 interface NewDocPageProps {

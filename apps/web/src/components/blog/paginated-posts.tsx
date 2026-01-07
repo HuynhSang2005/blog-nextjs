@@ -10,7 +10,7 @@ import {
   getObjectValueByLocale,
 } from '@/lib/core/utils/locale'
 
-import type { LocaleOptions } from '@/lib/core/types/i18n'
+import type { LocaleOptions } from '@/types/i18n'
 import { cn, formatDate, truncateText } from '@/lib/utils'
 import { BlogPostItemTags } from './post-item-tags'
 import { buttonVariants } from '../ui/button'
@@ -20,7 +20,7 @@ import { RSSToggle } from './rss-toggle'
 import { ReadTime } from './read-time'
 import { Link } from '@/navigation'
 import { Card } from '../ui/card'
-import type { LegacyBlog } from '@/lib/types/legacy-blog'
+import type { LegacyBlog } from '@/types/legacy-blog'
 
 interface PaginatedBlogPostsProps {
   posts: LegacyBlog[]

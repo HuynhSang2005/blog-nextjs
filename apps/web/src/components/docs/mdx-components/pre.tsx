@@ -1,5 +1,5 @@
 import { CopyButton, CopyNpmCommandButton } from './copy-button'
-import type { NpmCommands } from '@/lib/core/types/unist'
+import type { NpmCommands } from '@/types/unist'
 import { cn } from '@/lib/utils'
 
 export const pre = ({
