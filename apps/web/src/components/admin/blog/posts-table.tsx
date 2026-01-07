@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useCallback, useState, useTransition } from 'react'
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -8,14 +8,12 @@ import {
   type VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 
@@ -45,30 +43,60 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select'
-import type { BlogPost } from '@/lib/queries/blog'
+import type { BlogPostListItem } from '@/types/supabase-helpers'
 import { deleteBlogPost } from '@/app/actions/blog'
 import { toast } from 'sonner'
-
-const statusConfig = {
-  draft: { label: 'Nháp', variant: 'secondary' as const },
-  published: { label: 'Đã xuất bản', variant: 'default' as const },
-  archived: { label: 'Đã lưu trữ', variant: 'outline' as const },
-}
+import { useTranslations } from 'next-intl'
+import { AdminPagination } from '@/components/admin/shared/admin-pagination'
+import { AdminDateRangePicker } from '@/components/admin/shared/admin-date-range-picker'
 
 export function BlogPostsTable({
   data,
   locale,
+  page,
+  totalPages,
+  initialSearch,
+  initialStatus,
 }: {
-  data: BlogPost[]
+  data: BlogPostListItem[]
   locale: string
+  page: number
+  totalPages: number
+  initialSearch: string
+  initialStatus: 'all' | 'draft' | 'published' | 'archived'
 }) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [, startTransition] = useTransition()
+  const t = useTranslations('admin.blog')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
 
-  const columns: ColumnDef<BlogPost>[] = [
+  const updateQueryParam = useCallback(
+    (key: string, value: string | null) => {
+      const next = new URLSearchParams(searchParams)
+      if (!value) {
+        next.delete(key)
+      } else {
+        next.set(key, value)
+      }
+
+      // Reset pagination when filters change
+      next.delete('page')
+
+      startTransition(() => {
+        const qs = next.toString()
+        router.replace(qs ? `${pathname}?${qs}` : pathname)
+        router.refresh()
+      })
+    },
+    [pathname, router, searchParams, startTransition]
+  )
+
+  const columns: ColumnDef<BlogPostListItem>[] = [
     {
       accessorKey: 'title',
       header: ({ column }) => {
@@ -77,7 +105,7 @@ export function BlogPostsTable({
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             variant="ghost"
           >
-            Tiêu đề
+            {t('columns.title')}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -103,22 +131,25 @@ export function BlogPostsTable({
     },
     {
       accessorKey: 'status',
-      header: 'Trạng thái',
+      header: t('columns.status'),
       cell: ({ row }) => {
-        const status = row.getValue('status') as keyof typeof statusConfig
-        const config = statusConfig[status]
-        return <Badge variant={config.variant}>{config.label}</Badge>
-      },
-      filterFn: (row, id, value) => {
-        return value.includes(row.getValue(id))
+        const status = row.getValue('status') as 'draft' | 'published' | 'archived'
+        const variant =
+          status === 'published'
+            ? ('default' as const)
+            : status === 'draft'
+              ? ('secondary' as const)
+              : ('outline' as const)
+
+        return <Badge variant={variant}>{t(`status.${status}`)}</Badge>
       },
     },
     {
       accessorKey: 'author',
-      header: 'Tác giả',
+      header: t('columns.author'),
       cell: ({ row }) => {
         const author = row.original.author
-        return author?.full_name || 'Không rõ'
+        return author?.full_name || '-'
       },
     },
     {
@@ -129,7 +160,7 @@ export function BlogPostsTable({
             onClick={() => column.toggleSorting(column.getIsSorted() === 'asc')}
             variant="ghost"
           >
-            Ngày tạo
+            {t('columns.created_at')}
             <ArrowUpDown className="ml-2 h-4 w-4" />
           </Button>
         )
@@ -141,7 +172,7 @@ export function BlogPostsTable({
     },
     {
       accessorKey: 'published_at',
-      header: 'Ngày xuất bản',
+      header: t('columns.published_at'),
       cell: ({ row }) => {
         const date = row.getValue('published_at') as string | null
         if (!date) return <span className="text-muted-foreground">-</span>
@@ -155,15 +186,15 @@ export function BlogPostsTable({
         const post = row.original
 
         const handleDelete = async () => {
-          if (!confirm('Bạn có chắc muốn xóa bài viết này?')) return
+          if (!confirm(t('messages.delete_confirm'))) return
 
           try {
             await deleteBlogPost(post.id)
-            toast.success('Đã xóa bài viết')
+            toast.success(t('messages.delete_success'))
             router.refresh()
           } catch (error) {
             console.error('Error deleting post:', error)
-            toast.error('Không thể xóa bài viết')
+            toast.error(t('messages.delete_error'))
           }
         }
 
@@ -180,13 +211,13 @@ export function BlogPostsTable({
               <DropdownMenuItem
                 onClick={() => navigator.clipboard.writeText(post.slug)}
               >
-                Sao chép slug
+                {t('actions.copy_slug')}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem asChild>
                 <Link href={`/${locale}/admin/blog/${post.id}`}>
                   <Pencil className="mr-2 h-4 w-4" />
-                  Chỉnh sửa
+                  {t('actions.edit')}
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuItem
@@ -194,7 +225,7 @@ export function BlogPostsTable({
                 onClick={handleDelete}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Xóa
+                {t('actions.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -209,9 +240,7 @@ export function BlogPostsTable({
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
@@ -225,35 +254,37 @@ export function BlogPostsTable({
   return (
     <div className="w-full space-y-4">
       {/* Filters */}
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Input
-          className="max-w-sm"
-          onChange={event =>
-            table.getColumn('title')?.setFilterValue(event.target.value)
-          }
-          placeholder="Tìm kiếm bài viết..."
-          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
+          className="sm:max-w-sm"
+          defaultValue={initialSearch}
+          onChange={event => {
+            updateQueryParam('search', event.target.value || null)
+          }}
+          placeholder={t('list.search_placeholder')}
         />
+
         <Select
-          onValueChange={value =>
-            table
-              .getColumn('status')
-              ?.setFilterValue(value === 'all' ? '' : value)
-          }
-          value={
-            (table.getColumn('status')?.getFilterValue() as string) ?? 'all'
-          }
+          defaultValue={initialStatus}
+          onValueChange={value => {
+            updateQueryParam('status', value === 'all' ? null : value)
+          }}
         >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Lọc theo trạng thái" />
+          <SelectTrigger className="w-full sm:w-[200px]">
+            <SelectValue placeholder={t('list.filter_by_status')} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">Tất cả</SelectItem>
-            <SelectItem value="draft">Nháp</SelectItem>
-            <SelectItem value="published">Đã xuất bản</SelectItem>
-            <SelectItem value="archived">Đã lưu trữ</SelectItem>
+            <SelectItem value="all">{t('status.all')}</SelectItem>
+            <SelectItem value="draft">{t('status.draft')}</SelectItem>
+            <SelectItem value="published">{t('status.published')}</SelectItem>
+            <SelectItem value="archived">{t('status.archived')}</SelectItem>
           </SelectContent>
         </Select>
+
+        <AdminDateRangePicker
+          clearLabel={t('list.date_range_clear')}
+          placeholder={t('list.date_range_placeholder')}
+        />
       </div>
 
       {/* Table */}
@@ -297,10 +328,9 @@ export function BlogPostsTable({
             ) : (
               <TableRow>
                 <TableCell
-                  className="h-24 text-center"
                   colSpan={columns.length}
                 >
-                  Không có bài viết nào.
+                  {t('list.no_posts')}
                 </TableCell>
               </TableRow>
             )}
@@ -308,31 +338,15 @@ export function BlogPostsTable({
         </Table>
       </div>
 
-      {/* Pagination */}
-      <div className="flex items-center justify-end space-x-2">
-        <div className="flex-1 text-sm text-muted-foreground">
-          {table.getFilteredSelectedRowModel().rows.length} /{' '}
-          {table.getFilteredRowModel().rows.length} bài viết
-        </div>
-        <div className="space-x-2">
-          <Button
-            disabled={!table.getCanPreviousPage()}
-            onClick={() => table.previousPage()}
-            size="sm"
-            variant="outline"
-          >
-            Trước
-          </Button>
-          <Button
-            disabled={!table.getCanNextPage()}
-            onClick={() => table.nextPage()}
-            size="sm"
-            variant="outline"
-          >
-            Sau
-          </Button>
-        </div>
-      </div>
+      <AdminPagination
+        nextAriaLabel={t('pagination.next')}
+        nextLabel={t('pagination.next')}
+        page={page}
+        previousAriaLabel={t('pagination.previous')}
+        previousLabel={t('pagination.previous')}
+        totalPages={totalPages}
+      />
+
     </div>
   )
 }

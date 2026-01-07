@@ -34,8 +34,8 @@ export interface MediaItem {
   bytes: number | null
   alt_text: string | null
   caption: string | null
-  uploaded_at: string
-  metadata: Record<string, unknown> | null
+  uploaded_at: string | null
+  metadata: unknown | null
 }
 
 interface MediaGridProps {

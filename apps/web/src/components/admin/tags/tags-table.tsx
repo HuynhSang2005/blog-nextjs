@@ -39,11 +39,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { deleteTag } from '@/app/actions/tags'
 import { toast } from 'sonner'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
+import { useTranslations } from 'next-intl'
 
 type Tag = Database['public']['Tables']['tags']['Row'] & {
   usageCount?: number
@@ -56,6 +56,7 @@ interface TagsTableProps {
 }
 
 export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
+  const t = useTranslations('admin.tags')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
@@ -65,7 +66,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
   const columns: ColumnDef<Tag>[] = [
     {
       accessorKey: 'name',
-      header: 'Tên thẻ',
+      header: t('table.columns.name'),
       cell: ({ row }) => {
         const color = row.original.color
         return (
@@ -83,7 +84,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
     },
     {
       accessorKey: 'slug',
-      header: 'Slug',
+      header: t('table.columns.slug'),
       cell: ({ row }) => (
         <code className="rounded bg-muted px-2 py-1 text-sm">
           {row.getValue('slug')}
@@ -92,21 +93,21 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
     },
     {
       accessorKey: 'description',
-      header: 'Mô tả',
+      header: t('table.columns.description'),
       cell: ({ row }) => {
         const description = row.getValue('description') as string | null
         return description ? (
           <span className="text-sm text-muted-foreground">{description}</span>
         ) : (
           <span className="text-sm text-muted-foreground italic">
-            Chưa có mô tả
+            {t('table.empty_description')}
           </span>
         )
       },
     },
     {
       accessorKey: 'usageCount',
-      header: 'Sử dụng',
+      header: t('table.columns.usage'),
       cell: ({ row }) => {
         const count = row.getValue('usageCount') as number
         return <Badge variant="secondary">{count || 0}</Badge>
@@ -121,16 +122,16 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button className="h-8 w-8 p-0" variant="ghost">
-                <span className="sr-only">Mở menu</span>
+                <span className="sr-only">{t('actions.open_menu')}</span>
                 <MoreHorizontal className="h-4 w-4" />
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Hành động</DropdownMenuLabel>
+              <DropdownMenuLabel>{t('table.actions')}</DropdownMenuLabel>
               <DropdownMenuSeparator />
               <DropdownMenuItem onClick={() => onEdit(tag)}>
                 <Pencil className="mr-2 h-4 w-4" />
-                Chỉnh sửa
+                {t('actions.edit')}
               </DropdownMenuItem>
               <DropdownMenuItem
                 className="text-destructive focus:text-destructive"
@@ -140,7 +141,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
                 }}
               >
                 <Trash2 className="mr-2 h-4 w-4" />
-                Xóa
+                {t('actions.delete')}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
@@ -169,12 +170,12 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
     setIsDeleting(true)
     try {
       await deleteTag(deletingTag.id)
-      toast.success('Đã xóa thẻ thành công')
+      toast.success(t('messages.delete_success'))
       onDeleteSuccess(deletingTag.id)
       setDeleteDialogOpen(false)
       setDeletingTag(null)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Không thể xóa thẻ')
+      toast.error(error instanceof Error ? error.message : t('messages.delete_error'))
     } finally {
       setIsDeleting(false)
     }
@@ -183,16 +184,6 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
   return (
     <>
       <div className="space-y-4">
-        {/* Filter */}
-        <Input
-          className="max-w-sm"
-          onChange={event =>
-            table.getColumn('name')?.setFilterValue(event.target.value)
-          }
-          placeholder="Tìm kiếm thẻ..."
-          value={(table.getColumn('name')?.getFilterValue() as string) ?? ''}
-        />
-
         {/* Table */}
         <div className="rounded-md border">
           <Table>
@@ -235,7 +226,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
                     className="h-24 text-center"
                     colSpan={columns.length}
                   >
-                    Chưa có thẻ nào.
+                    {t('table.empty')}
                   </TableCell>
                 </TableRow>
               )}
@@ -248,26 +239,24 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
       <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Bạn có chắc chắn?</AlertDialogTitle>
+            <AlertDialogTitle>{t('delete.confirm_title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Hành động này sẽ xóa vĩnh viễn thẻ{' '}
-              <strong>{deletingTag?.name}</strong>.
+              {t('delete.confirm_description', { name: deletingTag?.name ?? '' })}
               {deletingTag?.usageCount && deletingTag.usageCount > 0 ? (
                 <span className="mt-2 block text-destructive">
-                  Thẻ này đang được sử dụng bởi {deletingTag.usageCount} bài
-                  viết/dự án. Bạn cần gỡ thẻ khỏi các nội dung trước khi xóa.
+                  {t('delete.in_use', { count: deletingTag.usageCount })}
                 </span>
               ) : null}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>Hủy</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>{t('actions.cancel')}</AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={isDeleting || (deletingTag?.usageCount || 0) > 0}
               onClick={handleDelete}
             >
-              {isDeleting ? 'Đang xóa...' : 'Xóa'}
+              {isDeleting ? t('actions.deleting') : t('actions.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

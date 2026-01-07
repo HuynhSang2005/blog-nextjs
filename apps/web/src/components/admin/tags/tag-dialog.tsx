@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useState } from 'react'
+import { useTranslations } from 'next-intl'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import {
@@ -23,10 +24,10 @@ import {
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Button } from '@/components/ui/button'
-import { tagSchema, type TagFormData } from '@/lib/validations/tag'
+import { tagSchema, type TagFormData } from '@/schemas/tag'
 import { createTag, updateTag } from '@/app/actions/tags'
 import { toast } from 'sonner'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
 
 type Tag = Database['public']['Tables']['tags']['Row']
 
@@ -44,6 +45,7 @@ export function TagDialog({
   onSuccess,
 }: TagDialogProps) {
   const isEditing = !!tag
+  const t = useTranslations('admin.tags')
 
   const [isSlugManuallyEdited, setIsSlugManuallyEdited] = useState(false)
 
@@ -92,7 +94,7 @@ export function TagDialog({
         if (data.description) updateData.description = data.description
 
         result = await updateTag(tag.id, updateData)
-        toast.success('Đã cập nhật thẻ thành công')
+        toast.success(t('messages.update_success'))
       } else {
         const createData = {
           name: data.name,
@@ -101,13 +103,13 @@ export function TagDialog({
           description: data.description || null,
         }
         result = await createTag(createData)
-        toast.success('Đã tạo thẻ mới thành công')
+        toast.success(t('messages.create_success'))
       }
 
       onSuccess(result)
       form.reset()
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Có lỗi xảy ra')
+      toast.error(error instanceof Error ? error.message : t('messages.generic_error'))
     }
   }
 
@@ -136,12 +138,12 @@ export function TagDialog({
       <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>
-            {isEditing ? 'Chỉnh sửa thẻ' : 'Tạo thẻ mới'}
+            {isEditing ? t('dialog.edit_title') : t('dialog.create_title')}
           </DialogTitle>
           <DialogDescription>
             {isEditing
-              ? 'Cập nhật thông tin của thẻ'
-              : 'Thêm một thẻ mới cho bài viết và dự án'}
+              ? t('dialog.edit_description')
+              : t('dialog.create_description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -152,10 +154,10 @@ export function TagDialog({
               name="name"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Tên thẻ *</FormLabel>
+                  <FormLabel>{t('form.name_label')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="Next.js"
+                      placeholder={t('form.name_placeholder')}
                       {...field}
                       onChange={e => {
                         field.onChange(e)
@@ -173,10 +175,10 @@ export function TagDialog({
               name="slug"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Slug</FormLabel>
+                  <FormLabel>{t('form.slug_label')}</FormLabel>
                   <FormControl>
                     <Input
-                      placeholder="nextjs"
+                      placeholder={t('form.slug_placeholder')}
                       {...field}
                       onChange={e => {
                         setIsSlugManuallyEdited(true)
@@ -185,9 +187,7 @@ export function TagDialog({
                       value={field.value || ''}
                     />
                   </FormControl>
-                  <FormDescription>
-                    Tự động tạo từ tên nếu để trống
-                  </FormDescription>
+                  <FormDescription>{t('form.slug_help')}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -198,7 +198,7 @@ export function TagDialog({
               name="color"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Màu sắc</FormLabel>
+                  <FormLabel>{t('form.color_label')}</FormLabel>
                   <div className="flex gap-2">
                     <FormControl>
                       <Input
@@ -210,15 +210,13 @@ export function TagDialog({
                     </FormControl>
                     <FormControl>
                       <Input
-                        placeholder="#3b82f6"
+                        placeholder={t('form.color_placeholder')}
                         {...field}
                         value={field.value || ''}
                       />
                     </FormControl>
                   </div>
-                  <FormDescription>
-                    Mã màu hex để hiển thị thẻ (tùy chọn)
-                  </FormDescription>
+                  <FormDescription>{t('form.color_help')}</FormDescription>
                   <FormMessage />
                 </FormItem>
               )}
@@ -229,11 +227,11 @@ export function TagDialog({
               name="description"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Mô tả</FormLabel>
+                  <FormLabel>{t('form.description_label')}</FormLabel>
                   <FormControl>
                     <Textarea
                       className="resize-none"
-                      placeholder="Mô tả về thẻ này..."
+                      placeholder={t('form.description_placeholder')}
                       rows={3}
                       {...field}
                       value={field.value || ''}
@@ -250,14 +248,14 @@ export function TagDialog({
                 type="button"
                 variant="outline"
               >
-                Hủy
+                {t('actions.cancel')}
               </Button>
               <Button disabled={form.formState.isSubmitting} type="submit">
                 {form.formState.isSubmitting
-                  ? 'Đang xử lý...'
+                  ? t('actions.saving')
                   : isEditing
-                    ? 'Cập nhật'
-                    : 'Tạo mới'}
+                    ? t('actions.save')
+                    : t('actions.create')}
               </Button>
             </DialogFooter>
           </form>

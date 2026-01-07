@@ -1,25 +1,52 @@
-import type { Metadata } from 'next'
-import { getTags } from '@/app/actions/tags'
+import { getTranslations } from 'next-intl/server'
+import { getTagsAdminList } from '@/app/actions/tags'
 import { TagsClient } from './tags-client'
 
-export const metadata: Metadata = {
-  title: 'Quản lý thẻ',
-  description: 'Quản lý thẻ cho bài viết và dự án',
+interface TagsPageProps {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{
+    slug?: string
+    from?: string
+    to?: string
+    page?: string
+  }>
 }
 
-export default async function TagsPage() {
-  const tags = await getTags()
+export default async function TagsPage({ params, searchParams }: TagsPageProps) {
+  const { locale } = await params
+  const t = await getTranslations('admin.tags')
+
+  const sp = await searchParams
+  const page = Number.parseInt(sp.page ?? '1', 10)
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1
+
+  const slug = sp.slug ?? ''
+  const dateFrom = sp.from ?? ''
+  const dateTo = sp.to ?? ''
+
+  const res = await getTagsAdminList({
+    pagination: { page: safePage, pageSize: 20 },
+    filters: {
+      slug: slug || undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    },
+  })
 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight">Quản lý thẻ</h1>
-        <p className="text-muted-foreground">
-          Quản lý thẻ sử dụng cho bài viết và dự án
-        </p>
+        <h1 className="text-3xl font-bold tracking-tight">{t('title')}</h1>
+        <p className="text-muted-foreground">{t('description')}</p>
       </div>
 
-      <TagsClient initialTags={tags} />
+      <TagsClient
+        initialSlug={slug}
+        page={res.pagination.page}
+        tags={res.data}
+        totalItems={res.pagination.totalItems}
+        totalPages={res.pagination.totalPages}
+      />
     </div>
   )
 }

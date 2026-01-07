@@ -3,6 +3,7 @@
 import { useCallback, useTransition } from 'react'
 import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { Filter, Search } from 'lucide-react'
+import { useTranslations } from 'next-intl'
 import {
   Card,
   CardContent,
@@ -37,6 +38,7 @@ export function MediaPageClient({
   const pathname = usePathname()
   const searchParams = useSearchParams()
   const [, startTransition] = useTransition()
+  const t = useTranslations('admin.media')
 
   const updateQueryParam = useCallback(
     (key: string, value: string | null) => {
@@ -46,6 +48,9 @@ export function MediaPageClient({
       } else {
         next.set(key, value)
       }
+
+      // Reset pagination when filters change
+      next.delete('page')
 
       startTransition(() => {
         const qs = next.toString()
@@ -60,8 +65,8 @@ export function MediaPageClient({
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Lọc & Tìm kiếm</CardTitle>
-          <CardDescription>Tìm media theo tên file hoặc loại</CardDescription>
+          <CardTitle>{t('title')}</CardTitle>
+          <CardDescription>{t('description')}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col gap-4 sm:flex-row">
@@ -73,7 +78,7 @@ export function MediaPageClient({
                 onChange={e => {
                   updateQueryParam('search', e.target.value || null)
                 }}
-                placeholder="Tìm kiếm theo tên file..."
+                placeholder={t('search_placeholder')}
               />
             </div>
 
@@ -85,13 +90,13 @@ export function MediaPageClient({
             >
               <SelectTrigger className="w-[180px]">
                 <Filter className="mr-2 h-4 w-4" />
-                <SelectValue placeholder="Loại file" />
+                <SelectValue placeholder={t('filter_type')} />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="all">Tất cả</SelectItem>
-                <SelectItem value="image">Hình ảnh</SelectItem>
-                <SelectItem value="video">Video</SelectItem>
-                <SelectItem value="raw">File khác</SelectItem>
+                <SelectItem value="all">{t('all_types')}</SelectItem>
+                <SelectItem value="image">{t('images')}</SelectItem>
+                <SelectItem value="video">{t('videos')}</SelectItem>
+                <SelectItem value="raw">{t('other')}</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -101,7 +106,7 @@ export function MediaPageClient({
       <Card>
         <CardHeader>
           <CardTitle>
-            {total} media {initialSearch && `phù hợp với "${initialSearch}"`}
+            {t('total')}: {total}
           </CardTitle>
         </CardHeader>
         <CardContent>

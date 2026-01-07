@@ -4,21 +4,48 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { getDocsAdminList } from '@/lib/queries/docs'
+import { getDocsAdminListPaginated, getDocsTopics } from '@/services/docs-service'
 import { DocsTable } from '@/components/admin/docs/docs-table'
-
-async function DocsTableWrapper() {
-  const docs = await getDocsAdminList()
-  return <DocsTable data={docs} />
-}
 
 interface AdminDocsPageProps {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{
+    search?: string
+    topic?: string
+    from?: string
+    to?: string
+    page?: string
+  }>
 }
 
-export default async function AdminDocsPage({ params }: AdminDocsPageProps) {
+export default async function AdminDocsPage({
+  params,
+  searchParams,
+}: AdminDocsPageProps) {
   const { locale } = await params
   const t = await getTranslations('admin.docs')
+
+  const sp = await searchParams
+  const page = Number.parseInt(sp.page ?? '1', 10)
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1
+
+  const search = sp.search ?? ''
+  const topic = sp.topic ?? ''
+  const dateFrom = sp.from ?? ''
+  const dateTo = sp.to ?? ''
+
+  const [topics, docsRes] = await Promise.all([
+    getDocsTopics(),
+    getDocsAdminListPaginated({
+      pagination: { page: safePage, pageSize: 20 },
+      filters: {
+        search: search || undefined,
+        topicSlug: topic || undefined,
+        dateFrom: dateFrom || undefined,
+        dateTo: dateTo || undefined,
+      },
+    }),
+  ])
 
   return (
     <div className="flex flex-col gap-6">
@@ -37,7 +64,14 @@ export default async function AdminDocsPage({ params }: AdminDocsPageProps) {
       </div>
 
       <Suspense fallback={<div>{t('messages.loading')}</div>}>
-        <DocsTableWrapper />
+        <DocsTable
+          data={docsRes.data}
+          initialSearch={search}
+          initialTopic={topic}
+          page={docsRes.pagination.page}
+          topics={topics.map(t => ({ name: t.name, slug: t.slug }))}
+          totalPages={docsRes.pagination.totalPages}
+        />
       </Suspense>
     </div>
   )

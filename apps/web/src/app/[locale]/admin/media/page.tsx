@@ -5,9 +5,11 @@
 
 import { getTranslations } from 'next-intl/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { getMedia, getMediaStats } from '@/lib/queries/media'
+import { getMediaList, getMediaStats } from '@/services/media-service'
 import { MediaUploader } from '@/components/admin/media/media-uploader'
 import { MediaPageClient } from '@/components/admin/media/media-page-client'
+import { AdminPagination } from '@/components/admin/shared/admin-pagination'
+import type { MediaItem } from '@/components/admin/media/media-grid'
 
 interface MediaPageProps {
   searchParams: Promise<{
@@ -18,34 +20,57 @@ interface MediaPageProps {
 }
 
 export default async function MediaPage({ searchParams }: MediaPageProps) {
-  const _t = await getTranslations('admin.media')
+  const t = await getTranslations('admin.media')
   const params = await searchParams
 
   const search = params.search || ''
   const resourceType = params.type || 'all'
   const page = parseInt(params.page || '1', 10)
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1
   const limit = 20
 
   // Fetch media with filters
-  const { media, total } = await getMedia({
+  const { data: media, count: total } = await getMediaList({
     search,
     resourceType: resourceType === 'all' ? undefined : resourceType,
     limit,
-    offset: (page - 1) * limit,
+    offset: (safePage - 1) * limit,
   })
 
   // Get stats
   const stats = await getMediaStats()
+  const totalPages = total > 0 ? Math.ceil(total / limit) : 0
+
+  const mediaItems: MediaItem[] = media.map(item => {
+    const resourceType: MediaItem['resource_type'] =
+      item.resource_type === 'image' ||
+      item.resource_type === 'video' ||
+      item.resource_type === 'raw'
+        ? item.resource_type
+        : 'raw'
+
+    return {
+    id: item.id,
+    public_id: item.public_id,
+    resource_type: resourceType,
+    format: item.format,
+    width: item.width,
+    height: item.height,
+    bytes: item.bytes,
+    alt_text: item.alt_text,
+    caption: item.caption,
+    uploaded_at: item.uploaded_at,
+    metadata: item.metadata,
+    }
+  })
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Thư viện Media</h1>
-          <p className="text-muted-foreground">
-            Quản lý hình ảnh, video và file tải lên Cloudinary
-          </p>
+          <h1 className="text-3xl font-bold">{t('title')}</h1>
+          <p className="text-muted-foreground">{t('description')}</p>
         </div>
         <MediaUploader />
       </div>
@@ -54,38 +79,40 @@ export default async function MediaPage({ searchParams }: MediaPageProps) {
       <div className="grid gap-4 md:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Tổng số</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('total')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.total}</div>
-            <p className="text-xs text-muted-foreground">media files</p>
+            <div className="text-2xl font-bold">
+              {stats.totalImages + stats.totalVideos}
+            </div>
+            <p className="text-xs text-muted-foreground">{t('media_files')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Hình ảnh</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('images')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.images}</div>
-            <p className="text-xs text-muted-foreground">images</p>
+            <div className="text-2xl font-bold">{stats.totalImages}</div>
+            <p className="text-xs text-muted-foreground">{t('images_label')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Video</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('videos')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.videos}</div>
-            <p className="text-xs text-muted-foreground">videos</p>
+            <div className="text-2xl font-bold">{stats.totalVideos}</div>
+            <p className="text-xs text-muted-foreground">{t('videos_label')}</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Khác</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('other')}</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{stats.raw}</div>
-            <p className="text-xs text-muted-foreground">other files</p>
+            <div className="text-2xl font-bold">0</div>
+            <p className="text-xs text-muted-foreground">{t('other_label')}</p>
           </CardContent>
         </Card>
       </div>
@@ -94,8 +121,17 @@ export default async function MediaPage({ searchParams }: MediaPageProps) {
       <MediaPageClient
         initialSearch={search}
         initialType={resourceType}
-        media={media}
+        media={mediaItems}
         total={total}
+      />
+
+      <AdminPagination
+        nextAriaLabel={t('pagination.next')}
+        nextLabel={t('pagination.next')}
+        page={safePage}
+        previousAriaLabel={t('pagination.previous')}
+        previousLabel={t('pagination.previous')}
+        totalPages={totalPages}
       />
     </div>
   )

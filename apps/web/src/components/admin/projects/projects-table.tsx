@@ -1,14 +1,12 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useCallback, useState, useTransition } from 'react'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { useLocale, useTranslations } from 'next-intl'
 import {
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
   type ColumnDef,
@@ -18,7 +16,6 @@ import {
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
-import type { Database } from '@/lib/supabase/database.types'
 
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
@@ -59,19 +56,29 @@ import {
 import { deleteProject } from '@/app/actions/projects'
 import { toast } from 'sonner'
 
-type Media = Database['public']['Tables']['media']['Row']
-type Project = Database['public']['Tables']['projects']['Row']
-type ProjectWithRelations = Project & {
-  cover_media: Media | null
-  og_media: Media | null
-}
+import type { ProjectListItem } from '@/types/supabase-helpers'
+import { AdminPagination } from '@/components/admin/shared/admin-pagination'
+import { AdminDateRangePicker } from '@/components/admin/shared/admin-date-range-picker'
 
 interface ProjectsTableProps {
-  projects: ProjectWithRelations[]
+  projects: ProjectListItem[]
+  page: number
+  totalPages: number
+  initialSearch: string
+  initialStatus: 'all' | 'in_progress' | 'completed' | 'archived'
 }
 
-export function ProjectsTable({ projects }: ProjectsTableProps) {
+export function ProjectsTable({
+  projects,
+  page,
+  totalPages,
+  initialSearch,
+  initialStatus,
+}: ProjectsTableProps) {
   const router = useRouter()
+  const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [, startTransition] = useTransition()
   const locale = useLocale()
   const t = useTranslations('admin.projects')
   const [sorting, setSorting] = useState<SortingState>([])
@@ -79,7 +86,28 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false)
   const [projectToDelete, setProjectToDelete] = useState<string | null>(null)
 
-  const columns: ColumnDef<ProjectWithRelations>[] = [
+  const updateQueryParam = useCallback(
+    (key: string, value: string | null) => {
+      const next = new URLSearchParams(searchParams)
+      if (!value) {
+        next.delete(key)
+      } else {
+        next.set(key, value)
+      }
+
+      // Reset pagination when filters change
+      next.delete('page')
+
+      startTransition(() => {
+        const qs = next.toString()
+        router.replace(qs ? `${pathname}?${qs}` : pathname)
+        router.refresh()
+      })
+    },
+    [pathname, router, searchParams, startTransition]
+  )
+
+  const columns: ColumnDef<ProjectListItem>[] = [
     {
       accessorKey: 'title',
       header: t('table.title'),
@@ -193,9 +221,7 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
     data: projects,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     state: {
@@ -224,21 +250,13 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
       <div className="flex items-center justify-between gap-4">
         <Input
           className="max-w-sm"
-          onChange={event =>
-            table.getColumn('title')?.setFilterValue(event.target.value)
-          }
+          defaultValue={initialSearch}
+          onChange={event => updateQueryParam('search', event.target.value || null)}
           placeholder={t('table.search_placeholder')}
-          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
         />
         <Select
-          onValueChange={value =>
-            table
-              .getColumn('status')
-              ?.setFilterValue(value === 'all' ? '' : value)
-          }
-          value={
-            (table.getColumn('status')?.getFilterValue() as string) ?? 'all'
-          }
+          defaultValue={initialStatus}
+          onValueChange={value => updateQueryParam('status', value === 'all' ? null : value)}
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={t('table.filter_status')} />
@@ -252,6 +270,11 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
             <SelectItem value="archived">{t('status.archived')}</SelectItem>
           </SelectContent>
         </Select>
+
+        <AdminDateRangePicker
+          clearLabel={t('table.date_range_clear')}
+          placeholder={t('table.date_range_placeholder')}
+        />
       </div>
 
       <div className="rounded-md border">
@@ -305,24 +328,14 @@ export function ProjectsTable({ projects }: ProjectsTableProps) {
         </Table>
       </div>
 
-      <div className="flex items-center justify-end space-x-2">
-        <Button
-          disabled={!table.getCanPreviousPage()}
-          onClick={() => table.previousPage()}
-          size="sm"
-          variant="outline"
-        >
-          {t('table.previous')}
-        </Button>
-        <Button
-          disabled={!table.getCanNextPage()}
-          onClick={() => table.nextPage()}
-          size="sm"
-          variant="outline"
-        >
-          {t('table.next')}
-        </Button>
-      </div>
+      <AdminPagination
+        nextAriaLabel={t('table.next')}
+        nextLabel={t('table.next')}
+        page={page}
+        previousAriaLabel={t('table.previous')}
+        previousLabel={t('table.previous')}
+        totalPages={totalPages}
+      />
 
       <AlertDialog onOpenChange={setDeleteDialogOpen} open={deleteDialogOpen}>
         <AlertDialogContent>

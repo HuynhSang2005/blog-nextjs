@@ -13,15 +13,45 @@ import {
 } from '@/components/ui/card'
 import { TableSkeleton } from '@/components/admin/table-skeleton'
 import { BlogPostsTable } from '@/components/admin/blog/posts-table'
-import { getBlogPosts } from '@/lib/queries/blog'
+import { getBlogPosts } from '@/services/blog-service'
 
 interface BlogPostsPageProps {
   params: Promise<{ locale: string }>
+  searchParams: Promise<{
+    search?: string
+    status?: 'draft' | 'published' | 'archived' | 'all'
+    from?: string
+    to?: string
+    page?: string
+  }>
 }
 
-export default async function BlogPostsPage({ params }: BlogPostsPageProps) {
+export default async function BlogPostsPage({
+  params,
+  searchParams,
+}: BlogPostsPageProps) {
   const { locale } = await params
   const t = await getTranslations('admin.blog')
+
+  const sp = await searchParams
+  const page = Number.parseInt(sp.page ?? '1', 10)
+  const safePage = Number.isFinite(page) && page > 0 ? page : 1
+
+  const status = sp.status && sp.status !== 'all' ? sp.status : null
+  const search = sp.search ?? ''
+  const dateFrom = sp.from ?? ''
+  const dateTo = sp.to ?? ''
+
+  const { data: posts, pagination } = await getBlogPosts(
+    locale,
+    status as any,
+    { page: safePage, pageSize: 20 },
+    {
+      search: search || undefined,
+      dateFrom: dateFrom || undefined,
+      dateTo: dateTo || undefined,
+    }
+  )
 
   return (
     <div className="flex flex-col gap-6">
@@ -47,15 +77,17 @@ export default async function BlogPostsPage({ params }: BlogPostsPageProps) {
         </CardHeader>
         <CardContent>
           <Suspense fallback={<TableSkeleton />}>
-            <BlogPostsTableWrapper locale={locale} />
+            <BlogPostsTable
+              data={posts}
+              initialSearch={search}
+              initialStatus={(sp.status ?? 'all') as any}
+              locale={locale}
+              page={pagination.page}
+              totalPages={pagination.totalPages}
+            />
           </Suspense>
         </CardContent>
       </Card>
     </div>
   )
-}
-
-async function BlogPostsTableWrapper({ locale }: { locale: string }) {
-  const posts = await getBlogPosts()
-  return <BlogPostsTable data={posts} locale={locale} />
 }

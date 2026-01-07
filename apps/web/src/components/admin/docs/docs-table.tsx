@@ -1,6 +1,6 @@
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useTransition } from 'react'
 import {
   type ColumnDef,
   type ColumnFiltersState,
@@ -8,14 +8,12 @@ import {
   type VisibilityState,
   flexRender,
   getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 import { ArrowUpDown, MoreHorizontal, Pencil, Trash2 } from 'lucide-react'
 import Link from 'next/link'
-import { usePathname, useRouter } from 'next/navigation'
+import { usePathname, useRouter, useSearchParams } from 'next/navigation'
 import { format } from 'date-fns'
 import { vi } from 'date-fns/locale'
 import { useTranslations } from 'next-intl'
@@ -39,12 +37,39 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table'
-import type { Doc } from '@/lib/queries/docs'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select'
+import type { Doc } from '@/services/docs-service'
 import { deleteDoc } from '@/app/actions/docs'
+import { AdminPagination } from '@/components/admin/shared/admin-pagination'
+import { AdminDateRangePicker } from '@/components/admin/shared/admin-date-range-picker'
 
-export function DocsTable({ data }: { data: Doc[] }) {
+export interface DocsTableProps {
+  data: Doc[]
+  page: number
+  totalPages: number
+  topics: Array<{ slug: string; name: string }>
+  initialSearch: string
+  initialTopic: string
+}
+
+export function DocsTable({
+  data,
+  page,
+  totalPages,
+  topics,
+  initialSearch,
+  initialTopic,
+}: DocsTableProps) {
   const router = useRouter()
   const pathname = usePathname()
+  const searchParams = useSearchParams()
+  const [, startTransition] = useTransition()
   const locale = useMemo(() => {
     const match = pathname.match(/^\/([^/]+)(?:\/|$)/)
     return match?.[1] ?? 'vi'
@@ -54,6 +79,27 @@ export function DocsTable({ data }: { data: Doc[] }) {
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
   const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
   const [rowSelection, setRowSelection] = useState({})
+
+  const updateQueryParam = useCallback(
+    (key: string, value: string | null) => {
+      const next = new URLSearchParams(searchParams)
+      if (!value) {
+        next.delete(key)
+      } else {
+        next.set(key, value)
+      }
+
+      // Reset pagination when filters change
+      next.delete('page')
+
+      startTransition(() => {
+        const qs = next.toString()
+        router.replace(qs ? `${pathname}?${qs}` : pathname)
+        router.refresh()
+      })
+    },
+    [pathname, router, searchParams, startTransition]
+  )
 
   const columns: ColumnDef<Doc>[] = [
     {
@@ -92,10 +138,6 @@ export function DocsTable({ data }: { data: Doc[] }) {
       cell: ({ row }) => {
         const topicName = row.original.topic?.name
         return topicName || <span className="text-muted-foreground">-</span>
-      },
-      filterFn: (row, id, value) => {
-        const v = row.getValue(id)
-        return typeof v === 'string' ? v.includes(value) : true
       },
     },
     {
@@ -176,9 +218,7 @@ export function DocsTable({ data }: { data: Doc[] }) {
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
     onColumnVisibilityChange: setColumnVisibility,
     onRowSelectionChange: setRowSelection,
     state: {
@@ -191,14 +231,38 @@ export function DocsTable({ data }: { data: Doc[] }) {
 
   return (
     <div className="w-full space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
         <Input
-          className="max-w-sm"
-          onChange={event =>
-            table.getColumn('title')?.setFilterValue(event.target.value)
-          }
+          className="sm:max-w-sm"
+          defaultValue={initialSearch}
+          onChange={event => {
+            updateQueryParam('search', event.target.value || null)
+          }}
           placeholder={t('table.search_placeholder')}
-          value={(table.getColumn('title')?.getFilterValue() as string) ?? ''}
+        />
+
+        <Select
+          defaultValue={initialTopic || 'all'}
+          onValueChange={value => {
+            updateQueryParam('topic', value === 'all' ? null : value)
+          }}
+        >
+          <SelectTrigger className="w-full sm:w-[220px]">
+            <SelectValue placeholder={t('form.placeholders.topic')} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">Tất cả</SelectItem>
+            {topics.map(topic => (
+              <SelectItem key={topic.slug} value={topic.slug}>
+                {topic.name}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+
+        <AdminDateRangePicker
+          clearLabel={t('table.date_range_clear')}
+          placeholder={t('table.date_range_placeholder')}
         />
       </div>
 
@@ -251,24 +315,14 @@ export function DocsTable({ data }: { data: Doc[] }) {
         </Table>
       </div>
 
-      <div className="flex items-center justify-end space-x-2">
-        <Button
-          disabled={!table.getCanPreviousPage()}
-          onClick={() => table.previousPage()}
-          size="sm"
-          variant="outline"
-        >
-          {t('table.pagination.previous')}
-        </Button>
-        <Button
-          disabled={!table.getCanNextPage()}
-          onClick={() => table.nextPage()}
-          size="sm"
-          variant="outline"
-        >
-          {t('table.pagination.next')}
-        </Button>
-      </div>
+      <AdminPagination
+        nextAriaLabel={t('table.pagination.next')}
+        nextLabel={t('table.pagination.next')}
+        page={page}
+        previousAriaLabel={t('table.pagination.previous')}
+        previousLabel={t('table.pagination.previous')}
+        totalPages={totalPages}
+      />
     </div>
   )
 }
