@@ -3,28 +3,30 @@
 .mdxeditor {
   min-height: 400px;
   overflow: visible;
-  background: hsl(var(--background));
-  border: 1px solid hsl(var(--border));
+  background: var(--background);
+  border: 1px solid var(--border);
   border-radius: var(--radius);
 }
 
-/* Typography plugin sets `.prose { max-width: 65ch; }`.
- * In admin editors we want the content area to use the full available width.
- */
-.mdxeditor .prose {
-  max-width: none;
-}
-
 .mdxeditor:focus-within {
-  outline: 2px solid hsl(var(--ring));
+  outline: 2px solid var(--ring);
   outline-offset: 2px;
 }
 
 /* Toolbar styling (stable class provided by @mdxeditor/editor) */
-.mdxeditor-toolbar {
+.mdxeditor-toolbar,
+.mdxeditor .mdxeditor-toolbar,
+.mdxeditor-diff-source-wrapper .mdxeditor-toolbar {
   padding: 0.5rem;
-  background: hsl(var(--muted) / 0.3);
-  border-bottom: 1px solid hsl(var(--border));
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+  /* Match mdxeditor.dev behavior: toolbar follows the editor while scrolling. */
+  position: sticky;
+  top: 4rem;
+  bottom: auto !important;
+  left: auto !important;
+  right: auto !important;
+  z-index: 10;
 }
 
 /* Editor content area */
@@ -35,118 +37,171 @@
   overflow: visible;
 }
 
-/* Dark mode support */
-.dark .mdxeditor {
-  --mdxeditor-background: hsl(var(--background));
-  --mdxeditor-foreground: hsl(var(--foreground));
-  --mdxeditor-border: hsl(var(--border));
-  --mdxeditor-muted: hsl(var(--muted));
-  --mdxeditor-accent: hsl(var(--accent));
+/* --- Content typography (matches MDXEditor demo expectations) --- */
+
+.mdxeditor-root-contenteditable {
+  line-height: 1.6;
+  color: var(--foreground);
 }
 
-/* Code block styling */
-.mdxeditor pre {
-  padding: 1rem;
-  overflow-x: auto;
-  background: hsl(var(--muted));
-  border-radius: var(--radius);
+.mdxeditor-root-contenteditable p {
+  margin: 0.75rem 0;
 }
 
-.dark .mdxeditor pre {
-  background: hsl(var(--muted) / 0.5);
-}
-
-/* Table styling */
-.mdxeditor table {
-  width: 100%;
-  margin: 1rem 0;
-  border-collapse: collapse;
-}
-
-.mdxeditor table th,
-.mdxeditor table td {
-  padding: 0.5rem;
-  border: 1px solid hsl(var(--border));
-}
-
-.mdxeditor table th {
-  font-weight: 600;
-  background: hsl(var(--muted));
-}
-
-/* Image styling */
-.mdxeditor img {
-  max-width: 100%;
-  height: auto;
-  border-radius: var(--radius);
-}
-
-/* Blockquote styling */
-.mdxeditor blockquote {
-  padding-left: 1rem;
-  margin-left: 0;
-  font-style: italic;
-  color: hsl(var(--muted-foreground));
-  border-left: 4px solid hsl(var(--primary));
-}
-
-/* Link styling */
-.mdxeditor a {
-  color: hsl(var(--primary));
-  text-decoration: underline;
-}
-
-.mdxeditor a:hover {
-  text-decoration: none;
-}
-
-/* Headings */
-.mdxeditor h1,
-.mdxeditor h2,
-.mdxeditor h3,
-.mdxeditor h4,
-.mdxeditor h5,
-.mdxeditor h6 {
-  margin-top: 1.5rem;
+.mdxeditor-root-contenteditable h1,
+.mdxeditor-root-contenteditable h2,
+.mdxeditor-root-contenteditable h3,
+.mdxeditor-root-contenteditable h4,
+.mdxeditor-root-contenteditable h5,
+.mdxeditor-root-contenteditable h6 {
+  margin-top: 1.25rem;
   margin-bottom: 0.5rem;
   font-weight: 600;
   line-height: 1.25;
 }
 
-.mdxeditor h1 {
+.mdxeditor-root-contenteditable h1 {
   font-size: 1.875rem;
 }
 
-.mdxeditor h2 {
+.mdxeditor-root-contenteditable h2 {
   font-size: 1.5rem;
 }
 
-.mdxeditor h3 {
+.mdxeditor-root-contenteditable h3 {
   font-size: 1.25rem;
 }
 
-.mdxeditor h4 {
+.mdxeditor-root-contenteditable h4 {
   font-size: 1.125rem;
 }
 
-.mdxeditor h5 {
+.mdxeditor-root-contenteditable h5 {
   font-size: 1rem;
 }
 
-.mdxeditor h6 {
+.mdxeditor-root-contenteditable h6 {
   font-size: 0.875rem;
 }
 
-/* Lists */
-.mdxeditor ul,
-.mdxeditor ol {
+.mdxeditor-root-contenteditable ul,
+.mdxeditor-root-contenteditable ol {
   padding-left: 1.5rem;
-  margin: 0.5rem 0;
+  margin: 0.75rem 0;
+  /* Admin dashboard CSS often resets list styles -> force them back */
+  list-style-position: outside !important;
+}
+
+.mdxeditor-root-contenteditable ul {
+  list-style-type: disc !important;
+}
+
+.mdxeditor-root-contenteditable ul ul {
+  list-style-type: circle !important;
+}
+
+.mdxeditor-root-contenteditable ul ul ul {
+  list-style-type: square !important;
+}
+
+.mdxeditor-root-contenteditable ol {
+  list-style-type: decimal !important;
+}
+
+.mdxeditor-root-contenteditable ol ol {
+  list-style-type: lower-alpha !important;
+}
+
+.mdxeditor-root-contenteditable li {
+  margin: 0.25rem 0;
+}
+
+/* Checklist support (listsPlugin supports task lists) */
+.mdxeditor-root-contenteditable li[role='checkbox'] {
+  /* Don't show bullets in task lists even if ul has list-style forced */
+  list-style-type: none !important;
+}
+
+.mdxeditor-root-contenteditable li[role='checkbox']::marker {
+  content: '';
+}
+
+.mdxeditor-root-contenteditable li[role='checkbox']::before {
+  /* Center the checkbox square vertically relative to the line */
+  top: 50% !important;
+  transform: translateY(-50%) !important;
+  border-color: var(--border) !important;
+}
+
+.mdxeditor-root-contenteditable li[role='checkbox'][aria-checked='true']::before {
+  border-color: var(--primary) !important;
+}
+
+.mdxeditor-root-contenteditable blockquote {
+  margin: 0.75rem 0;
+  padding-left: 1rem !important;
+  border-left: 4px solid var(--primary) !important;
+  color: var(--muted-foreground);
+}
+
+.mdxeditor-root-contenteditable blockquote > :first-child {
+  margin-top: 0;
+}
+
+.mdxeditor-root-contenteditable blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+.mdxeditor-root-contenteditable a {
+  color: var(--primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.mdxeditor-root-contenteditable a:hover {
+  text-decoration: none;
+}
+
+/* Inline code */
+.mdxeditor-root-contenteditable code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    'Liberation Mono', 'Courier New', monospace;
+}
+
+.mdxeditor-root-contenteditable :not(pre) > code {
+  padding: 0.1rem 0.35rem;
+  border: 1px solid var(--border);
+  border-radius: calc(var(--radius) - 2px);
+  background: var(--muted);
+}
+
+/* Code blocks */
+.mdxeditor-root-contenteditable pre {
+  margin: 0.75rem 0;
+  padding: 1rem;
+  overflow-x: auto;
+  background: var(--muted);
+  border-radius: var(--radius);
+}
+
+.dark .mdxeditor-root-contenteditable pre {
+  background: var(--muted);
 }
 
 /* Placeholder text */
-.mdxeditor [data-placeholder]:empty:before {
-  color: hsl(var(--muted-foreground));
+.mdxeditor-root-contenteditable[data-placeholder]:empty:before,
+.mdxeditor-root-contenteditable [data-placeholder]:empty:before {
+  color: var(--muted-foreground);
   pointer-events: none;
   content: attr(data-placeholder);
 }
+
+/* Dark mode support */
+.dark .mdxeditor {
+  --mdxeditor-background: var(--background);
+  --mdxeditor-foreground: var(--foreground);
+  --mdxeditor-border: var(--border);
+  --mdxeditor-muted: var(--muted);
+  --mdxeditor-accent: var(--accent);
+}
+

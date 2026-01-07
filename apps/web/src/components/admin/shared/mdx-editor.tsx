@@ -8,6 +8,7 @@ import type {
   MDXEditorProps,
 } from '@mdxeditor/editor'
 import '@mdxeditor/editor/style.css'
+import '@/styles/mdx-editor.css'
 import '@/styles/mdx-editor-overrides.css'
 import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
@@ -73,6 +74,7 @@ export function MDXEditorWrapper({
         GenericJsxEditor,
         listsPlugin,
         linkPlugin,
+        linkDialogPlugin,
         quotePlugin,
         thematicBreakPlugin,
         markdownShortcutPlugin,
@@ -95,6 +97,8 @@ export function MDXEditorWrapper({
         ListsToggle,
         BlockTypeSelect,
         CodeToggle,
+        ConditionalContents,
+        ChangeCodeMirrorLanguage,
         insertMarkdown$,
         usePublisher,
         Button: ToolbarButton,
@@ -272,6 +276,7 @@ export function MDXEditorWrapper({
         headingsPlugin(),
         listsPlugin(),
         linkPlugin(),
+        linkDialogPlugin(),
         quotePlugin(),
         thematicBreakPlugin(),
 
@@ -280,6 +285,7 @@ export function MDXEditorWrapper({
           defaultCodeBlockLanguage: 'typescript',
         }),
         codeMirrorPlugin({
+          autoLoadLanguageSupport: true,
           codeBlockLanguages: {
             typescript: 'TypeScript',
             javascript: 'JavaScript',
@@ -326,6 +332,14 @@ export function MDXEditorWrapper({
                 <ListsToggle />
                 <ToolbarSeparator />
                 <InsertCodeBlock />
+                <ConditionalContents
+                  options={[
+                    {
+                      when: editor => editor?.editorType === 'codeblock',
+                      contents: () => <ChangeCodeMirrorLanguage />,
+                    },
+                  ]}
+                />
                 <InsertImage />
                 <InsertTable />
                 <ToolbarSeparator />
@@ -368,7 +382,7 @@ export function MDXEditorWrapper({
   return (
     <div className={className}>
       <MDXEditorComponent
-        contentEditableClassName="prose prose-slate dark:prose-invert max-w-none min-h-[400px] p-4"
+        className="mdxeditor"
         markdown={initialMarkdown}
         onChange={(markdown: string) => {
           lastEmittedMarkdownRef.current = markdown
