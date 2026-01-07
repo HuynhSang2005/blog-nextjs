@@ -2,11 +2,107 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
 import { locales } from '@/config/i18n'
+import type { PaginatedResponse, PaginationParams } from '@/types/supabase-helpers'
 
 type TagInsert = Database['public']['Tables']['tags']['Insert']
 type TagUpdate = Database['public']['Tables']['tags']['Update']
+
+type TagRow = Database['public']['Tables']['tags']['Row'] & {
+  usageCount?: number
+}
+
+function isoDayStart(date: string): string {
+  return `${date}T00:00:00.000Z`
+}
+
+function isoNextDayStart(date: string): string {
+  const dayStart = new Date(`${date}T00:00:00.000Z`)
+  dayStart.setUTCDate(dayStart.getUTCDate() + 1)
+  return dayStart.toISOString()
+}
+
+export interface TagsAdminFilters {
+  slug?: string
+  dateFrom?: string
+  dateTo?: string
+}
+
+/**
+ * Get tags with usage counts (Admin) - supports pagination and filters.
+ */
+export async function getTagsAdminList(params: {
+  pagination?: PaginationParams
+  filters?: TagsAdminFilters
+}): Promise<PaginatedResponse<TagRow>> {
+  const supabase = await createClient()
+
+  let query = supabase
+    .from('tags')
+    .select(
+      `
+      *,
+      blog_post_tags(count),
+      project_tags(count)
+    `,
+      { count: 'exact' }
+    )
+    .order('name')
+
+  const { filters, pagination } = params
+
+  if (filters?.slug) {
+    const slugTerm = filters.slug.trim()
+    if (slugTerm) {
+      query = query.ilike('slug', `%${slugTerm}%`)
+    }
+  }
+
+  if (filters?.dateFrom) {
+    query = query.gte('created_at', isoDayStart(filters.dateFrom))
+  }
+  if (filters?.dateTo) {
+    query = query.lt('created_at', isoNextDayStart(filters.dateTo))
+  }
+
+  if (pagination) {
+    const from = (pagination.page - 1) * pagination.pageSize
+    const to = from + pagination.pageSize - 1
+    query = query.range(from, to)
+  }
+
+  const { data: tags, error, count } = await query
+
+  if (error) {
+    console.error('Error fetching tags (admin paginated):', error)
+    throw new Error('Không thể tải danh sách thẻ')
+  }
+
+  const rows = (tags || []).map(tag => ({
+    ...tag,
+    usageCount:
+      (tag.blog_post_tags?.[0]?.count || 0) +
+      (tag.project_tags?.[0]?.count || 0),
+  })) as TagRow[]
+
+  const totalItems = count || 0
+  const currentPage = pagination?.page || 1
+  const currentPageSize = pagination?.pageSize || rows.length
+  const totalPages =
+    currentPageSize > 0 ? Math.ceil(totalItems / currentPageSize) : 0
+
+  return {
+    data: rows,
+    pagination: {
+      page: currentPage,
+      pageSize: currentPageSize,
+      totalItems,
+      totalPages,
+      hasMore: currentPage < totalPages,
+    },
+  }
+}
 
 /**
  * Get all tags with post counts

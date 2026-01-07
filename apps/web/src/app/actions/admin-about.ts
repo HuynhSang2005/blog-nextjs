@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
 
 type AboutSectionInsert =
   Database['public']['Tables']['about_sections']['Insert']

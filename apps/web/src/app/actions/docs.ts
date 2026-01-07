@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
-import type { Database } from '@/lib/supabase/database.types'
+import type { Database } from '@/types/database'
 import { precomputeArtifacts } from '@/lib/mdx/precompute'
 
 type DocInsert = Database['public']['Tables']['docs']['Insert']
