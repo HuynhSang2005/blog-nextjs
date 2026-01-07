@@ -240,7 +240,9 @@
         "description": "Xem và quản lý tất cả bài viết blog",
         "no_posts": "Chưa có bài viết nào",
         "search_placeholder": "Tìm kiếm bài viết...",
-        "filter_by_status": "Lọc theo trạng thái"
+        "filter_by_status": "Lọc theo trạng thái",
+        "date_range_placeholder": "Chọn khoảng ngày",
+        "date_range_clear": "Xóa"
       },
       "actions": {
         "create": "Tạo bài viết mới",
@@ -343,6 +345,8 @@
         "search_placeholder": "Tìm kiếm tài liệu...",
         "empty": "Chưa có tài liệu nào.",
         "actions_label": "Thao tác",
+        "date_range_placeholder": "Chọn khoảng ngày",
+        "date_range_clear": "Xóa",
         "columns": {
           "title": "Tiêu đề",
           "topic": "Chủ đề",
@@ -421,6 +425,8 @@
         "filter_status": "Lọc theo trạng thái",
         "all_status": "Tất cả",
         "no_results": "Không tìm thấy dự án nào",
+        "date_range_placeholder": "Chọn khoảng ngày",
+        "date_range_clear": "Xóa",
         "previous": "Trước",
         "next": "Tiếp"
       },
@@ -450,9 +456,13 @@
       "filter_type": "Loại file",
       "all_types": "Tất cả",
       "images": "Hình ảnh",
+      "images_label": "hình ảnh",
       "videos": "Video",
+      "videos_label": "video",
       "other": "File khác",
+      "other_label": "file khác",
       "total": "Tổng số",
+      "media_files": "tệp media",
       "no_media": "Chưa có media nào",
       "no_media_description": "Upload media đầu tiên bằng nút Upload ở trên",
       "copy_url": "Sao chép URL",
@@ -476,7 +486,87 @@
       "cancel": "Hủy",
       "save": "Lưu",
       "saving": "Đang lưu...",
-      "deleting": "Đang xóa..."
+      "deleting": "Đang xóa...",
+      "pagination": {
+        "previous": "Trang trước",
+        "next": "Trang sau"
+      }
+    },
+
+    "tags": {
+      "title": "Quản lý Tags",
+      "description": "Tạo, chỉnh sửa và quản lý các tag",
+
+      "list": {
+        "total": "Tổng số",
+        "filters": {
+          "slug_placeholder": "Lọc theo slug...",
+          "date_range_placeholder": "Chọn khoảng ngày",
+          "date_range_clear": "Xóa"
+        }
+      },
+
+      "actions": {
+        "create": "Tạo tag mới",
+        "edit": "Chỉnh sửa",
+        "delete": "Xóa",
+        "cancel": "Hủy",
+        "save": "Lưu",
+        "saving": "Đang lưu...",
+        "deleting": "Đang xóa...",
+        "open_menu": "Mở menu"
+      },
+
+      "pagination": {
+        "previous": "Trang trước",
+        "next": "Trang sau"
+      },
+
+      "table": {
+        "actions": "Thao tác",
+        "empty": "Chưa có tag nào.",
+        "empty_description": "Chưa có mô tả",
+        "columns": {
+          "name": "Tên",
+          "slug": "Slug",
+          "description": "Mô tả",
+          "usage": "Sử dụng"
+        }
+      },
+
+      "dialog": {
+        "create_title": "Tạo tag mới",
+        "create_description": "Thêm một tag mới để phân loại nội dung",
+        "edit_title": "Chỉnh sửa tag",
+        "edit_description": "Cập nhật thông tin tag"
+      },
+
+      "form": {
+        "name_label": "Tên",
+        "name_placeholder": "Nhập tên tag...",
+        "slug_label": "Slug",
+        "slug_placeholder": "ví dụ: nextjs",
+        "slug_help": "Slug chỉ nên chứa chữ thường, số và dấu gạch ngang.",
+        "color_label": "Màu",
+        "color_placeholder": "Ví dụ: #3b82f6",
+        "color_help": "Dùng để hiển thị badge/tag trong UI (tùy chọn).",
+        "description_label": "Mô tả",
+        "description_placeholder": "Mô tả ngắn gọn (tùy chọn)"
+      },
+
+      "delete": {
+        "confirm_title": "Xác nhận xóa",
+        "confirm_description": "Bạn có chắc muốn xóa tag: {name}? Hành động này không thể hoàn tác.",
+        "in_use": "Tag này đang được sử dụng ({count}). Vui lòng gỡ tag khỏi các mục liên quan trước khi xóa."
+      },
+
+      "messages": {
+        "create_success": "Đã tạo tag",
+        "update_success": "Đã cập nhật tag",
+        "delete_success": "Đã xóa tag",
+        "delete_error": "Không thể xóa tag",
+        "generic_error": "Đã xảy ra lỗi. Vui lòng thử lại."
+      }
     },
     "about": {
       "title": "Quản lý trang Giới thiệu",
