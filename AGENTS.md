@@ -67,13 +67,10 @@ Ghi chú: Contentlayer/MDX trong repo (nếu còn) được xem như **legacy/se
 
 ## 6) Lệnh dev thường dùng
 
-- Dev: `bun dev`
-- Typecheck: `bun run tsc --noEmit`
-- Lint/format: `bun run biome check --write .`
-- Build (khi cần): `turbo build` hoặc `cd apps/web ; bun run build`
 
----
+## 8) Knowns CLI (tuỳ chọn)
 
-## 7) Tài liệu (tuỳ chọn)
+Nếu bạn dùng Knowns để quản lý task/docs/time tracking, xem hướng dẫn ngắn gọn tại `.github/instructions/knowns-cli.instructions.md`.
 
-Repo có `docs/` nhưng nội dung có thể thay đổi/xoá/di chuyển. Khi cần thêm bối cảnh, ưu tiên tìm trong workspace bằng Serena/Copilot search.
+Nguyên tắc: dùng Knowns cho **quản lý công việc & kiến thức**, còn thao tác repo/DB vẫn theo workflow chuẩn của repo (Serena + Supabase MCP).
+

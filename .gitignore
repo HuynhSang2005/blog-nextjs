@@ -47,3 +47,8 @@ bun-debug.log*
 # Documentation
 # Ignore toàn bộ docs trong git (Serena vẫn có thể đọc nếu cấu hình không dùng gitignore)
 /docs/
+
+# knowns (ignore all except docs)
+.knowns/*
+!.knowns/docs/
+!.knowns/docs/**
