@@ -1,47 +1,66 @@
 {
-	"servers": {
-		"supabase": {
-			"type": "http",
-			"url": "https://mcp.supabase.com/mcp?project_ref=rjbxioqgfzgodfrsbbia&features=account,docs,database,debugging,development,functions,branching,storage"
-		},
-		"oraios/serena": {
-			"type": "stdio",
-			"command": "uvx",
-			"args": [
-				"--from",
-				"git+https://github.com/oraios/serena",
-				"serena",
-				"start-mcp-server",
-				"serena==latest",
-				"--context",
-				"ide-assistant"
-			]
-		},
-		"shadcn": {
-			"command": "bunx",
-			"args": [
-				"shadcn@latest",
-				"mcp"
-			],
-			"type": "stdio"
-		},
-		"io.github.upstash/context7": {
-			"type": "stdio",
-			"command": "npx",
-			"args": [
-				"@upstash/context7-mcp@1.0.31"
-			],
-			"env": {
-				"CONTEXT7_API_KEY": "${input:CONTEXT7_API_KEY}"
-			}
-		}
-	},
-	"inputs": [
-		{
-			"id": "CONTEXT7_API_KEY",
-			"type": "promptString",
-			"description": "API key for authentication",
-			"password": true
-		}
-	]
+  "servers": {
+    "supabase": {
+      "type": "http",
+      "url": "https://mcp.supabase.com/mcp?project_ref=rjbxioqgfzgodfrsbbia&features=account,docs,database,debugging,development,functions,branching,storage"
+    },
+    "oraios/serena": {
+      "type": "stdio",
+      "command": "uvx",
+      "args": [
+        "--from",
+        "git+https://github.com/oraios/serena",
+        "serena",
+        "start-mcp-server",
+        "serena==latest",
+        "--context",
+        "ide-assistant"
+      ]
+    },
+    "shadcn": {
+      "command": "bunx",
+      "args": ["shadcn@latest", "mcp"],
+      "type": "stdio"
+    },
+    "io.github.upstash/context7": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["@upstash/context7-mcp@1.0.31"],
+      "env": {
+        "CONTEXT7_API_KEY": "${input:CONTEXT7_API_KEY}"
+      }
+    },
+    "perplexity": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["-y", "@perplexity-ai/mcp-server@0.5.2"],
+      "env": {
+        "PERPLEXITY_API_KEY": "${input:api_key}",
+        "PERPLEXITY_TIMEOUT_MS": "${input:timeout}"
+      }
+    },
+    "chrome-devtools": {
+      "type": "stdio",
+      "command": "bunx",
+      "args": ["-y", "chrome-devtools-mcp@latest"]
+    }
+  },
+  "inputs": [
+    {
+      "id": "CONTEXT7_API_KEY",
+      "type": "promptString",
+      "description": "API key for authentication",
+      "password": true
+    },
+    {
+      "id": "api_key",
+      "type": "promptString",
+      "description": "PERPLEXITY_API_KEY (required)"
+    },
+    {
+      "id": "timeout",
+      "type": "promptString",
+      "description": "PERPLEXITY_TIMEOUT_MS (optional, milliseconds)"
+    }
+  ]
 }
