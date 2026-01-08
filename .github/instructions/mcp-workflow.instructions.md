@@ -1,4 +1,4 @@
----
+﻿---
 applyTo: "**"
 ---
 
@@ -13,8 +13,10 @@ Giảm sai lệch kiến thức, tránh đọc file thừa, và đảm bảo m�
   - DDL/migration: dùng `apply_migration`.
   - Query/debug dữ liệu: dùng `execute_sql`.
   - Kiểm tra vấn đề security/perf: dùng `get_advisors` khi phù hợp.
-- **Tra cứu thư viện**: dùng Context7 (`resolve-library-id` → `query-docs`) trước khi “đoán API”.
+- **Tra cứu thư viện**: dùng Context7 (`resolve-library-id` → `get-library-docs`) trước khi “đoán API”.
 - **Tra cứu web/so sánh**: dùng Perplexity khi cần thông tin bên ngoài repo.
+
+Gợi ý: ưu tiên VS Code search/Serena search để kiểm tra API/usage trong codebase trước khi tìm trên web.
 
 ## Nguyên tắc an toàn
 - Không hardcode secrets/keys.

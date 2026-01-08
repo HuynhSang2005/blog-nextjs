@@ -1,5 +1,5 @@
 ---
-applyTo: "apps/web/src/{config,lib}/**/!(core/**)"
+applyTo: "apps/web/src/{config,lib,services}/**/!(core/**)"
 ---
 
 # Configuration & Utilities Instructions
@@ -59,15 +59,15 @@ export const docsConfig: {
   sidebarNav: NavItem[]
 } = {
   mainNav: [
-    { title: 'Documentation', href: '/docs' },
+    { title: 'Tài liệu', href: '/docs' },
     { title: 'Blog', href: '/blog' },
   ],
   sidebarNav: [
     {
-      title: 'Getting Started',
+      title: 'Bắt đầu',
       items: [
-        { title: 'Introduction', href: '/docs' },
-        { title: 'Installation', href: '/docs/installation' },
+        { title: 'Giới thiệu', href: '/docs' },
+        { title: 'Cài đặt', href: '/docs/installation' },
       ],
     },
   ],
@@ -184,7 +184,9 @@ export function absoluteUrl(path: string): string {
 
 ## Data Fetching Utilities
 
-### Supabase Helpers (`lib/supabase/queries.ts`)
+### Supabase Helpers (DB-first)
+
+Gợi ý: trong repo này, các truy vấn Supabase nên nằm ở `apps/web/src/services/*-service.ts` (ví dụ: `blog-service.ts`, `docs-service.ts`).
 ```typescript
 import { createClient } from '@/lib/supabase/server'
 
@@ -194,20 +196,16 @@ import { createClient } from '@/lib/supabase/server'
  * @param locale - Locale code (e.g., 'vi')
  * @returns Blog posts with media and author info
  */
-export async function getBlogPosts(locale: string) {
-  const supabase = createClient()
-  
+export async function getBlogPostsExample(locale: string) {
+  const supabase = await createClient()
+
   const { data, error } = await supabase
     .from('blog_posts')
-    .select(`
-      *,
-      media:cover_media_id(*),
-      profiles:author_id(*)
-    `)
+    .select('*')
     .eq('locale', locale)
     .eq('status', 'published')
     .order('published_at', { ascending: false })
-  
+
   if (error) throw error
   return data
 }
@@ -219,21 +217,17 @@ export async function getBlogPosts(locale: string) {
  * @param locale - Locale code
  * @returns Blog post with relations
  */
-export async function getBlogPost(slug: string, locale: string) {
-  const supabase = createClient()
-  
+export async function getBlogPostExample(slug: string, locale: string) {
+  const supabase = await createClient()
+
   const { data, error } = await supabase
     .from('blog_posts')
-    .select(`
-      *,
-      cover_media:media!cover_media_id(*),
-      author:profiles!author_id(*)
-    `)
+    .select('*')
     .eq('slug', slug)
     .eq('locale', locale)
     .eq('status', 'published')
     .single()
-  
+
   if (error) throw error
   return data
 }
@@ -251,7 +245,7 @@ export async function getPublicDocBySlug(params: {
   locale: string
   slug?: string
 }) {
-  const supabase = createClient()
+  const supabase = await createClient()
 
   const { data, error } = await supabase
     .from('docs')
@@ -293,31 +287,6 @@ export function getCloudinaryUrl(
  */
 export function getThumbnailUrl(publicId: string, width: number, height: number): string {
   return getCloudinaryUrl(publicId, `c_fill,w_${width},h_${height},g_auto`)
-}
-
-/**
- * Gets a single blog post by slug.
- * @param slug - Post slug
- * @param locale - Locale code
- * @returns Blog post or undefined
- */
-export function getBlogPost(slug: string, locale: string): BlogPost | undefined {
-  return allBlogPosts.find(
-    post => post.slug === slug && post.locale === locale
-  )
-}
-
-/**
- * Gets all unique tags from blog posts.
- * @param locale - Locale code
- * @returns Array of unique tags
- */
-export function getAllTags(locale: string): string[] {
-  const tags = allBlogPosts
-    .filter(post => post.locale === locale)
-    .flatMap(post => post.tags || [])
-  
-  return Array.from(new Set(tags)).sort()
 }
 ```
 

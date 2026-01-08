@@ -39,6 +39,12 @@ Ghi chú: Contentlayer/MDX trong repo (nếu còn) được xem như **legacy/se
   - **Perplexity MCP**: tra cứu web/so sánh/cập nhật mới.
   - **Search của GitHub Copilot/VS Code**: tra cứu trong workspace.
 
+## 3.1) Agent Skills (khuyến nghị)
+
+- Skill dùng cho workflow lặp lại, chuyên biệt (testing, Supabase, i18n...).
+- Vị trí: `.github/skills/<skill-name>/SKILL.md`.
+- Giữ skill nhỏ gọn, tập trung 1 chủ đề; thêm script/example vào cùng folder khi cần.
+
 ---
 
 ## 4) Không được sửa (project boundaries)

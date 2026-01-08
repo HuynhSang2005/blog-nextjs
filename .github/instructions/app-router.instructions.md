@@ -16,21 +16,14 @@ applyTo: "apps/web/src/app/**"
 ### Route Structure
 ```
 apps/web/src/app/[locale]/
-├── layout.tsx              # Root layout
-├── page.tsx                # Homepage
-├── template.tsx            # Re-render on navigation
-├── loading.tsx             # Loading UI
-├── error.tsx               # Error boundary
-├── not-found.tsx           # 404 page
-├── blog/
-│   ├── page.tsx           # /blog
-│   ├── [slug]/
-│   │   └── page.tsx       # /blog/post-slug
-│   └── tags/[tag]/
-│       └── page.tsx       # /blog/tags/nextjs
-└── docs/
-    └── [...slug]/
-        └── page.tsx       # /docs/getting-started
+├── (site)/
+│   ├── blog/
+│   │   ├── page.tsx           # /[locale]/blog
+│   │   └── [slug]/page.tsx    # /[locale]/blog/post-slug
+│   └── docs/
+│       └── [[...slug]]/page.tsx # /[locale]/docs/... (slug optional)
+└── admin/
+  └── ...
 ```
 
 ### Page Component Pattern (Next.js 16)
@@ -40,8 +33,11 @@ apps/web/src/app/[locale]/
 **Blog Posts (from Supabase Database):**
 ```tsx
 // apps/web/src/app/[locale]/blog/[slug]/page.tsx
-import { getBlogPost } from '@/lib/supabase/queries'
+import { getBlogPost } from '@/services/blog-service'
 import { getTranslations } from 'next-intl/server'
+import { notFound } from 'next/navigation'
+import { setRequestLocale } from 'next-intl/server'
+import { MdxRemote } from '@/components/docs/mdx-remote'
 
 export default async function BlogPostPage({ 
   params 
@@ -49,16 +45,18 @@ export default async function BlogPostPage({
   params: Promise<{ locale: string; slug: string }>
 }) {
   const { locale, slug } = await params
+  setRequestLocale(locale)
   const t = await getTranslations('blog')
   
-  // Fetch from Supabase database
-  const post = await getBlogPost(slug, locale)
+  // Fetch từ Supabase (DB-first)
+  const { data: post, error } = await getBlogPost(slug, locale)
+  if (error || !post) notFound()
   
   return (
     <article>
       <h1>{post.title}</h1>
       <p>{t('published')}: {post.published_at}</p> {/* "Xuất bản lúc" */}
-      <div dangerouslySetInnerHTML={{ __html: post.content }} />
+      {post.content ? <MdxRemote source={post.content} /> : null}
     </article>
   )
 }
@@ -67,19 +65,24 @@ export default async function BlogPostPage({
 **Documentation (from Supabase + runtime MDX):**
 ```tsx
 // apps/web/src/app/[locale]/docs/[...slug]/page.tsx
-import { getPublicDocBySlug } from '@/lib/queries/docs'
-import { MdxRemote } from '@/components/mdx/MdxRemote'
+import { getPublicDocBySlug } from '@/services/docs-service'
+import { MdxRemote } from '@/components/docs/mdx-remote'
 import { getTranslations } from 'next-intl/server'
+import { setRequestLocale } from 'next-intl/server'
 
 export default async function DocPage({
   params,
 }: {
-  params: Promise<{ locale: string; slug: string[] }>
+  params: Promise<{ locale?: string; slug?: string[] }>
 }) {
   const { locale, slug } = await params
+  setRequestLocale(locale ?? 'vi')
   const t = await getTranslations('docs')
 
-  const doc = await getPublicDocBySlug({ locale, slug: slug.join('/') })
+  const doc = await getPublicDocBySlug({
+    locale: locale ?? 'vi',
+    slugParts: slug,
+  })
 
   if (!doc) return <div>{t('notFound')}</div>
 
@@ -110,7 +113,7 @@ import type { Metadata } from 'next'
 // Static metadata
 export const metadata: Metadata = {
   title: 'Blog',
-  description: 'My blog posts',
+  description: 'Bài viết về lập trình web',
 }
 
 // Dynamic metadata
@@ -210,13 +213,8 @@ export default async function BlogLayout({
     </div>
   )
 }
-  
-  if (!post) {
-    notFound() // Renders not-found.tsx
-  }
-  
-  return <article>...</article>
-}
+
+// Gợi ý: trong page chi tiết, dùng `notFound()` khi không tìm thấy nội dung.
 ```
 
 ### Data Fetching
@@ -225,7 +223,10 @@ export default async function BlogLayout({
 ```tsx
 export default async function BlogPage() {
   // Direct data fetch in Server Component
-  const posts = await getPosts()
+  const { data: posts } = await getBlogPosts('vi', 'published', {
+    page: 1,
+    pageSize: 10,
+  })
   
   return (
     <div>
@@ -371,7 +372,7 @@ export async function POST(request: NextRequest) {
 **app/[locale]/feed/[format]/route.ts:**
 ```tsx
 import { Feed } from 'feed'
-import { getBlogPosts } from '@/lib/queries/blog'
+import { getBlogPosts } from '@/services/blog-service'
 
 export async function GET(
   request: NextRequest,
@@ -385,7 +386,10 @@ export async function GET(
     link: 'https://example.com',
   })
   
-  const posts = await getBlogPosts({ locale })
+  const { data: posts } = await getBlogPosts(locale, 'published', {
+    page: 1,
+    pageSize: 100,
+  })
 
   posts.forEach((post) => {
     feed.addItem({
@@ -466,18 +470,16 @@ export default async function BlogPage({
 }: { 
   searchParams: Promise<{ tag?: string; category?: string }> 
 }) {
-  const { tag, category } = await searchParams
-  
-  let posts = allBlogPosts
-  
-  if (tag) {
-    posts = posts.filter(p => p.tags.includes(tag))
-  }
-  
-  if (category) {
-    posts = posts.filter(p => p.category === category)
-  }
-  
+  const { tag } = await searchParams
+
+  // Gợi ý: filter nên chạy ở tầng Supabase query (services) thay vì filter mảng in-memory.
+  const { data: posts } = await getBlogPosts('vi', 'published', {
+    page: 1,
+    pageSize: 10,
+  }, {
+    tagSlug: tag,
+  })
+
   return <PostList posts={posts} />
 }
 ```
@@ -508,13 +510,13 @@ export default async function SearchPage({
 import { unstable_cache } from 'next/cache'
 
 const getCachedPosts = unstable_cache(
-  async () => getPosts(),
+  async () => getBlogPosts('vi', 'published', { page: 1, pageSize: 10 }),
   ['posts'],
   { revalidate: 3600 } // 1 hour
 )
 
 export default async function BlogPage() {
-  const posts = await getCachedPosts()
+  const { data: posts } = await getCachedPosts()
   return <PostList posts={posts} />
 }
 ```

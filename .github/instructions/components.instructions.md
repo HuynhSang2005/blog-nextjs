@@ -19,7 +19,7 @@ applyTo: "apps/web/src/components/**/!(ui/**)"
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { useTranslations } from 'next-intl' // For client components
-// import { getTranslations } from 'next-intl/server' // For server components
+import { getTranslations } from 'next-intl/server' // For server components
 
 // 2. Type definitions
 interface ComponentProps {
@@ -56,8 +56,8 @@ export async function ServerComponent({ title }: ComponentProps) {
 ```
 
 ### Naming Conventions
-- **Component files**: PascalCase (e.g., `BlogPost.tsx`, `SiteHeader.tsx`)
-- **Component names**: Match file name exactly
+- **Component files**: kebab-case (e.g., `site-header.tsx`, `post-list.tsx`)
+- **Component exports**: PascalCase (e.g., `SiteHeader`, `PostList`)
 - **Props interface**: `ComponentNameProps`
 - **Export**: Named export preferred (not default for reusable components)
 
@@ -218,7 +218,7 @@ export function PostMeta({ date, readTime, className }: PostMetaProps) {
       <time dateTime={date.toISOString()}>
         {formatDate(date)}
       </time>
-      <span>{readTime} min read</span>
+      <span>{readTime} phút đọc</span>
     </div>
   )
 }
@@ -250,7 +250,7 @@ export function CopyButton({ text }: CopyButtonProps) {
       size="icon"
       variant="ghost"
       onClick={handleCopy}
-      aria-label={copied ? 'Copied' : 'Copy to clipboard'}
+      aria-label={copied ? 'Đã sao chép' : 'Sao chép vào clipboard'}
     >
       {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
     </Button>

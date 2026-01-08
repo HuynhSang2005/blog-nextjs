@@ -101,7 +101,7 @@ export function InteractiveButton() {
 - Third-party libraries requiring client-side
 
 ### File Naming
-- Components: **PascalCase** (`BlogPost.tsx`, `SiteHeader.tsx`)
+- Components: **kebab-case** (`blog-pagination.tsx`, `site-header.tsx`)
 - Utilities: **camelCase** (`formatDate.ts`, `cn.ts`)
 - Config: **kebab-case** (`site.ts`, `blog.ts`)
 - MDX content: **kebab-case** (`gioi-thieu-blog.mdx`)
@@ -155,35 +155,28 @@ apps/web/src/app/[locale]/
 
 **Blog Posts (from Database):**
 ```tsx
-// apps/web/src/lib/supabase/queries.ts
-import { createClient } from '@/lib/supabase/server'
+import { getBlogPosts } from '@/services/blog-service'
 
-export async function getBlogPosts(locale: string) {
-  const supabase = createClient()
-  const { data, error } = await supabase
-    .from('blog_posts')
-    .select('*, media(*), profiles(*)')
-    .eq('locale', locale)
-    .eq('status', 'published')
-    .order('published_at', { ascending: false })
-  
-  if (error) throw error
-  return data
-}
-
-// Server Component - fetch from database
-export default async function BlogPage({ params }: { params: Promise<{ locale: string }> }) {
+// Server Component - fetch từ Supabase (DB-first)
+export default async function BlogPage({
+  params,
+}: {
+  params: Promise<{ locale: string }>
+}) {
   const { locale } = await params
-  const posts = await getBlogPosts(locale)
-  
+  const { data: posts } = await getBlogPosts(locale, 'published', {
+    page: 1,
+    pageSize: 10,
+  })
+
   return <div>{posts.map(post => <PostCard key={post.id} post={post} />)}</div>
 }
 ```
 
 **Documentation (from MDX):**
 ```tsx
-import { getPublicDocBySlug } from '@/lib/queries/docs'
-import { MdxRemote } from '@/components/mdx/MdxRemote'
+import { getPublicDocBySlug } from '@/services/docs-service'
+import { MdxRemote } from '@/components/docs/mdx-remote'
 
 export default async function DocsPage({
   params,
@@ -191,7 +184,7 @@ export default async function DocsPage({
   params: Promise<{ locale: string; slug?: string[] }>
 }) {
   const { locale, slug } = await params
-  const doc = await getPublicDocBySlug({ locale, slug: slug?.join('/') })
+  const doc = await getPublicDocBySlug({ locale, slugParts: slug })
   return <MdxRemote source={doc.content} />
 }
 ```
@@ -217,9 +210,9 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 
 // Use with variants (defined by Shadcn)
-<Button variant="default" size="lg">Primary</Button>
-<Button variant="outline" size="sm">Secondary</Button>
-<Button variant="ghost">Ghost</Button>
+<Button variant="default" size="lg">Nút chính</Button>
+<Button variant="outline" size="sm">Nút phụ</Button>
+<Button variant="ghost">Nút ẩn</Button>
 ```
 
 ---
