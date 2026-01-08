@@ -13,13 +13,14 @@
 
 ## Non-negotiables
 
-1) Next.js 16 `params`/`searchParams`: treat as Promises and always `await` them.
-2) Server Components by default: only add `'use client'` when required.
-3) DB-first content: blog/docs/projects come from Supabase (docs stored as MDX string, rendered at runtime).
-4) Do not modify generated/immutable areas:
+1) UI text: user-facing UI must be **Tiếng Việt** via `next-intl` and `apps/web/src/i18n/locales/vi.json` (keep technical terms in English).
+2) Next.js 16 `params`/`searchParams`: treat as Promises and always `await` them.
+3) Server Components by default: only add `'use client'` when required.
+4) DB-first content: blog/docs/projects come from Supabase (docs stored as MDX string, rendered at runtime).
+5) Do not modify generated/immutable areas:
 	- `apps/web/src/components/ui/**` (shadcn)
 	- `apps/web/src/lib/core/**`
-5) No secrets: never hardcode keys/tokens; never commit `.env*.local`.
+6) No secrets: never hardcode keys/tokens; never commit `.env*.local`.
 
 ## Repo workflow
 
