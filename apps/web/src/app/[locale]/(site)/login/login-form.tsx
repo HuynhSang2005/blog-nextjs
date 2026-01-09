@@ -27,8 +27,8 @@ import { Input } from '@/components/ui/input'
 import { signIn } from './actions'
 
 const loginSchema = z.object({
-  email: z.email({ message: 'Email không hợp lệ' }),
-  password: z.string().min(1, { message: 'Vui lòng nhập mật khẩu' }),
+  email: z.email({ error: 'Email không hợp lệ' }),
+  password: z.string().min(1, { error: 'Vui lòng nhập mật khẩu' }),
 })
 
 type LoginFormData = z.infer<typeof loginSchema>

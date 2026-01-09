@@ -3,24 +3,26 @@ import { z } from 'zod'
 export const blogPostSchema = z.object({
   title: z
     .string()
-    .min(1, 'Tiêu đề không được để trống')
-    .max(200, 'Tiêu đề không được quá 200 ký tự'),
+    .min(1, { error: 'Tiêu đề không được để trống' })
+    .max(200, { error: 'Tiêu đề không được quá 200 ký tự' }),
 
   slug: z
     .string()
-    .min(1, 'Slug không được để trống')
-    .regex(/^[a-z0-9-]+$/, 'Slug chỉ chứa chữ thường, số và dấu gạch ngang'),
+    .min(1, { error: 'Slug không được để trống' })
+    .regex(/^[a-z0-9-]+$/, {
+      error: 'Slug chỉ chứa chữ thường, số và dấu gạch ngang',
+    }),
 
   excerpt: z
     .string()
-    .max(500, 'Mô tả ngắn không được quá 500 ký tự')
+    .max(500, { error: 'Mô tả ngắn không được quá 500 ký tự' })
     .optional()
     .nullable(),
 
-  content: z.string().min(1, 'Nội dung không được để trống'),
+  content: z.string().min(1, { error: 'Nội dung không được để trống' }),
 
   status: z.enum(['draft', 'published', 'archived'], {
-    message: 'Vui lòng chọn trạng thái',
+    error: 'Vui lòng chọn trạng thái',
   }),
 
   locale: z.string(),
