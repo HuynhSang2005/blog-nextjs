@@ -2,7 +2,7 @@
  * Admin feature module
  *
  * Domain: Admin dashboard and management interfaces
- * 
+ *
  * This module provides a centralized access point for all admin-related UI components.
  * The actual component files remain in '@/components/admin/' for now.
  * Auth/gating is handled at the proxy and layout level (do not change behavior).

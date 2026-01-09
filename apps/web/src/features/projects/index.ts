@@ -2,7 +2,7 @@
  * Projects feature module
  *
  * Domain: Portfolio projects display and management
- * 
+ *
  * This module provides a centralized access point for all project-related UI components.
  * The actual component files remain in '@/components/projects/' for now.
  * Data fetching is done via services/project-service.ts (DB-first).

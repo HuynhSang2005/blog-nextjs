@@ -49,17 +49,17 @@ export default async function MediaPage({ searchParams }: MediaPageProps) {
         : 'raw'
 
     return {
-    id: item.id,
-    public_id: item.public_id,
-    resource_type: resourceType,
-    format: item.format,
-    width: item.width,
-    height: item.height,
-    bytes: item.bytes,
-    alt_text: item.alt_text,
-    caption: item.caption,
-    uploaded_at: item.uploaded_at,
-    metadata: item.metadata,
+      id: item.id,
+      public_id: item.public_id,
+      resource_type: resourceType,
+      format: item.format,
+      width: item.width,
+      height: item.height,
+      bytes: item.bytes,
+      alt_text: item.alt_text,
+      caption: item.caption,
+      uploaded_at: item.uploaded_at,
+      metadata: item.metadata,
     }
   })
 
