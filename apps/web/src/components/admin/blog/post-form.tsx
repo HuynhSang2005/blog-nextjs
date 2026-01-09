@@ -51,9 +51,23 @@ import {
   updateBlogPost,
   updateBlogPostTags,
 } from '@/app/actions/blog'
-import { MDXEditorWrapper } from '@/components/admin/shared/mdx-editor'
+import dynamic from 'next/dynamic'
+import { Skeleton } from '@/components/ui/skeleton'
 import type { Database } from '@/types/database'
 import { cn } from '@/lib/utils'
+
+// Lazy load MDX Editor to reduce initial bundle size
+// Using any to bypass complex type resolution with dynamic imports
+const MDXEditorWrapper = dynamic(
+  () =>
+    import('@/components/admin/shared/mdx-editor').then(
+      mod => mod.MDXEditorWrapper
+    ),
+  {
+    loading: () => <Skeleton className="min-h-[500px] w-full rounded-md" />,
+    ssr: false,
+  }
+) as any
 
 type BlogPost = Database['public']['Tables']['blog_posts']['Row']
 type Tag = Database['public']['Tables']['tags']['Row']

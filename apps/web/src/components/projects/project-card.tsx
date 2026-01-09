@@ -54,6 +54,9 @@ export function ProjectCard({ project, size, locale }: ProjectCardProps) {
                 isHovered && 'scale-110'
               )}
               fill
+              priority={
+                size === 'large' || size === 'wide' || Boolean(project.featured)
+              } // LCP optimization
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               src={project.cover_media.public_id}
             />

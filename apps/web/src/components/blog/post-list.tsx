@@ -38,7 +38,7 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
         'md:grid-cols-1': posts.length < 2,
       })}
     >
-      {posts.map(post => (
+      {posts.map((post, index) => (
         <Card
           className="overflow-hidden hover:shadow-lg transition-shadow"
           key={post.id}
@@ -53,6 +53,7 @@ export function BlogPostList({ posts, locale, messages }: BlogPostListProps) {
                   crop="fill"
                   gravity="auto"
                   height={450}
+                  priority={index < 2} // LCP optimization: First 2 posts get priority
                   sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 800px"
                   src={post.cover_media.public_id}
                   width={800}

@@ -1,6 +1,7 @@
 import { cache } from 'react'
 import { createClient } from '@/lib/supabase/server'
 
+import type { Tables } from '@/types/database'
 import type {
   ProjectWithRelations,
   ProjectListItem,
@@ -35,6 +36,100 @@ export type AdminProjectWithRelations = Omit<
   project_tags: Array<{ tag_id: string }>
   gallery: AdminGalleryItem[]
   tech_stack: AdminTechItem[]
+}
+
+// --- Helper Types for Supabase Join Queries ---
+
+/**
+ * Safely cast Supabase join query results to proper types
+ * Supabase returns unknown[] for join queries, so we need type assertions
+ */
+
+/**
+ * Type for project_tech_stack rows from Supabase join query
+ */
+type TechStackRow = Tables<'project_tech_stack'>
+
+/**
+ * Type for project_media rows from Supabase join query
+ */
+type ProjectMediaRow = Tables<'project_media'> & { media: Tables<'media'> }
+
+/**
+ * Type for project_tags rows from Supabase join query
+ */
+type ProjectTagsRow = { tag_id: string; tag: Tables<'tags'> | null }
+
+/**
+ * Safely transform tech_stack data from Supabase join result
+ */
+function transformTechStack(data: unknown, index: number): AdminTechItem {
+  const t = data as TechStackRow | null | undefined
+  if (!t) {
+    return {
+      id: `temp_${index}`,
+      name: '',
+      category: 'frontend',
+      order_index: index,
+    }
+  }
+
+  const category =
+    t.category === 'frontend' ||
+    t.category === 'backend' ||
+    t.category === 'database' ||
+    t.category === 'devops' ||
+    t.category === 'tools' ||
+    t.category === 'other'
+      ? t.category
+      : 'frontend'
+
+  return {
+    id: t.id,
+    name: t.name,
+    category,
+    icon: t.icon ?? undefined,
+    order_index: t.order_index ?? index,
+  }
+}
+
+/**
+ * Safely transform gallery data from Supabase join result
+ */
+function transformGallery(data: unknown): AdminGalleryItem {
+  const g = data as ProjectMediaRow | undefined
+  if (!g) {
+    return {
+      id: '',
+      media_id: '',
+      public_id: '',
+      alt_text: '',
+      caption: '',
+      order_index: 0,
+    }
+  }
+
+  return {
+    id: g.id,
+    media_id: g.media_id,
+    public_id: g.media?.public_id ?? '',
+    alt_text: g.media?.alt_text ?? '',
+    caption: g.caption ?? '',
+    order_index: g.order_index ?? 0,
+  }
+}
+
+/**
+ * Safely extract tag_ids from project_tags join result
+ */
+function extractTagIds(data: unknown): Array<{ tag_id: string }> {
+  const tags = data as ProjectTagsRow[] | null | undefined
+  if (!tags) return []
+
+  return tags
+    .map(t => t.tag_id)
+    .filter((tagId): tagId is string => Boolean(tagId))
+    .map(tagId => ({ tag_id: tagId }))
 }
 
 // --- Types ---
@@ -385,46 +480,21 @@ export async function getProjectById(
   // Transform for admin usage
   const project: AdminProjectWithRelations = {
     ...data,
-    // biome-ignore lint/suspicious/noExplicitAny: complex join structure
-    tags: (data.project_tags as any[]).map(t => t.tag).filter(Boolean),
-    // Used by admin ProjectForm to prefill selected tags.
-    // biome-ignore lint/suspicious/noExplicitAny: complex join structure
-    project_tags: (data.project_tags as any[])
-      .map(t => t.tag_id)
-      .filter((tagId): tagId is string => Boolean(tagId))
-      .map(tagId => ({ tag_id: tagId })),
-    // Map DB rows to the strict TechStackManager shape.
-    // biome-ignore lint/suspicious/noExplicitAny: complex join structure
+    // tags from join query - use proper type casting
+    tags:
+      (data.project_tags as ProjectTagsRow[] | null | undefined)
+        ?.map(t => t.tag)
+        .filter((tag): tag is Tables<'tags'> => Boolean(tag)) ?? [],
+    // Used by admin ProjectForm to prefill selected tag IDs
+    project_tags: extractTagIds(data.project_tags),
+    // Map DB rows to the strict TechStackManager shape
     tech_stack: (
-      (data.project_tech_stack as any[] | null | undefined) || []
-    ).map((t, index) => {
-      const category =
-        t.category === 'frontend' ||
-        t.category === 'backend' ||
-        t.category === 'database' ||
-        t.category === 'devops' ||
-        t.category === 'tools' ||
-        t.category === 'other'
-          ? t.category
-          : 'frontend'
-
-      return {
-        id: t.id,
-        name: t.name,
-        category,
-        icon: t.icon ?? undefined,
-        order_index: t.order_index ?? index,
-      }
-    }),
-    // biome-ignore lint/suspicious/noExplicitAny: complex join structure
-    gallery: (data.gallery as any[]).map(g => ({
-      id: g.id,
-      media_id: g.media_id,
-      public_id: g.media?.public_id ?? '',
-      alt_text: g.media?.alt_text ?? '',
-      caption: g.caption ?? '',
-      order_index: g.order_index ?? 0,
-    })),
+      (data.project_tech_stack as TechStackRow[] | null | undefined) || []
+    ).map((t, index) => transformTechStack(t, index)),
+    // Map gallery with media info
+    gallery: ((data.gallery as ProjectMediaRow[] | null | undefined) || []).map(
+      g => transformGallery(g)
+    ),
   }
 
   return project

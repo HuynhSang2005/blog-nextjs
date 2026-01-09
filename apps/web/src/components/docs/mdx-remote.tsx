@@ -151,6 +151,8 @@ const components = {
 }
 
 export function MdxRemote({ source }: { source: string }) {
+  'use memo'
+
   const sanitizedSource = stripMdxEsm(source)
 
   return (

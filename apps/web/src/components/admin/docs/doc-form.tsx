@@ -8,6 +8,7 @@ import { useTranslations } from 'next-intl'
 import { toast } from 'sonner'
 import { Loader2, Save } from 'lucide-react'
 import type { FieldErrors } from 'react-hook-form'
+import dynamic from 'next/dynamic'
 
 import { Button } from '@/components/ui/button'
 import {
@@ -29,11 +30,23 @@ import {
 } from '@/components/ui/select'
 import { Switch } from '@/components/ui/switch'
 import { Card, CardContent } from '@/components/ui/card'
-import { MDXEditorWrapper } from '@/components/admin/shared/mdx-editor'
+import { Skeleton } from '@/components/ui/skeleton'
 
 import { docSchema, type DocFormData } from '@/schemas/docs'
 import { createDoc, updateDoc } from '@/app/actions/docs'
 import type { Database } from '@/types/database'
+
+// Lazy load MDX Editor to reduce initial bundle size
+const MDXEditorWrapper = dynamic(
+  () =>
+    import('@/components/admin/shared/mdx-editor').then(
+      mod => mod.MDXEditorWrapper
+    ),
+  {
+    loading: () => <Skeleton className="min-h-[500px] w-full rounded-md" />,
+    ssr: false,
+  }
+) as any
 
 type DocRow = Database['public']['Tables']['docs']['Row']
 type DocsTopic = Database['public']['Tables']['docs_topics']['Row']
