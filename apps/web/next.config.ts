@@ -1,13 +1,43 @@
 import createNextIntlPlugin from 'next-intl/plugin'
 import type { NextConfig } from 'next'
+import withBundleAnalyzer from '@next/bundle-analyzer'
 
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+
+  // React Compiler (stable in Next.js 16, NOT enabled by default)
+  // Annotation mode: selective optimization with "use memo" directive
+  reactCompiler: {
+    compilationMode: 'annotation',
+  },
+
   experimental: {
+    // Turbopack File System Caching (beta)
+    // Stores compiler artifacts on disk between runs for faster restarts
+    // Especially beneficial for large projects and monorepos
+    turbopackFileSystemCacheForDev: true,
+
     optimizePackageImports: [
+      // UI & Icons
       'lucide-react',
-      'date-fns',
+      'clsx',
+      'tailwind-merge',
+      'class-variance-authority',
+      // Animation
       'framer-motion',
+      // Date & Time
+      'date-fns',
+      // State Management
+      '@tanstack/react-query',
+      '@tanstack/react-table',
+      // Forms & Validation
+      'react-hook-form',
+      'zod',
+      // UI Components
+      'cmdk',
+      'sonner',
+      'vaul',
+      // Radix UI (all components)
       '@radix-ui/react-accordion',
       '@radix-ui/react-alert-dialog',
       '@radix-ui/react-aspect-ratio',
@@ -33,4 +63,9 @@ const nextConfig: NextConfig = {
 
 const withNextIntl = createNextIntlPlugin()
 
-export default withNextIntl(nextConfig)
+// Bundle analyzer wrapper - only enabled when ANALYZE=true
+const configWithBundleAnalyzer = withBundleAnalyzer({
+  enabled: process.env.ANALYZE === 'true',
+})(nextConfig)
+
+export default withNextIntl(configWithBundleAnalyzer)

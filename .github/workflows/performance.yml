@@ -1,0 +1,67 @@
+name: Performance Check
+
+on:
+  pull_request:
+    branches: [main, develop]
+
+# Cancel in-progress runs for the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  bundle-size:
+    name: Check Bundle Size
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'bun'
+
+      - name: Install dependencies
+        run: bun install
+
+      - name: Build project
+        run: bun run build
+
+      - name: Get total JS chunks size
+        id: chunks-size
+        run: |
+          size=$(du -sb .next/static/chunks/**/*.js 2>/dev/null | awk '{sum += $1} END {print sum}' || echo "0")
+          size_kb=$((size / 1024))
+          echo "JS chunks size: ${size_kb} KB"
+          echo "chunks_size_kb=$size_kb" >> $GITHUB_OUTPUT
+
+      - name: Check JS chunks size limit
+        if: ${{ steps.chunks-size.outputs.chunks_size_kb > 500 }}
+        run: |
+          echo "JS chunks size (${ steps.chunks-size.outputs.chunks_size_kb } KB) exceeds 500 KB limit"
+          exit 1
+
+      - name: Get total server chunks size
+        id: server-size
+        run: |
+          size=$(du -sb .next/server/app/**/*.js 2>/dev/null | awk '{sum += $1} END {print sum}' || echo "0")
+          size_kb=$((size / 1024))
+          echo "Server chunks size: ${size_kb} KB"
+          echo "server_size_kb=$size_kb" >> $GITHUB_OUTPUT
+
+      - name: Check server chunks size limit
+        if: ${{ steps.server-size.outputs.server_size_kb > 2000 }}
+        run: |
+          echo "Server chunks size (${ steps.server-size.outputs.server_size_kb } KB) exceeds 2000 KB limit"
+          exit 1
+
+      - name: Report bundle sizes
+        run: |
+          echo "Bundle size check passed!"
+          echo ""
+          echo "Bundle Sizes:"
+          echo "   - JS chunks: ${ steps.chunks-size.outputs.chunks_size_kb } KB (limit: 500 KB)"
+          echo "   - Server chunks: ${ steps.server-size.outputs.server_size_kb } KB (limit: 2000 KB)"
