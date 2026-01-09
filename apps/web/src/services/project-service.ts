@@ -11,6 +11,32 @@ import type {
   PaginationParams,
 } from '@/types/supabase-helpers'
 
+type AdminGalleryItem = {
+  id: string
+  media_id: string
+  public_id: string
+  alt_text: string
+  caption: string
+  order_index: number
+}
+
+type AdminTechItem = {
+  id: string
+  name: string
+  category: 'frontend' | 'backend' | 'database' | 'devops' | 'tools' | 'other'
+  icon?: string
+  order_index: number
+}
+
+export type AdminProjectWithRelations = Omit<
+  ProjectWithRelations,
+  'gallery' | 'tech_stack'
+> & {
+  project_tags: Array<{ tag_id: string }>
+  gallery: AdminGalleryItem[]
+  tech_stack: AdminTechItem[]
+}
+
 // --- Types ---
 
 type TagJoinRow<TTag> = {
@@ -225,9 +251,7 @@ export const getProject = cache(
         tags:project_tags(
           tag:tags(*)
         ),
-        tech_stack:project_tech_stack(
-          tech:tags(*)
-        )
+        tech_stack:project_tech_stack(*)
       `
         )
         .eq('slug', slug)
@@ -248,11 +272,8 @@ export const getProject = cache(
             TagJoinRow<ProjectWithRelations['tags'][number]>
           >
         ),
-        tech_stack: flattenTags<ProjectWithRelations['tech_stack'][number]>(
-          data.tech_stack as unknown as Array<
-            TagJoinRow<ProjectWithRelations['tech_stack'][number]>
-          >
-        ),
+        tech_stack: (data.tech_stack ||
+          []) as unknown as ProjectWithRelations['tech_stack'],
       } as ProjectWithRelations
 
       return { data: project, error: null }
@@ -323,7 +344,7 @@ export async function getFeaturedProjects(
  */
 export async function getProjectById(
   id: string
-): Promise<ProjectWithRelations | null> {
+): Promise<AdminProjectWithRelations | null> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -333,16 +354,21 @@ export async function getProjectById(
       cover_media:media!cover_media_id(*),
       og_media:media!og_media_id(*),
       project_tags(
+        tag_id,
         tag:tags(*)
       ),
       project_tech_stack(
-        tech:tags(*)
+        *
       ),
       gallery:project_media(
         id,
+        media_id,
         order_index,
         caption,
-        media:media(*)
+        media:media(
+          public_id,
+          alt_text
+        )
       )
     `)
     .eq('id', id)
@@ -357,16 +383,47 @@ export async function getProjectById(
   }
 
   // Transform for admin usage
-  const project: ProjectWithRelations = {
+  const project: AdminProjectWithRelations = {
     ...data,
     // biome-ignore lint/suspicious/noExplicitAny: complex join structure
-    tags: (data.project_tags as any[]).map(t => t.tag),
+    tags: (data.project_tags as any[]).map(t => t.tag).filter(Boolean),
+    // Used by admin ProjectForm to prefill selected tags.
     // biome-ignore lint/suspicious/noExplicitAny: complex join structure
-    tech_stack: (data.project_tech_stack as any[]).map(t => t.tech),
+    project_tags: (data.project_tags as any[])
+      .map(t => t.tag_id)
+      .filter((tagId): tagId is string => Boolean(tagId))
+      .map(tagId => ({ tag_id: tagId })),
+    // Map DB rows to the strict TechStackManager shape.
+    // biome-ignore lint/suspicious/noExplicitAny: complex join structure
+    tech_stack: (
+      (data.project_tech_stack as any[] | null | undefined) || []
+    ).map((t, index) => {
+      const category =
+        t.category === 'frontend' ||
+        t.category === 'backend' ||
+        t.category === 'database' ||
+        t.category === 'devops' ||
+        t.category === 'tools' ||
+        t.category === 'other'
+          ? t.category
+          : 'frontend'
+
+      return {
+        id: t.id,
+        name: t.name,
+        category,
+        icon: t.icon ?? undefined,
+        order_index: t.order_index ?? index,
+      }
+    }),
     // biome-ignore lint/suspicious/noExplicitAny: complex join structure
     gallery: (data.gallery as any[]).map(g => ({
-      ...g,
-      media: g.media,
+      id: g.id,
+      media_id: g.media_id,
+      public_id: g.media?.public_id ?? '',
+      alt_text: g.media?.alt_text ?? '',
+      caption: g.caption ?? '',
+      order_index: g.order_index ?? 0,
     })),
   }
 

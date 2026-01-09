@@ -58,7 +58,7 @@ export default async function EditProjectPage({
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <ProjectForm mode="edit" project={project as any} tags={tags} />
+          <ProjectForm mode="edit" project={project} tags={tags} />
         </CardContent>
       </Card>
     </div>

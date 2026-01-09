@@ -24,7 +24,7 @@ test('Media: trang list load + filter/search cập nhật URL', async ({
   })
 
   // Type filter updates URL and reloads.
-  await page.getByRole('button', { name: /Loại file/i }).click()
+  await page.getByRole('combobox').first().click()
   await page.getByRole('option', { name: 'Hình ảnh' }).click()
 
   await page.waitForURL(/type=image/, { timeout: 20_000 })

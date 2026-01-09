@@ -27,8 +27,7 @@ test('Settings: trang load + copy button hiển thị toast', async ({
 
   // Click copy button next to "Tên trang web" and expect toast.
   const siteNameBlock = page
-    .locator('label', { hasText: 'Tên trang web' })
-    .first()
+    .getByText('Tên trang web', { exact: true })
     .locator('..')
   await siteNameBlock.getByRole('button').click()
 
