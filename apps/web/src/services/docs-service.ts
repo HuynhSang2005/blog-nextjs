@@ -3,7 +3,10 @@ import type { Database } from '@/types/database'
 import { cache } from 'react'
 import type { LocaleOptions, LocalizedRecord } from '@/types/i18n'
 import type { SidebarNavItem } from '@/types/nav'
-import type { PaginatedResponse, PaginationParams } from '@/types/supabase-helpers'
+import type {
+  PaginatedResponse,
+  PaginationParams,
+} from '@/types/supabase-helpers'
 
 export type DocsTopic = Database['public']['Tables']['docs_topics']['Row']
 export type Doc = Database['public']['Tables']['docs']['Row'] & {

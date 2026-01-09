@@ -251,12 +251,16 @@ export function ProjectsTable({
         <Input
           className="max-w-sm"
           defaultValue={initialSearch}
-          onChange={event => updateQueryParam('search', event.target.value || null)}
+          onChange={event =>
+            updateQueryParam('search', event.target.value || null)
+          }
           placeholder={t('table.search_placeholder')}
         />
         <Select
           defaultValue={initialStatus}
-          onValueChange={value => updateQueryParam('status', value === 'all' ? null : value)}
+          onValueChange={value =>
+            updateQueryParam('status', value === 'all' ? null : value)
+          }
         >
           <SelectTrigger className="w-[180px]">
             <SelectValue placeholder={t('table.filter_status')} />

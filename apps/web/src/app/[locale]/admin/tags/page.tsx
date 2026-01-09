@@ -12,7 +12,10 @@ interface TagsPageProps {
   }>
 }
 
-export default async function TagsPage({ params, searchParams }: TagsPageProps) {
+export default async function TagsPage({
+  params,
+  searchParams,
+}: TagsPageProps) {
   const { locale: _locale } = await params
   const t = await getTranslations('admin.tags')
 

@@ -133,7 +133,10 @@ export function BlogPostsTable({
       accessorKey: 'status',
       header: t('columns.status'),
       cell: ({ row }) => {
-        const status = row.getValue('status') as 'draft' | 'published' | 'archived'
+        const status = row.getValue('status') as
+          | 'draft'
+          | 'published'
+          | 'archived'
         const variant =
           status === 'published'
             ? ('default' as const)
@@ -327,9 +330,7 @@ export function BlogPostsTable({
               ))
             ) : (
               <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                >
+                <TableCell colSpan={columns.length}>
                   {t('list.no_posts')}
                 </TableCell>
               </TableRow>
@@ -346,7 +347,6 @@ export function BlogPostsTable({
         previousLabel={t('pagination.previous')}
         totalPages={totalPages}
       />
-
     </div>
   )
 }
