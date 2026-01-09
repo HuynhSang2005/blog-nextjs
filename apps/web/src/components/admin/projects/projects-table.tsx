@@ -104,7 +104,7 @@ export function ProjectsTable({
         router.refresh()
       })
     },
-    [pathname, router, searchParams, startTransition]
+    [pathname, router, searchParams]
   )
 
   const columns: ColumnDef<ProjectListItem>[] = [

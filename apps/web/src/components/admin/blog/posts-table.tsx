@@ -93,7 +93,7 @@ export function BlogPostsTable({
         router.refresh()
       })
     },
-    [pathname, router, searchParams, startTransition]
+    [pathname, router, searchParams]
   )
 
   const columns: ColumnDef<BlogPostListItem>[] = [

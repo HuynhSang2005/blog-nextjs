@@ -59,7 +59,7 @@ export function TagsClient({
         router.refresh()
       })
     },
-    [pathname, router, searchParams, startTransition]
+    [pathname, router, searchParams]
   )
 
   const handleCreateSuccess = (_newTag: Tag) => {

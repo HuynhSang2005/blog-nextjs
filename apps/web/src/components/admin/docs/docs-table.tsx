@@ -98,7 +98,7 @@ export function DocsTable({
         router.refresh()
       })
     },
-    [pathname, router, searchParams, startTransition]
+    [pathname, router, searchParams]
   )
 
   const columns: ColumnDef<Doc>[] = [

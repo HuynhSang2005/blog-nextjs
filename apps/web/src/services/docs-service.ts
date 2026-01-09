@@ -140,6 +140,7 @@ function isoNextDayStart(date: string): string {
 }
 
 function applyOrDateFilter(params: {
+  // biome-ignore lint/suspicious/noExplicitAny: Supabase query builder type is complex
   query: any
   dateFrom?: string
   dateTo?: string

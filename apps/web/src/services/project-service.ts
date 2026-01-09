@@ -36,6 +36,7 @@ function isoNextDayStart(date: string): string {
 }
 
 function applyOrDateFilter(params: {
+  // biome-ignore lint/suspicious/noExplicitAny: Supabase query builder type is complex
   query: any
   dateFrom?: string
   dateTo?: string
@@ -320,7 +321,9 @@ export async function getFeaturedProjects(
 /**
  * Get single project by ID (Admin)
  */
-export async function getProjectById(id: string): Promise<any | null> {
+export async function getProjectById(
+  id: string
+): Promise<ProjectWithRelations | null> {
   const supabase = await createClient()
 
   const { data, error } = await supabase
@@ -354,18 +357,17 @@ export async function getProjectById(id: string): Promise<any | null> {
   }
 
   // Transform for admin usage
-  const project = {
+  const project: ProjectWithRelations = {
     ...data,
-    project_tags: data.project_tags, // Keep raw for form default values if needed, or transform
-    gallery: data.gallery.map((g: any) => ({
-      id: g.id,
-      media_id: g.media.id,
-      public_id: g.media.public_id,
-      alt_text: g.media.alt_text,
-      caption: g.caption,
-      order_index: g.order_index,
+    // biome-ignore lint/suspicious/noExplicitAny: complex join structure
+    tags: (data.project_tags as any[]).map(t => t.tag),
+    // biome-ignore lint/suspicious/noExplicitAny: complex join structure
+    tech_stack: (data.project_tech_stack as any[]).map(t => t.tech),
+    // biome-ignore lint/suspicious/noExplicitAny: complex join structure
+    gallery: (data.gallery as any[]).map(g => ({
+      ...g,
+      media: g.media,
     })),
-    // tech_stack transformation if needed
   }
 
   return project

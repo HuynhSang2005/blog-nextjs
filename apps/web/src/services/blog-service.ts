@@ -19,8 +19,6 @@ export type BlogPost = Database['public']['Tables']['blog_posts']['Row'] & {
   tags?: Array<Database['public']['Tables']['tags']['Row']>
 }
 
-type TagRow = Database['public']['Tables']['tags']['Row']
-
 type TagJoinRow<TTag> = {
   tag: TTag | null
 }
@@ -52,6 +50,7 @@ function isoNextDayStart(date: string): string {
 }
 
 function applyOrDateFilter(params: {
+  // biome-ignore lint/suspicious/noExplicitAny: Supabase query builder type is complex
   query: any
   dateFrom?: string
   dateTo?: string
@@ -454,7 +453,10 @@ export async function getBlogPostById(id: string): Promise<BlogPost | null> {
   // The admin form might expect a specific structure
   const post = {
     ...data,
-    tags: data.blog_post_tags.map((t: any) => t.tag),
+    // biome-ignore lint/suspicious/noExplicitAny: tag structure is dynamic
+    tags: (data.blog_post_tags as unknown as Array<{ tag: any }>).map(
+      t => t.tag
+    ),
   }
 
   return post as unknown as BlogPost

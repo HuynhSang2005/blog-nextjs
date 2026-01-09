@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { useTranslations } from 'next-intl'
 import { Button } from '@/components/ui/button'
@@ -72,20 +72,23 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
     router.push(`${pathname}?${params.toString()}`, { scroll: false })
   }
 
-  function updateSearch(value: string) {
-    const params = new URLSearchParams(searchParams.toString())
-    const trimmed = value.trim()
+  const updateSearch = useCallback(
+    (value: string) => {
+      const params = new URLSearchParams(searchParams.toString())
+      const trimmed = value.trim()
 
-    if (!trimmed) {
-      params.delete('q')
-    } else {
-      params.set('q', trimmed)
-    }
+      if (!trimmed) {
+        params.delete('q')
+      } else {
+        params.set('q', trimmed)
+      }
 
-    // Reset to first page when changing search
-    params.delete('page')
-    router.push(`${pathname}?${params.toString()}`, { scroll: false })
-  }
+      // Reset to first page when changing search
+      params.delete('page')
+      router.push(`${pathname}?${params.toString()}`, { scroll: false })
+    },
+    [pathname, router, searchParams]
+  )
 
   function clearAllFilters() {
     router.push(pathname, { scroll: false })
@@ -105,7 +108,7 @@ export function ProjectFilters({ stats }: ProjectFiltersProps) {
     }, 300)
 
     return () => clearTimeout(handle)
-  }, [searchQuery, currentSearchQuery, pathname, router, searchParams])
+  }, [searchQuery, currentSearchQuery, updateSearch])
 
   return (
     <div className="sticky top-16 z-40 border-b bg-background/80 backdrop-blur-lg">

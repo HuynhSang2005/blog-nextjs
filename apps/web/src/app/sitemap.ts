@@ -25,7 +25,8 @@ function pickLatestDate(values: Array<string | null | undefined>): Date {
   }
 
   candidates.sort((a, b) => b.getTime() - a.getTime())
-  return candidates[0]!
+  // Safe: candidates is guaranteed non-empty after the check above
+  return candidates[0] ?? new Date()
 }
 
 export default async function sitemap(): Promise<Sitemap> {
