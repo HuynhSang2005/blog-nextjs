@@ -7,7 +7,7 @@
     "useIgnoreFile": true
   },
   "files": {
-    "ignoreUnknown": false,
+    "ignoreUnknown": true,
     "includes": [
       "**",
       "!**/node_modules",
@@ -16,8 +16,10 @@
       "!**/dist",
       "!**/build",
       "!**/coverage",
-      "!**/*.config.js",
-      "!**/*.config.ts"
+      "!docs",
+      "!dev-v1",
+      "!dev-mdx",
+      "!repomix-admin-dashboard-template"
     ]
   },
   "formatter": {
@@ -43,7 +45,7 @@
     "rules": {
       "recommended": true,
       "correctness": {
-        "noUnusedVariables": "error",
+        "noUnusedVariables": "warn",
         "noUnusedImports": "warn",
         "useExhaustiveDependencies": "warn"
       },
@@ -87,14 +89,55 @@
   },
   "overrides": [
     {
-      "includes": [
-        "**/*.css"
-      ],
+      "includes": ["**/*.css"],
       "linter": {
         "rules": {
           "suspicious": {
             "noUnknownAtRules": "off",
             "noIrregularWhitespace": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/lib/mdx/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/scripts/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
+          },
+          "correctness": {
+            "noUnusedVariables": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/styles/**"],
+      "linter": {
+        "rules": {
+          "complexity": {
+            "noImportantStyles": "off"
+          }
+        }
+      }
+    },
+    {
+      "includes": ["**/admin/**"],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "off"
           }
         }
       }

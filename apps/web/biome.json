@@ -1,17 +1,5 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "root": false,
-  "extends": ["@huynhsang-blog/biome-config"],
-  "files": {
-    "includes": [
-      "!**/node_modules",
-      "!**/.next",
-      "!**/out",
-      "!**/dist",
-      "!**/build",
-      "!**/coverage",
-      "!**/*.config.js",
-      "!**/*.config.ts"
-    ]
-  }
+  "extends": ["@huynhsang-blog/biome-config"]
 }

@@ -6,7 +6,7 @@ description: Workflow dev trong repo (Bun package manager, Biome lint/format, Tu
 # Bun + Biome + Turborepo workflow
 
 ## Khi nào dùng skill này
-- Khi bạn nói: “chạy dev”, “build”, “typecheck”, “biome”, “format”, “turbo”.
+- Khi bạn nói: "chạy dev", "build", "typecheck", "biome", "format", "turbo".
 
 ## Commands chuẩn (repo)
 - Dev (monorepo): `bun run dev`
@@ -20,12 +20,19 @@ description: Workflow dev trong repo (Bun package manager, Biome lint/format, Tu
 - Dev: `cd apps/web` rồi `bun run dev`
 - Lint: `bun run lint`
 - Lint autofix: `bun run lint:fix`
+- Format: `bun run format`
+- Format check: `bun run format:check`
 - Typecheck: `bun run typecheck`
 - E2E: `bun run test:e2e`
 
 ## Quy tắc
 - Không dùng npm/yarn/pnpm.
 - Không dùng ESLint/Prettier (Biome là chuẩn).
+
+## Biome là all-in-one
+- Biome thay thế cả Prettier (formatter) và ESLint (linter).
+- Biome có flag `--staged` để format/lint chỉ staged files (thay thế `pretty-quick`).
+- Pre-commit hook: `.husky/pre-commit` chạy `bunx biome check --staged --no-errors-on-unmatched --write`.
 
 ## Khi gặp lỗi Biome
 - Ưu tiên chạy script đã có:
