@@ -4,9 +4,7 @@ import { getTranslations } from 'next-intl/server'
 
 import { MDXRemote } from 'next-mdx-remote-client/rsc'
 import { getProjectBySlug } from '@/app/actions/projects-queries'
-import { ProjectHeader } from '@/components/projects/project-header'
-import { ProjectGallery } from '@/components/projects/project-gallery'
-import { ProjectInfo } from '@/components/projects/project-info'
+import { ProjectHeader, ProjectGallery, ProjectInfo } from '@/features/projects'
 
 // Revalidate every 60 minutes (Phase 2: Runtime caching)
 export const revalidate = 3600

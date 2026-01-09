@@ -1,7 +1,7 @@
 import { redirect } from 'next/navigation'
 import { getTranslations } from 'next-intl/server'
 
-import { AdminSidebar } from '@/components/admin/layout/admin-sidebar'
+import { AdminSidebar } from '@/features/admin'
 import {
   Breadcrumb,
   BreadcrumbItem,

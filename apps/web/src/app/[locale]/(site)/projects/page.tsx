@@ -7,9 +7,7 @@ import {
   PageHeaderHeading,
   PageHeaderDescription,
 } from '@/components/page-header'
-import { ProjectsGrid } from '@/components/projects/projects-grid'
-import { ProjectFilters } from '@/components/projects/project-filters'
-import { ProjectsPagination } from '@/components/projects/projects-pagination'
+import { ProjectsGrid, ProjectFilters, ProjectsPagination } from '@/features/projects'
 
 interface ProjectsPageProps {
   params: Promise<{

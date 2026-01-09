@@ -12,7 +12,7 @@ import { CldImage } from '@/components/ui/cld-image'
 import { Balancer } from '@/components/ui/balancer'
 import Link from 'next/link'
 import { dateLocales } from '@/config/i18n'
-import { ReadTime } from '@/components/blog/read-time'
+import { ReadTime } from '@/features/blog'
 import { badgeVariants } from '@/components/ui/badge'
 import { buttonVariants } from '@/components/ui/button'
 import {

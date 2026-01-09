@@ -6,8 +6,7 @@
 import { getTranslations } from 'next-intl/server'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { getMediaList, getMediaStats } from '@/services/media-service'
-import { MediaUploader } from '@/components/admin/media/media-uploader'
-import { MediaPageClient } from '@/components/admin/media/media-page-client'
+import { MediaUploader, MediaPageClient } from '@/features/media'
 import { AdminPagination } from '@/components/admin/shared/admin-pagination'
 import type { MediaItem } from '@/components/admin/media/media-grid'
 
