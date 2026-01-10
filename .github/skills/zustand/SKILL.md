@@ -1,23 +1,73 @@
 ---
 name: zustand
-description: (Tuỳ chọn) Hướng dẫn dùng Zustand cho client state nếu repo cần. Lưu ý: hiện chưa thấy zustand trong dependencies.
+description: Cách dùng Zustand v5 trong repo này (persist middleware, subscribeWithSelector, UI state only).
 ---
 
 ## Trạng thái hiện tại
-- `apps/web/package.json` chưa có `zustand`.
 
-## Khi nào cân nhắc thêm
-- Cần global client state đơn giản (UI state: mở/đóng panel, selection tạm, draft state), không phải server-state.
-- Nếu là server-state (fetch từ API/DB), ưu tiên React Query.
+- **Đã cài đặt**: `zustand` v5.0.9 trong `apps/web/package.json`
+- **Stores**:
+  - `apps/web/src/stores/ui-store.ts` — UI state (theme, sidebar, etc.)
+  - `apps/web/src/stores/admin-store.ts` — Admin dashboard state
 
-## Cách thêm (nếu quyết định dùng)
-- Cài đặt: `bun add zustand`
-- Tạo store trong `apps/web/src/stores/` (tạo folder nếu chưa có).
+## Khi nào dùng Zustand
 
-## Pattern tối giản
-- Store chỉ chạy client. Component dùng store sẽ là `'use client'`.
-- Giữ state nhỏ và tách domain rõ ràng.
+- **UI state đơn giản**: mở/đóng panel, selection tạm, theme, sidebar
+- **Client-only state**: không có server data (không phải source of truth cho DB)
+- **Cần persist**: lưu state qua reload (dùng persist middleware)
+
+**Không dùng khi**:
+- Server-state (fetch từ API/DB) → dùng **TanStack Query**
+- i18n/permissions/RLS → xử lý ở tầng khác
+
+## Pattern bắt buộc
+
+### 1. Store với Persist Middleware
+```typescript
+import { create } from 'zustand'
+import { persist, subscribeWithSelector } from 'zustand/middleware'
+
+interface UiState {
+  theme: 'light' | 'dark'
+  sidebarOpen: boolean
+  setTheme: (theme: 'light' | 'dark') => void
+  toggleSidebar: () => void
+}
+
+export const useUiStore = create<UiState>()(
+  subscribeWithSelector(
+    persist(
+      (set) => ({
+        theme: 'light',
+        sidebarOpen: true,
+        setTheme: (theme) => set({ theme }),
+        toggleSidebar: () => set((state) => ({ sidebarOpen: !state.sidebarOpen })),
+      }),
+      {
+        name: 'ui-storage',
+        partialize: (state) => ({ theme: state.theme, sidebarOpen: state.sidebarOpen }),
+      }
+    )
+  )
+)
+```
+
+### 2. Partialize (QUAN TRỌNG)
+- Chỉ persist field cần thiết, tránh persist cả store
+- `partialize`: lọc field trước khi lưu vào localStorage
+
+### 3. Subscribe với Selector
+```typescript
+// Trong component
+useUiStore.subscribeWithSelector((state) => state.theme), (theme) => {
+  // React khi theme thay đổi
+  document.documentElement.classList.toggle('dark', theme === 'dark')
+})
+```
 
 ## Tránh
-- Không nhét data từ DB vào store như source of truth.
-- Không dùng Zustand để né i18n/permissions/RLS.
+
+- Nhét data từ DB vào store như source of truth.
+- Dùng Zustand để né i18n/permissions/RLS.
+- Tạo store mới không cần thiết.
+- Persist cả store thay vì dùng partialize.

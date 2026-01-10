@@ -22,6 +22,15 @@
 	- `apps/web/src/lib/core/**`
 6) No secrets: never hardcode keys/tokens; never commit `.env*.local`.
 
+## State Management
+
+- **TanStack Query** (@tanstack/react-query v5): Client-side server state.
+  - Provider: `apps/web/src/providers/query-provider.tsx`
+  - Pattern: Query keys ổn định, invalidate sau mutations.
+- **Zustand** (v5): Client-only UI state.
+  - Stores: `apps/web/src/stores/ui-store.ts`, `admin-store.ts`
+  - Pattern: Dùng persist middleware với `partialize`, subscribeWithSelector.
+
 ## Repo workflow
 
 - Repo exploration/edits: prefer Serena-style search/symbol navigation.
