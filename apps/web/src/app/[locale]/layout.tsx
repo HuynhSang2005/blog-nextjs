@@ -13,6 +13,7 @@ import { getSansFont } from '@/lib/fonts'
 import { cn } from '@/lib/utils'
 import { QueryProvider } from '@/providers/query-provider'
 import { Toaster } from '@/components/ui/sonner'
+import { WebVitalsReport } from '@/components/performance/web-vitals'
 
 export async function generateMetadata(props: {
   params: Promise<{ locale: string }>
@@ -139,6 +140,7 @@ export default async function RootLayout(props: {
             enableSystem
           >
             <QueryProvider>
+              <WebVitalsReport />
               {children}
               <Toaster />
             </QueryProvider>

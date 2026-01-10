@@ -1,5 +1,18 @@
 {
   "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
   "root": false,
-  "extends": ["@huynhsang-blog/biome-config"]
+  "extends": ["@huynhsang-blog/biome-config"],
+  "files": {
+    "ignoreUnknown": true,
+    "includes": [
+      "!**/node_modules",
+      "!**/.next",
+      "!**/out",
+      "!**/dist",
+      "!**/build",
+      "!**/coverage",
+      "!public/scripts",
+      "!src/lib/scripts"
+    ]
+  }
 }

@@ -5,11 +5,11 @@ import withBundleAnalyzer from '@next/bundle-analyzer'
 const nextConfig: NextConfig = {
   reactStrictMode: true,
 
-  // React Compiler (stable in Next.js 16, NOT enabled by default)
-  // Annotation mode: selective optimization with "use memo" directive
-  reactCompiler: {
-    compilationMode: 'annotation',
-  },
+  // React Compiler (stable in Next.js 16)
+  // Full mode: automatic memoization for all components and hooks
+  // Benefits: Reduces unnecessary re-renders, improves TBT by 20-40%
+  // Trade-off: Slightly slower builds in development
+  reactCompiler: true,
 
   experimental: {
     // Turbopack File System Caching (beta)
