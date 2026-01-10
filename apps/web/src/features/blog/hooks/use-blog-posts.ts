@@ -9,8 +9,13 @@ import {
   updateBlogPostTags,
 } from '@/app/actions/blog'
 import type { BlogPostFormData } from '@/schemas/blog'
-import type { BlogPostStatus, PaginationParams } from '@/types/supabase-helpers'
+import type {
+  BlogPostStatus,
+  PaginationParams,
+  PaginatedResponse,
+} from '@/types/supabase-helpers'
 import type { FilterParams } from '@/services/blog-service'
+import type { BlogPostListItem } from '@/types/supabase-helpers'
 
 // Query Keys
 export const blogPostsKeys = {
@@ -47,7 +52,7 @@ export function useBlogPosts(
 }
 
 /**
- * Create a new blog post
+ * Create a new blog post with optimistic update
  */
 export function useCreateBlogPost() {
   const queryClient = useQueryClient()
@@ -70,18 +75,60 @@ export function useCreateBlogPost() {
 
       return result
     },
-    onSuccess: () => {
-      // Invalidate and refetch blog posts
-      queryClient.invalidateQueries({ queryKey: blogPostsKeys.lists() })
+    // Optimistic update
+    onMutate: async (newPost: BlogPostFormData) => {
+      // Cancel any outgoing refetches to avoid overwriting our optimistic update
+      await queryClient.cancelQueries({ queryKey: blogPostsKeys.lists() })
+
+      // Snapshot the previous value
+      const previousPosts = queryClient.getQueryData<
+        PaginatedResponse<BlogPostListItem>
+      >(blogPostsKeys.lists())
+
+      // Optimistically update to the new value
+      // Create a temporary post object for the UI
+      const tempPost = {
+        id: `temp-${Date.now()}`,
+        ...newPost,
+        status: 'draft' as const,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        reading_time_minutes: 1,
+        locale: 'vi',
+        featured: false,
+        allow_comments: true,
+      }
+
+      if (previousPosts) {
+        queryClient.setQueryData(blogPostsKeys.lists(), {
+          ...previousPosts,
+          data: [tempPost, ...previousPosts.data],
+        })
+      }
+
+      // Return context with previous value for rollback (always return the object, even if undefined)
+      return { previousPosts: previousPosts ?? null }
     },
-    onError: (error: Error) => {
+    onError: (
+      error: Error,
+      _newPost: BlogPostFormData,
+      context?: { previousPosts: PaginatedResponse<BlogPostListItem> | null }
+    ) => {
+      // Rollback to the previous value on error
+      if (context?.previousPosts) {
+        queryClient.setQueryData(blogPostsKeys.lists(), context.previousPosts)
+      }
       console.error('Error creating blog post:', error)
+    },
+    onSettled: () => {
+      // Always refetch after error or success to ensure consistency
+      queryClient.invalidateQueries({ queryKey: blogPostsKeys.lists() })
     },
   })
 }
 
 /**
- * Update an existing blog post
+ * Update an existing blog post with optimistic update
  */
 export function useUpdateBlogPost() {
   const queryClient = useQueryClient()
@@ -105,22 +152,81 @@ export function useUpdateBlogPost() {
 
       return result
     },
-    onSuccess: (_, variables) => {
-      // Invalidate and refetch blog posts
+    // Optimistic update
+    onMutate: async (variables: { id: string; data: BlogPostFormData }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: blogPostsKeys.lists() })
+      await queryClient.cancelQueries({
+        queryKey: blogPostsKeys.detail(variables.id),
+      })
+
+      // Snapshot previous values
+      const previousPost = queryClient.getQueryData(
+        blogPostsKeys.detail(variables.id)
+      )
+      const previousPosts = queryClient.getQueryData<
+        PaginatedResponse<BlogPostListItem>
+      >(blogPostsKeys.lists())
+
+      // Optimistically update the specific post
+      if (previousPost) {
+        queryClient.setQueryData(blogPostsKeys.detail(variables.id), {
+          ...previousPost,
+          ...variables.data,
+          updated_at: new Date().toISOString(),
+        })
+      }
+
+      // Optimistically update in the list
+      if (previousPosts) {
+        queryClient.setQueryData(blogPostsKeys.lists(), {
+          ...previousPosts,
+          data: previousPosts.data.map(post =>
+            post.id === variables.id
+              ? {
+                  ...post,
+                  ...variables.data,
+                  updated_at: new Date().toISOString(),
+                }
+              : post
+          ),
+        })
+      }
+
+      return { previousPost, previousPosts: previousPosts ?? null }
+    },
+    onError: (
+      error: Error,
+      variables: { id: string; data: BlogPostFormData },
+      context?: {
+        previousPost: unknown
+        previousPosts: PaginatedResponse<BlogPostListItem> | null
+      }
+    ) => {
+      // Rollback on error
+      if (context?.previousPost) {
+        queryClient.setQueryData(
+          blogPostsKeys.detail(variables.id),
+          context.previousPost
+        )
+      }
+      if (context?.previousPosts) {
+        queryClient.setQueryData(blogPostsKeys.lists(), context.previousPosts)
+      }
+      console.error('Error updating blog post:', error)
+    },
+    onSettled: (_data, _error, variables) => {
+      // Always refetch to ensure consistency
       queryClient.invalidateQueries({ queryKey: blogPostsKeys.lists() })
-      // Invalidate the specific post
       queryClient.invalidateQueries({
         queryKey: blogPostsKeys.detail(variables.id),
       })
-    },
-    onError: (error: Error) => {
-      console.error('Error updating blog post:', error)
     },
   })
 }
 
 /**
- * Delete a blog post
+ * Delete a blog post with optimistic update
  */
 export function useDeleteBlogPost() {
   const queryClient = useQueryClient()
@@ -130,14 +236,46 @@ export function useDeleteBlogPost() {
       await deleteBlogPost(id)
       return id
     },
-    onSuccess: id => {
-      // Invalidate and refetch blog posts
-      queryClient.invalidateQueries({ queryKey: blogPostsKeys.lists() })
-      // Remove the specific post from cache
+    // Optimistic update
+    onMutate: async (id: string) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: blogPostsKeys.lists() })
+      await queryClient.cancelQueries({ queryKey: blogPostsKeys.detail(id) })
+
+      // Snapshot previous values
+      const previousPost = queryClient.getQueryData(blogPostsKeys.detail(id))
+      const previousPosts = queryClient.getQueryData<
+        PaginatedResponse<BlogPostListItem>
+      >(blogPostsKeys.lists())
+
+      // Optimistically remove from list
+      if (previousPosts) {
+        queryClient.setQueryData(blogPostsKeys.lists(), {
+          ...previousPosts,
+          data: previousPosts.data.filter(post => post.id !== id),
+        })
+      }
+
+      // Remove from detail cache
       queryClient.removeQueries({ queryKey: blogPostsKeys.detail(id) })
+
+      return { previousPost, previousPosts: previousPosts ?? null }
     },
-    onError: (error: Error) => {
+    onError: (
+      error: Error,
+      _id: string,
+      context?: { previousPosts: PaginatedResponse<BlogPostListItem> | null }
+    ) => {
+      // Rollback on error
+      if (context?.previousPosts) {
+        queryClient.setQueryData(blogPostsKeys.lists(), context.previousPosts)
+      }
       console.error('Error deleting blog post:', error)
+    },
+    onSettled: (_data, _error, id) => {
+      // Always refetch to ensure consistency
+      queryClient.invalidateQueries({ queryKey: blogPostsKeys.lists() })
+      queryClient.removeQueries({ queryKey: blogPostsKeys.detail(id) })
     },
   })
 }

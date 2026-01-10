@@ -9,8 +9,13 @@ import {
   updateProjectTags,
 } from '@/app/actions/projects'
 import type { ProjectFormData } from '@/schemas/project'
-import type { ProjectStatus, PaginationParams } from '@/types/supabase-helpers'
+import type {
+  ProjectStatus,
+  PaginationParams,
+  PaginatedResponse,
+} from '@/types/supabase-helpers'
 import type { ProjectFilterParams } from '@/services/project-service'
+import type { ProjectListItem } from '@/types/supabase-helpers'
 
 // Query Keys
 export const projectsKeys = {
@@ -47,7 +52,7 @@ export function useProjects(
 }
 
 /**
- * Create a new project
+ * Create a new project with optimistic update
  */
 export function useCreateProject() {
   const queryClient = useQueryClient()
@@ -65,17 +70,56 @@ export function useCreateProject() {
 
       return result
     },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: projectsKeys.lists() })
+    // Optimistic update
+    onMutate: async (newProject: ProjectFormData) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: projectsKeys.lists() })
+
+      // Snapshot previous value
+      const previousProjects = queryClient.getQueryData<
+        PaginatedResponse<ProjectListItem>
+      >(projectsKeys.lists())
+
+      // Optimistically update to the new value
+      const tempProject = {
+        id: `temp-${Date.now()}`,
+        ...newProject,
+        status: 'draft' as const,
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
+        locale: 'vi',
+        featured: false,
+      }
+
+      if (previousProjects) {
+        queryClient.setQueryData(projectsKeys.lists(), {
+          ...previousProjects,
+          data: [tempProject, ...previousProjects.data],
+        })
+      }
+
+      return { previousProjects: previousProjects ?? null }
     },
-    onError: (error: Error) => {
+    onError: (
+      error: Error,
+      _newProject: ProjectFormData,
+      context?: { previousProjects: PaginatedResponse<ProjectListItem> | null }
+    ) => {
+      // Rollback on error
+      if (context?.previousProjects) {
+        queryClient.setQueryData(projectsKeys.lists(), context.previousProjects)
+      }
       console.error('Error creating project:', error)
+    },
+    onSettled: () => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: projectsKeys.lists() })
     },
   })
 }
 
 /**
- * Update an existing project
+ * Update an existing project with optimistic update
  */
 export function useUpdateProject() {
   const queryClient = useQueryClient()
@@ -91,20 +135,75 @@ export function useUpdateProject() {
 
       return result
     },
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: projectsKeys.lists() })
-      queryClient.invalidateQueries({
-        queryKey: projectsKeys.detail(variables.id),
-      })
+    // Optimistic update
+    onMutate: async ({ id, data }: { id: string; data: ProjectFormData }) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: projectsKeys.lists() })
+      await queryClient.cancelQueries({ queryKey: projectsKeys.detail(id) })
+
+      // Snapshot previous value
+      const previousProjects = queryClient.getQueryData<
+        PaginatedResponse<ProjectListItem>
+      >(projectsKeys.lists())
+      const previousProjectDetail = queryClient.getQueryData(
+        projectsKeys.detail(id)
+      )
+
+      // Optimistically update to the new value
+      if (previousProjects) {
+        queryClient.setQueryData(projectsKeys.lists(), {
+          ...previousProjects,
+          data: previousProjects.data.map(project =>
+            project.id === id
+              ? { ...project, ...data, updated_at: new Date().toISOString() }
+              : project
+          ),
+        })
+      }
+
+      if (previousProjectDetail) {
+        queryClient.setQueryData(projectsKeys.detail(id), {
+          ...previousProjectDetail,
+          ...data,
+          updated_at: new Date().toISOString(),
+        })
+      }
+
+      return {
+        previousProjects: previousProjects ?? null,
+        previousProjectDetail,
+      }
     },
-    onError: (error: Error) => {
+    onError: (
+      error: Error,
+      { id }: { id: string; data: ProjectFormData },
+      context?: {
+        previousProjects: PaginatedResponse<ProjectListItem> | null
+        previousProjectDetail: unknown
+      }
+    ) => {
+      // Rollback on error
+      if (context?.previousProjects) {
+        queryClient.setQueryData(projectsKeys.lists(), context.previousProjects)
+      }
+      if (context?.previousProjectDetail) {
+        queryClient.setQueryData(
+          projectsKeys.detail(id),
+          context.previousProjectDetail
+        )
+      }
       console.error('Error updating project:', error)
+    },
+    onSettled: (_data, _error, { id }) => {
+      // Always refetch after error or success
+      queryClient.invalidateQueries({ queryKey: projectsKeys.lists() })
+      queryClient.invalidateQueries({ queryKey: projectsKeys.detail(id) })
     },
   })
 }
 
 /**
- * Delete a project
+ * Delete a project with optimistic update
  */
 export function useDeleteProject() {
   const queryClient = useQueryClient()
@@ -114,12 +213,42 @@ export function useDeleteProject() {
       await deleteProject(id)
       return id
     },
-    onSuccess: id => {
+    // Optimistic update
+    onMutate: async (id: string) => {
+      // Cancel any outgoing refetches
+      await queryClient.cancelQueries({ queryKey: projectsKeys.lists() })
+      await queryClient.cancelQueries({ queryKey: projectsKeys.detail(id) })
+
+      // Snapshot previous value
+      const previousProjects = queryClient.getQueryData<
+        PaginatedResponse<ProjectListItem>
+      >(projectsKeys.lists())
+
+      // Optimistically remove from the list
+      if (previousProjects) {
+        queryClient.setQueryData(projectsKeys.lists(), {
+          ...previousProjects,
+          data: previousProjects.data.filter(project => project.id !== id),
+        })
+      }
+
+      return { previousProjects: previousProjects ?? null }
+    },
+    onError: (
+      error: Error,
+      _id: string,
+      context?: { previousProjects: PaginatedResponse<ProjectListItem> | null }
+    ) => {
+      // Rollback on error
+      if (context?.previousProjects) {
+        queryClient.setQueryData(projectsKeys.lists(), context.previousProjects)
+      }
+      console.error('Error deleting project:', error)
+    },
+    onSettled: (_data, _error, id) => {
+      // Always refetch after error or success
       queryClient.invalidateQueries({ queryKey: projectsKeys.lists() })
       queryClient.removeQueries({ queryKey: projectsKeys.detail(id) })
-    },
-    onError: (error: Error) => {
-      console.error('Error deleting project:', error)
     },
   })
 }
