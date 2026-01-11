@@ -68,7 +68,9 @@ export function BlogFilters({ messages, tags = [] }: BlogFiltersProps) {
   // Filter states
   const [search, setSearch] = React.useState(searchParams.get('search') || '')
   const [sort, setSort] = React.useState(searchParams.get('sort') || 'newest')
-  const [selectedTag, setSelectedTag] = React.useState(searchParams.get('tag') || '')
+  const [selectedTag, setSelectedTag] = React.useState(
+    searchParams.get('tag') || ''
+  )
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
     () => {
       const from = searchParams.get('from')
@@ -132,7 +134,10 @@ export function BlogFilters({ messages, tags = [] }: BlogFiltersProps) {
 
   // Check if any filters are active
   const hasActiveFilters =
-    search.trim() !== '' || sort !== 'newest' || selectedTag !== '' || dateRange !== undefined
+    search.trim() !== '' ||
+    sort !== 'newest' ||
+    selectedTag !== '' ||
+    dateRange !== undefined
 
   // Get optional messages with defaults
   const filtersLabel = messages.filters || 'Bộ lọc'
@@ -275,10 +280,7 @@ export function BlogFilters({ messages, tags = [] }: BlogFiltersProps) {
         {/* Apply button */}
         <div className="flex flex-col gap-2">
           <div className="h-5" /> {/* Spacer for label alignment */}
-          <Button
-            className="h-11 w-full"
-            onClick={applyFilters}
-          >
+          <Button className="h-11 w-full" onClick={applyFilters}>
             {messages.apply_filters}
           </Button>
         </div>

@@ -2,11 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import type { Metadata } from 'next'
 import { redirect } from 'next/navigation'
 
-import {
-  BlogPostList,
-  BlogPagination,
-  BlogFilters,
-} from '@/features/blog'
+import { BlogPostList, BlogPagination, BlogFilters } from '@/features/blog'
 import type { LocaleOptions } from '@/types/i18n'
 import { getBlogPosts } from '@/services/blog-service'
 import { absoluteUrl } from '@/lib/utils'
