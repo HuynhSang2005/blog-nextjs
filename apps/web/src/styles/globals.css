@@ -43,7 +43,9 @@
 .dark {
   --background: hsl(240 10% 3.9%);
   --foreground: hsl(0 0% 98%);
-  --card: hsl(240 10% 5.9%); /* Slightly lighter than background for separation */
+  --card: hsl(
+    240 10% 5.9%
+  ); /* Slightly lighter than background for separation */
   --card-foreground: hsl(0 0% 98%);
   --popover: hsl(240 10% 3.9%);
   --popover-foreground: hsl(0 0% 98%);
@@ -69,17 +71,17 @@
   --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
   --sidebar-border: hsl(240 3.7% 15.9%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
-  
+
   /* Dark mode overrides for custom blog colors - WCAG compliant */
   /* Use lighter grays for better contrast on dark backgrounds */
   --color-title-primary: #f4f4f5;
   --color-text-secondary: #a1a1aa;
   --color-text-tertiary: #71717a;
-  
+
   /* Dark mode tag badge colors - lighter for visibility */
   --color-tag-bg: hsl(217 91% 60% / 15%);
   --color-tag-text: hsl(217 91% 60%);
-  
+
   /* Dark mode border - subtler */
   --color-border-light: hsl(240 3.7% 15.9%);
   --color-border-subtle: hsl(240 3.7% 15.9%);
@@ -121,17 +123,17 @@
   --color-sidebar: var(--sidebar);
 
   /* Figma Tag Badge Colors */
-  --color-tag-bg: #EBFAFF;
-  --color-tag-text: #1F87AD;
+  --color-tag-bg: #ebfaff;
+  --color-tag-text: #1f87ad;
 
   /* Figma Text Colors */
   --color-title-primary: #272727;
-  --color-text-secondary: #5C5C5C;
-  --color-text-tertiary: #8F8F8F;
+  --color-text-secondary: #5c5c5c;
+  --color-text-tertiary: #8f8f8f;
 
   /* Figma Border Colors */
-  --color-border-light: #EBEBEB;
-  --color-border-subtle: #EAEAEA;
+  --color-border-light: #ebebeb;
+  --color-border-subtle: #eaeaea;
 }
 
 /* Custom shadow for blog cards - Figma multi-layer shadow */
