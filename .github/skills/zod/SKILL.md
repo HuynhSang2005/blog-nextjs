@@ -13,13 +13,21 @@ description: Quy ước dùng Zod trong repo (schemas folder, Vietnamese message
 - Xuất type bằng `z.infer<typeof schema>` để không bị drift.
 - Message validation phải tiếng Việt (giữ thuật ngữ kỹ thuật English khi cần).
 
-## Pattern hay dùng
+## Pattern hay dùng (CẬP NHẬT ZOD V4)
 - Optional + nullable (match DB):
   - `z.string().max(160).optional().nullable()`
 - UUID:
   - `z.string().uuid()`
 - Enum status:
-  - `z.enum(['draft', 'published', 'archived'], { message: '...' })`
+  - `z.enum(['draft', 'published', 'archived'], { error: 'Trạng thái không hợp lệ' })`
+- **Zod v4**: Dùng `error:` thay vì `message:` cho custom errors:
+  ```typescript
+  // Zod 4 pattern (KHUYẾN NGHỊ)
+  z.string().min(5, { error: "Quá ngắn, tối thiểu 5 ký tự" })
+  
+  // Zod 3 pattern (vẫn hoạt động nhưng không khuyến nghị)
+  z.string().min(5, { message: "Quá ngắn" })
+  ```
 
 ## Với react-hook-form
 - `resolver: zodResolver(schema)`

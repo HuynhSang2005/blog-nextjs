@@ -230,7 +230,7 @@ await mcp_perplexity_perplexity_search({
 
 // ✅ Best: So sánh thư viện
 await mcp_perplexity_perplexity_search({
-  query: "TanStack Query vs SWR vs React Query 2024 which to choose"
+  query: "TanStack Query vs SWR vs React Query 2025 which to choose"
 })
 ```
 

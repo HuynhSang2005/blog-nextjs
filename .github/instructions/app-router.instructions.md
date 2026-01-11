@@ -30,6 +30,30 @@ apps/web/src/app/[locale]/
 
 **IMPORTANT**: In Next.js 16, `params` and `searchParams` must be **awaited**:
 
+**Pattern tối ưu với Promise.all (khi cần cả params và searchParams):**
+```tsx
+// apps/web/src/app/[locale]/blog/page.tsx
+export default async function BlogPage({
+  params,
+  searchParams,
+}: {
+  params: Promise<{ locale: string }>
+  searchParams: Promise<{ page?: string; tag?: string }>
+}) {
+  // ✅ Tối ưu: Await cả hai cùng lúc
+  const [{ locale }, { page = '1', tag }] = await Promise.all([params, searchParams])
+  setRequestLocale(locale)
+  
+  // Fetch data với pagination và filter
+  const posts = await getBlogPosts(locale, 'published', {
+    page: parseInt(page),
+    tag,
+  })
+  
+  return <BlogList posts={posts} />
+}
+```
+
 **Blog Posts (from Supabase Database):**
 ```tsx
 // apps/web/src/app/[locale]/blog/[slug]/page.tsx
@@ -537,6 +561,39 @@ export default function Page() {
   )
 }
 ```
+
+### React Compiler (Next.js 16)
+
+Next.js 16 hỗ trợ **React Compiler** - tự động memoization cho React components:
+
+```tsx
+// next.config.ts
+const nextConfig = {
+  experimental: {
+    reactCompiler: true,
+    // hoặc: compilationMode: 'annotation' cho per-component opt-in
+  },
+}
+```
+
+**Lợi ích:**
+- Tự động memoize computations
+- Không cần `useMemo`/`useCallback` thủ công cho simple values
+- Giảm boilerplate code
+
+**Với TanStack Query, vẫn cần `queryOptions()`:**
+```typescript
+// queryOptions vẫn cần thiết cho stable query keys
+const postsOptions = queryOptions({
+  queryKey: ['blog', 'posts', filters] as const,
+  queryFn: () => fetchBlogPosts(filters),
+})
+```
+
+**Vẫn nên giữ `useMemo`/`useCallback` cho:**
+- Computed values phức tạp với nhiều dependencies
+- Values phụ thuộc vào external state
+- Callback handlers cần stable references
 
 ## Critical Rules
 

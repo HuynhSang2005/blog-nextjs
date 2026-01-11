@@ -2,7 +2,7 @@
 
 File này là “operating manual” cho AI Agent khi làm việc với repo này: **ngắn gọn, rõ ràng, repo-accurate**, ưu tiên *commands + boundaries + workflow* để tránh agent tự đoán sai.
 
-**Cập nhật**: January 9, 2026
+**Cập nhật**: January 11, 2026
 
 ---
 
@@ -38,6 +38,34 @@ Trong `apps/web/`:
 
 - **UI text**: phải là **Tiếng Việt** qua `next-intl` và `apps/web/src/i18n/locales/vi.json` (giữ thuật ngữ kỹ thuật bằng English: Next.js, React, API, RLS…).
 - **Next.js 16 App Router**: `params`/`searchParams` là Promise → luôn `await` (không destructure trực tiếp).
+  ```tsx
+  // ✅ Pattern đúng (Next.js 16)
+  export default async function Page({ 
+    params, searchParams 
+  }: { 
+    params: Promise<{ slug: string }>
+    searchParams: Promise<{ tag?: string }>
+  }) {
+    const { slug } = await params
+    const { tag } = await searchParams
+  }
+  
+  // ✅ Tối ưu với Promise.all (khi cần cả hai)
+  export default async function BlogPage({ 
+    params, searchParams 
+  }: { 
+    params: Promise<{ locale: string; slug: string }>
+    searchParams: Promise<{ page?: string }>
+  }) {
+    const [{ locale, slug }, { page = '1' }] = await Promise.all([params, searchParams])
+    // ...
+  }
+  
+  // ❌ Pattern cũ (Next.js 15) - KHÔNG DÙNG
+  export default function Page({ params }: { params: { slug: string } }) {
+    const { slug } = params // Lỗi: params là Promise
+  }
+  ```
 - **Server Components mặc định**: chỉ thêm `'use client'` khi cần state/effect/handlers/browser APIs.
 - **DB-first**: blog/docs/projects lấy từ **Supabase**; docs là **MDX string render runtime**.
 - **Media**: file trên **Cloudinary**, DB chỉ lưu metadata/reference.
@@ -45,19 +73,40 @@ Trong `apps/web/`:
 
 ### 2.1 State Management
 
-- **TanStack Query** (@tanstack/react-query v5): Client-side server state.
+- **TanStack Query** (@tanstack/react-query v5.90.16): Client-side server state.
   - Provider: `apps/web/src/providers/query-provider.tsx`
-  - Pattern: Query keys ổn định, invalidate sau mutations.
-  - Devtools chỉ bật trong development.
-- **Zustand** (v5): Client-only UI state.
+  - **Pattern khuyến nghị**: Dùng `queryOptions()` helper cho typed query keys:
+    ```typescript
+    import { queryOptions } from '@tanstack/react-query'
+    
+    const blogPostsOptions = (filters?: BlogFilters) => queryOptions({
+      queryKey: ['blog', 'posts', filters] as const,
+      queryFn: () => fetchBlogPosts(filters),
+      staleTime: 60 * 1000, // 1 phút
+      gcTime: 5 * 60 * 1000, // 5 phút (v5 đổi từ cacheTime)
+    })
+    ```
+  - Devtools: `@tanstack/react-query-devtools` v5.91.1 (chỉ bật trong development)
+  - Pattern: Query keys ổn định dạng mảng, invalidate sau mutations.
+- **Zustand** (v5.0.9): Client-only UI state.
   - Stores: `apps/web/src/stores/ui-store.ts`, `admin-store.ts`
   - Pattern: Dùng persist middleware với `partialize`, subscribeWithSelector.
+  - **Runtime API**: `store.persist.getOptions()` và `store.persist.setOptions()`
   - Chỉ cho UI state (theme, sidebar, selection) — không cho server data.
 
 ### 2.2 Validation (Zod v4)
 
 - **Zod** v4.3.5: Schema validation.
+- **Pattern khuyến nghị**: Dùng `error:` parameter thay vì `message:` (Zod v4):
+  ```typescript
+  // Zod 4 pattern (KHUYẾN NGHỊ)
+  z.string().min(5, { error: "Quá ngắn, tối thiểu 5 ký tự" })
+  
+  // Zod 3 pattern (vẫn hoạt động nhưng không khuyến nghị)
+  z.string().min(5, { message: "Quá ngắn" })
+  ```
 - Schemas tối ưu với built-in validators (`.min()`, `.max()`, `.url()`, `.email()`, `.regex()`).
+- **Locales**: `z.config(z.locales.en)` cho error messages theo ngôn ngữ.
 - Pattern: Validation trong tầng service/handler, không trong component.
 
 ---
@@ -114,8 +163,30 @@ Trong `apps/web/`:
 - Data layer: query/filter/pagination ưu tiên làm ở tầng `apps/web/src/services/**` (không filter mảng in-memory trong component).
 - Routing: luôn đi theo cấu trúc `app/[locale]/...`.
 - TypeScript: strict; tránh `any` (dùng `unknown` nếu bắt buộc).
-- TanStack Query: Dùng centralized QueryClient từ `query-provider.tsx`, tránh tạo client mới. Dùng `queryKey` ổn định dạng mảng.
-- Zustand: Dùng persist middleware với `partialize` để chỉ persist field cần thiết. Dùng `subscribeWithSelector` để reactive subscriptions.
+- **TanStack Query**:
+  - Dùng centralized QueryClient từ `query-provider.tsx`, tránh tạo client mới.
+  - **Dùng `queryOptions()` helper** cho typed, reusable query configs:
+    ```typescript
+    // ✅ Tốt: queryOptions() cho typed keys
+    const useBlogPosts = (filters?: BlogFilters) => useQuery(
+      queryOptions({
+        queryKey: ['blog', 'posts', filters] as const,
+        queryFn: () => fetchBlogPosts(filters),
+      })
+    )
+    
+    // ❌ Tránh: Không có type safety
+    const useBlogPosts = (filters?: BlogFilters) => useQuery({
+      queryKey: ['blog', 'posts', filters],
+      queryFn: () => fetchBlogPosts(filters),
+    })
+    ```
+  - Dùng `queryKey` ổn định dạng mảng với `as const`.
+- **Zustand**:
+  - Dùng persist middleware với `partialize` để chỉ persist field cần thiết.
+  - Dùng `subscribeWithSelector` để reactive subscriptions.
+  - Runtime options: `store.persist.getOptions()` và `store.persist.setOptions()`.
+- **Zod v4**: Dùng `error:` thay vì `message:` cho custom error messages.
 
 ---
 
@@ -133,7 +204,7 @@ Trong `apps/web/`:
 - Components rules: `.github/instructions/components.instructions.md`
 - Config/services/utils rules: `.github/instructions/config-utils.instructions.md`
 - MCP workflow: `.github/instructions/mcp-workflow.instructions.md`
-- Features pattern: `.github/instructions/features.instructions.md`
+
 
 ---
 
@@ -142,10 +213,40 @@ Trong `apps/web/`:
 - Skills là "playbook" theo chủ đề (i18n, Supabase, Playwright…) tại `.github/skills/<skill-name>/SKILL.md`.
 - Chỉ đọc skill liên quan task; không bắt buộc đọc tất cả.
 
-**Skills quan trọng cho Dev Refactor 3.1:**
-- `.github/skills/tanstack-react-query/SKILL.md` — QueryClient, optimistic updates
-- `.github/skills/zustand/SKILL.md` — Store setup, persist middleware
-- `.github/skills/zod/SKILL.md` — Schema validation patterns
+**Skills theo category:**
+
+**Core:**
+- `.github/skills/nextjs-app-router/SKILL.md` — Next.js 16 patterns, await params/searchParams
+- `.github/skills/serena-workflow/SKILL.md` — Serena MCP workflow
+- `.github/skills/minimax-nextjs-agent/SKILL.md` — MiniMax agent patterns
+
+**State Management:**
+- `.github/skills/tanstack-react-query/SKILL.md` — QueryClient, queryOptions, optimistic updates
+- `.github/skills/zustand/SKILL.md` — Store setup, persist middleware, subscribeWithSelector
+- `.github/skills/zod/SKILL.md` — Schema validation, error: parameter, locales
+
+**Backend/Services:**
+- `.github/skills/supabase-mcp/SKILL.md` — Supabase MCP workflow, DDL/migrations
+- `.github/skills/supabase-db-model/SKILL.md` — Database schema, RLS policies
+
+**Frontend:**
+- `.github/skills/next-intl/SKILL.md` — i18n setup, translations
+- `.github/skills/i18n-next-intl-vi/SKILL.md` — Vietnamese UI patterns
+- `.github/skills/tailwind/SKILL.md` — Tailwind CSS patterns
+- `.github/skills/react-hook-form/SKILL.md` — Form handling, validation
+- `.github/skills/frontend-design/SKILL.md` — frontend design
+
+
+**Media & Content:**
+- `.github/skills/cloudinary-media/SKILL.md` — Cloudinary integration
+- `.github/skills/mdx-runtime/SKILL.md` — MDX rendering, mdx-bundler
+
+**Testing & Toolchain:**
+- `.github/skills/playwright-e2e/SKILL.md` — E2E testing patterns
+- `.github/skills/bun-biome-turborepo/SKILL.md` — Build toolchain
+
+**Context:**
+- `.github/skills/project-context-huynhsang-blog/SKILL.md` — Project overview
 
 ---
 
