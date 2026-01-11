@@ -68,28 +68,37 @@ export function BlogPagination({
   return (
     <nav
       aria-label="Phân trang blog"
-      className="flex items-center justify-center gap-2 mt-8"
+      className={cn(
+        'flex items-center justify-center gap-1 lg:gap-2',
+        'py-8 lg:py-12'
+      )}
     >
       {/* Previous button */}
       <Button
         aria-label={messages.go_to_previous_page}
+        className={cn(
+          'h-9 lg:h-10 px-3 lg:px-4',
+          'text-sm font-medium',
+          'disabled:opacity-50',
+          'text-muted-foreground hover:text-foreground'
+        )}
         disabled={!hasPrevious}
         onClick={() => goToPage(currentPage - 1)}
         size="sm"
-        variant="outline"
+        variant="ghost"
       >
         <ChevronLeft className="h-4 w-4 mr-1" />
-        {messages.previous}
+        <span className="hidden sm:inline">{messages.previous}</span>
       </Button>
 
       {/* Page numbers */}
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-0.5 lg:gap-1">
         {pageNumbers.map(pageNum => {
           if (pageNum === '...') {
             ellipsisIndex += 1
             return (
               <span
-                className="px-2 text-muted-foreground"
+                className="px-2 text-muted-foreground text-sm"
                 key={`ellipsis-${ellipsisIndex}`}
               >
                 ...
@@ -104,7 +113,11 @@ export function BlogPagination({
             <Button
               aria-current={isActive ? 'page' : undefined}
               aria-label={`Đi đến trang ${page}`}
-              className={cn('min-w-[40px]', isActive && 'pointer-events-none')}
+              className={cn(
+                'h-9 lg:h-10 w-9 lg:w-10',
+                'text-sm font-medium',
+                isActive && 'pointer-events-none'
+              )}
               disabled={isActive}
               key={page}
               onClick={() => goToPage(page)}
@@ -120,12 +133,18 @@ export function BlogPagination({
       {/* Next button */}
       <Button
         aria-label={messages.go_to_next_page}
+        className={cn(
+          'h-9 lg:h-10 px-3 lg:px-4',
+          'text-sm font-medium',
+          'disabled:opacity-50',
+          'text-muted-foreground hover:text-foreground'
+        )}
         disabled={!hasNext}
         onClick={() => goToPage(currentPage + 1)}
         size="sm"
-        variant="outline"
+        variant="ghost"
       >
-        {messages.next}
+        <span className="hidden sm:inline">{messages.next}</span>
         <ChevronRight className="h-4 w-4 ml-1" />
       </Button>
     </nav>

@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, X, Calendar as CalendarIcon } from 'lucide-react'
+import { Search, Calendar as CalendarIcon, FilterX } from 'lucide-react'
 import { format } from 'date-fns'
 import type { DateRange } from 'react-day-picker'
 
@@ -37,16 +37,25 @@ interface BlogFiltersProps {
     date_to: string
     clear_filters: string
     apply_filters: string
+    filters?: string
+    show_filters?: string
+    hide_filters?: string
   }
 }
 
 /**
- * Client Component - Blog advanced filters
+ * Client Component - Blog advanced filters với mobile-first design
  * Search, sort, and date range filtering for blog posts
+ * - Touch targets ≥ 44px
+ * - Collapsible on mobile
+ * - Responsive grid layout
  */
 export function BlogFilters({ messages }: BlogFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
+
+  // Mobile filters visibility state
+  const [showMobileFilters, setShowMobileFilters] = React.useState(false)
 
   // Filter states
   const [search, setSearch] = React.useState(searchParams.get('search') || '')
@@ -64,6 +73,10 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
       return undefined
     }
   )
+
+  // Check if any filters are active
+  const hasActiveFilters =
+    search.trim() !== '' || sort !== 'newest' || dateRange !== undefined
 
   // Apply filters to URL
   const applyFilters = React.useCallback(() => {
@@ -99,6 +112,9 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
     // Reset to page 1 when filters change
     params.set('page', '1')
 
+    // Close mobile filters after applying
+    setShowMobileFilters(false)
+
     router.push(`?${params.toString()}`)
   }, [search, sort, dateRange, searchParams, router])
 
@@ -115,112 +131,148 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
     params.delete('to')
     params.set('page', '1')
 
+    // Close mobile filters after clearing
+    setShowMobileFilters(false)
+
     router.push(`?${params.toString()}`)
   }, [searchParams, router])
 
-  // Check if any filters are active
-  const hasActiveFilters =
-    search.trim() !== '' || sort !== 'newest' || dateRange !== undefined
+  // Get optional messages with defaults
+  const filtersLabel = messages.filters || 'Bộ lọc'
+  const hideFiltersLabel = messages.hide_filters || 'Ẩn bộ lọc'
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-      {/* Search */}
-      <div className="flex flex-col gap-2">
-        <Label className="text-sm" htmlFor="search">
-          {messages.search_placeholder}
-        </Label>
-        <div className="relative">
-          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <Input
-            className="pl-9"
-            id="search"
-            onChange={e => setSearch(e.target.value)}
-            onKeyDown={e => {
-              if (e.key === 'Enter') {
-                applyFilters()
-              }
-            }}
-            placeholder={messages.search_placeholder}
-            value={search}
-          />
-        </div>
-      </div>
-
-      {/* Sort */}
-      <div className="flex flex-col gap-2">
-        <Label className="text-sm" htmlFor="sort">
-          {messages.sort_by}
-        </Label>
-        <Select onValueChange={setSort} value={sort}>
-          <SelectTrigger id="sort">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">{messages.sort_newest}</SelectItem>
-            <SelectItem value="oldest">{messages.sort_oldest}</SelectItem>
-            <SelectItem value="title">{messages.sort_title}</SelectItem>
-            <SelectItem value="views">{messages.sort_views}</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
-
-      {/* Date range picker */}
-      <div className="flex flex-col gap-2">
-        <Label className="text-sm">{messages.date_range}</Label>
-        <Popover>
-          <PopoverTrigger asChild>
-            <Button
-              className={cn(
-                'justify-start text-left font-normal',
-                !dateRange && 'text-muted-foreground'
-              )}
-              variant="outline"
-            >
-              <CalendarIcon className="mr-2 h-4 w-4" />
-              {dateRange?.from ? (
-                dateRange.to ? (
-                  <>
-                    {format(dateRange.from, 'dd/MM/yyyy')} -{' '}
-                    {format(dateRange.to, 'dd/MM/yyyy')}
-                  </>
-                ) : (
-                  format(dateRange.from, 'dd/MM/yyyy')
-                )
-              ) : (
-                <span>{messages.date_range}</span>
-              )}
-            </Button>
-          </PopoverTrigger>
-          <PopoverContent align="start" className="w-auto p-0">
-            <Calendar
-              initialFocus
-              mode="range"
-              numberOfMonths={2}
-              onSelect={setDateRange}
-              selected={dateRange}
-            />
-          </PopoverContent>
-        </Popover>
-      </div>
-
-      {/* Actions */}
-      <div className="flex flex-col gap-2">
-        <div className="h-5" />
-        <div className="flex gap-2">
-          <Button className="flex-1" onClick={applyFilters}>
-            {messages.apply_filters}
-          </Button>
-          {hasActiveFilters && (
-            <Button
-              aria-label={messages.clear_filters}
-              onClick={clearFilters}
-              size="icon"
-              title={messages.clear_filters}
-              variant="ghost"
-            >
-              <X className="h-4 w-4" />
-            </Button>
+    <div className="space-y-4 lg:space-y-6">
+      {/* Mobile: Filter toggle button */}
+      <div className="lg:hidden">
+        <Button
+          className={cn(
+            'w-full justify-between h-11', // 44px minimum touch target
+            hasActiveFilters && 'border-primary'
           )}
+          onClick={() => setShowMobileFilters(!showMobileFilters)}
+          variant="outline"
+        >
+          <span>{showMobileFilters ? hideFiltersLabel : filtersLabel}</span>
+          <Search className="w-4 h-4 ml-2" />
+        </Button>
+      </div>
+
+      {/* Filters container - collapsible on mobile */}
+      <div
+        className={cn(
+          'grid gap-4',
+          // Mobile: collapsible with smooth transition
+          showMobileFilters ? 'grid-cols-1' : 'hidden',
+          // Tablet: 2 columns
+          'md:grid-cols-2',
+          // Desktop: 4 columns
+          'lg:grid lg:grid-cols-2 xl:grid-cols-4',
+          // Animation
+          'transition-all duration-200'
+        )}
+      >
+        {/* Search */}
+        <div className="flex flex-col gap-2">
+          <Label className="text-sm" htmlFor="search">
+            {messages.search_placeholder}
+          </Label>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <Input
+              className="pl-9 h-11" // 44px minimum touch target
+              id="search"
+              onChange={e => setSearch(e.target.value)}
+              onKeyDown={e => {
+                if (e.key === 'Enter') {
+                  applyFilters()
+                }
+              }}
+              placeholder={messages.search_placeholder}
+              value={search}
+            />
+          </div>
+        </div>
+
+        {/* Sort */}
+        <div className="flex flex-col gap-2">
+          <Label className="text-sm" htmlFor="sort">
+            {messages.sort_by}
+          </Label>
+          <Select onValueChange={setSort} value={sort}>
+            <SelectTrigger className="h-11" id="sort">
+              {' '}
+              {/* 44px minimum */}
+              <SelectValue placeholder={messages.sort_newest} />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="newest">{messages.sort_newest}</SelectItem>
+              <SelectItem value="oldest">{messages.sort_oldest}</SelectItem>
+              <SelectItem value="title">{messages.sort_title}</SelectItem>
+              <SelectItem value="views">{messages.sort_views}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Date range picker */}
+        <div className="flex flex-col gap-2">
+          <Label className="text-sm">{messages.date_range}</Label>
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button
+                className={cn(
+                  'h-11 justify-start text-left font-normal w-full',
+                  !dateRange?.from && 'text-muted-foreground'
+                )}
+                variant="outline"
+              >
+                <CalendarIcon className="mr-2 h-4 w-4" />
+                {dateRange?.from ? (
+                  dateRange.to ? (
+                    <>
+                      {format(dateRange.from, 'dd/MM/yyyy')} -{' '}
+                      {format(dateRange.to, 'dd/MM/yyyy')}
+                    </>
+                  ) : (
+                    format(dateRange.from, 'dd/MM/yyyy')
+                  )
+                ) : (
+                  <span>{messages.date_range}</span>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent align="start" className="w-auto p-0">
+              <Calendar
+                initialFocus
+                mode="range"
+                numberOfMonths={2}
+                onSelect={setDateRange}
+                selected={dateRange}
+              />
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Actions - Apply & Clear */}
+        <div className="flex flex-col gap-2">
+          <div className="h-5" /> {/* Spacer for label alignment */}
+          <div className="flex gap-2 h-11">
+            <Button className="flex-1 h-full" onClick={applyFilters}>
+              {messages.apply_filters}
+            </Button>
+            {hasActiveFilters && (
+              <Button
+                aria-label={messages.clear_filters}
+                className="h-full aspect-square min-w-[44px]"
+                onClick={clearFilters}
+                size="icon"
+                title={messages.clear_filters}
+                variant="outline"
+              >
+                <FilterX className="h-4 w-4" />
+              </Button>
+            )}
+          </div>
         </div>
       </div>
     </div>

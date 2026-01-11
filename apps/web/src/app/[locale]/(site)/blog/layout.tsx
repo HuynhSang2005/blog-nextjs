@@ -29,7 +29,7 @@ export default async function BlogLayout(props: {
   setRequestLocale(locale)
 
   return (
-    <div className="container mx-auto max-w-container px-4 pt-6 sm:px-6 lg:px-8">
+    <div className="container mx-auto max-w-[900px] px-4 pt-6 sm:px-6 lg:px-8">
       {children}
     </div>
   )

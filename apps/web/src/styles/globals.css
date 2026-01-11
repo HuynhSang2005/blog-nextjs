@@ -43,7 +43,7 @@
 .dark {
   --background: hsl(240 10% 3.9%);
   --foreground: hsl(0 0% 98%);
-  --card: hsl(240 10% 3.9%);
+  --card: hsl(240 10% 5.9%); /* Slightly lighter than background for separation */
   --card-foreground: hsl(0 0% 98%);
   --popover: hsl(240 10% 3.9%);
   --popover-foreground: hsl(0 0% 98%);
@@ -69,6 +69,20 @@
   --sidebar-accent-foreground: hsl(240 4.8% 95.9%);
   --sidebar-border: hsl(240 3.7% 15.9%);
   --sidebar-ring: hsl(217.2 91.2% 59.8%);
+  
+  /* Dark mode overrides for custom blog colors - WCAG compliant */
+  /* Use lighter grays for better contrast on dark backgrounds */
+  --color-title-primary: #f4f4f5;
+  --color-text-secondary: #a1a1aa;
+  --color-text-tertiary: #71717a;
+  
+  /* Dark mode tag badge colors - lighter for visibility */
+  --color-tag-bg: hsl(217 91% 60% / 15%);
+  --color-tag-text: hsl(217 91% 60%);
+  
+  /* Dark mode border - subtler */
+  --color-border-light: hsl(240 3.7% 15.9%);
+  --color-border-subtle: hsl(240 3.7% 15.9%);
 }
 
 @theme inline {
@@ -105,6 +119,49 @@
   --color-sidebar-primary: var(--sidebar-primary);
   --color-sidebar-foreground: var(--sidebar-foreground);
   --color-sidebar: var(--sidebar);
+
+  /* Figma Tag Badge Colors */
+  --color-tag-bg: #EBFAFF;
+  --color-tag-text: #1F87AD;
+
+  /* Figma Text Colors */
+  --color-title-primary: #272727;
+  --color-text-secondary: #5C5C5C;
+  --color-text-tertiary: #8F8F8F;
+
+  /* Figma Border Colors */
+  --color-border-light: #EBEBEB;
+  --color-border-subtle: #EAEAEA;
+}
+
+/* Custom shadow for blog cards - Figma multi-layer shadow */
+.shadow-blog {
+  box-shadow:
+    0 0 0 1px rgb(235 235 235 / 1),
+    0 1px 3px 0 rgb(143 143 143 / 0.2),
+    0 6px 13px 0 rgb(0 0 0 / 0.04),
+    0 53px 32px 0 rgb(0 0 0 / 0.02);
+}
+
+/* Disable shadows in dark mode - use background contrast instead */
+.dark .shadow-blog,
+.shadow-blog:where(.dark *) {
+  box-shadow: none;
+}
+
+/* Hover state for blog cards - enhanced shadow */
+.shadow-blog-hover:hover {
+  box-shadow:
+    0 0 0 1px rgb(234 234 234 / 1),
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+
+/* Disable hover shadow in dark mode */
+.dark .shadow-blog-hover:hover,
+.shadow-blog-hover:hover:where(.dark *) {
+  box-shadow: none;
 }
 
 @layer base {

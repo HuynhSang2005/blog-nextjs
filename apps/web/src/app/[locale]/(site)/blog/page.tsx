@@ -136,7 +136,7 @@ export default async function BlogPage(props: BlogPageProps) {
   }
 
   return (
-    <main className="relative max-w-5xl mx-auto space-y-6">
+    <main className="relative max-w-[900px] mx-auto space-y-8 lg:space-y-10">
       <RSSToggle
         messages={{
           rss_feed: t('blog.rss_feed'),
