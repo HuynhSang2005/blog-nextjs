@@ -120,7 +120,9 @@
       "date_from": "Từ ngày",
       "date_to": "Đến ngày",
       "clear_filters": "Xóa bộ lọc",
-      "apply_filters": "Áp dụng"
+      "apply_filters": "Áp dụng",
+      "filter_by_tag": "Lọc theo thẻ",
+      "all_tags": "Tất cả thẻ"
     },
 
     "words": {

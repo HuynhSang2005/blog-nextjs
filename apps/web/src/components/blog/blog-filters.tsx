@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { useRouter, useSearchParams } from 'next/navigation'
-import { Search, Calendar as CalendarIcon, FilterX } from 'lucide-react'
+import { Search, Calendar as CalendarIcon } from 'lucide-react'
 import { format } from 'date-fns'
 import type { DateRange } from 'react-day-picker'
 
@@ -37,20 +37,28 @@ interface BlogFiltersProps {
     date_to: string
     clear_filters: string
     apply_filters: string
+    filter_by_tag: string
+    all_tags: string
     filters?: string
     show_filters?: string
     hide_filters?: string
   }
+  tags?: Array<{
+    id: string
+    name: string
+    slug: string
+    color?: string | null
+  }>
 }
 
 /**
  * Client Component - Blog advanced filters với mobile-first design
- * Search, sort, and date range filtering for blog posts
+ * Search, sort, date range, and tag filtering for blog posts
  * - Touch targets ≥ 44px
  * - Collapsible on mobile
  * - Responsive grid layout
  */
-export function BlogFilters({ messages }: BlogFiltersProps) {
+export function BlogFilters({ messages, tags = [] }: BlogFiltersProps) {
   const router = useRouter()
   const searchParams = useSearchParams()
 
@@ -60,6 +68,7 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
   // Filter states
   const [search, setSearch] = React.useState(searchParams.get('search') || '')
   const [sort, setSort] = React.useState(searchParams.get('sort') || 'newest')
+  const [selectedTag, setSelectedTag] = React.useState(searchParams.get('tag') || '')
   const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
     () => {
       const from = searchParams.get('from')
@@ -73,10 +82,6 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
       return undefined
     }
   )
-
-  // Check if any filters are active
-  const hasActiveFilters =
-    search.trim() !== '' || sort !== 'newest' || dateRange !== undefined
 
   // Apply filters to URL
   const applyFilters = React.useCallback(() => {
@@ -94,6 +99,13 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
       params.set('sort', sort)
     } else {
       params.delete('sort')
+    }
+
+    // Tag filter
+    if (selectedTag !== '') {
+      params.set('tag', selectedTag)
+    } else {
+      params.delete('tag')
     }
 
     // Date range
@@ -116,26 +128,11 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
     setShowMobileFilters(false)
 
     router.push(`?${params.toString()}`)
-  }, [search, sort, dateRange, searchParams, router])
+  }, [search, sort, selectedTag, dateRange, searchParams, router])
 
-  // Clear all filters
-  const clearFilters = React.useCallback(() => {
-    setSearch('')
-    setSort('newest')
-    setDateRange(undefined)
-
-    const params = new URLSearchParams(searchParams.toString())
-    params.delete('search')
-    params.delete('sort')
-    params.delete('from')
-    params.delete('to')
-    params.set('page', '1')
-
-    // Close mobile filters after clearing
-    setShowMobileFilters(false)
-
-    router.push(`?${params.toString()}`)
-  }, [searchParams, router])
+  // Check if any filters are active
+  const hasActiveFilters =
+    search.trim() !== '' || sort !== 'newest' || selectedTag !== '' || dateRange !== undefined
 
   // Get optional messages with defaults
   const filtersLabel = messages.filters || 'Bộ lọc'
@@ -166,14 +163,14 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
           showMobileFilters ? 'grid-cols-1' : 'hidden',
           // Tablet: 2 columns
           'md:grid-cols-2',
-          // Desktop: 4 columns
-          'lg:grid lg:grid-cols-2 xl:grid-cols-4',
+          // Desktop: 2 rows - Search 3 cols, then Sort + Tag + Date
+          'lg:grid lg:grid-cols-4 lg:grid-rows-2',
           // Animation
           'transition-all duration-200'
         )}
       >
-        {/* Search */}
-        <div className="flex flex-col gap-2">
+        {/* Search - Full width on first row */}
+        <div className="flex flex-col gap-2 lg:col-span-4">
           <Label className="text-sm" htmlFor="search">
             {messages.search_placeholder}
           </Label>
@@ -210,6 +207,28 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
               <SelectItem value="oldest">{messages.sort_oldest}</SelectItem>
               <SelectItem value="title">{messages.sort_title}</SelectItem>
               <SelectItem value="views">{messages.sort_views}</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Tag filter */}
+        <div className="flex flex-col gap-2">
+          <Label className="text-sm" htmlFor="tag">
+            {messages.filter_by_tag}
+          </Label>
+          <Select onValueChange={setSelectedTag} value={selectedTag}>
+            <SelectTrigger className="h-11" id="tag">
+              <SelectValue placeholder={messages.all_tags} />
+            </SelectTrigger>
+            <SelectContent>
+              {tags.map(tag => (
+                <SelectItem key={tag.id} value={tag.slug}>
+                  <span className="inline-flex items-center gap-2">
+                    <span className="w-2 h-2 rounded-full bg-muted-foreground/60" />
+                    <span className="text-foreground">{tag.name}</span>
+                  </span>
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>
@@ -253,26 +272,15 @@ export function BlogFilters({ messages }: BlogFiltersProps) {
           </Popover>
         </div>
 
-        {/* Actions - Apply & Clear */}
+        {/* Apply button */}
         <div className="flex flex-col gap-2">
           <div className="h-5" /> {/* Spacer for label alignment */}
-          <div className="flex gap-2 h-11">
-            <Button className="flex-1 h-full" onClick={applyFilters}>
-              {messages.apply_filters}
-            </Button>
-            {hasActiveFilters && (
-              <Button
-                aria-label={messages.clear_filters}
-                className="h-full aspect-square min-w-[44px]"
-                onClick={clearFilters}
-                size="icon"
-                title={messages.clear_filters}
-                variant="outline"
-              >
-                <FilterX className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <Button
+            className="h-11 w-full"
+            onClick={applyFilters}
+          >
+            {messages.apply_filters}
+          </Button>
         </div>
       </div>
     </div>

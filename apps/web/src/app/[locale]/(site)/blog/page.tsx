@@ -5,13 +5,13 @@ import { redirect } from 'next/navigation'
 import {
   BlogPostList,
   BlogPagination,
-  RSSToggle,
   BlogFilters,
 } from '@/features/blog'
 import type { LocaleOptions } from '@/types/i18n'
 import { getBlogPosts } from '@/services/blog-service'
 import { absoluteUrl } from '@/lib/utils'
 import { siteConfig } from '@/config/site'
+import { getTags } from '@/app/actions/tags'
 
 interface BlogPageProps {
   params: Promise<{
@@ -125,6 +125,9 @@ export default async function BlogPage(props: BlogPageProps) {
     }
   )
 
+  // Fetch tags for filter dropdown
+  const tagsData = await getTags()
+
   // Nếu page > totalPages, redirect về page cuối cùng
   if (page > pagination.totalPages && pagination.totalPages > 0) {
     const validParams = new URLSearchParams()
@@ -137,12 +140,6 @@ export default async function BlogPage(props: BlogPageProps) {
 
   return (
     <main className="relative max-w-[900px] mx-auto space-y-8 lg:space-y-10">
-      <RSSToggle
-        messages={{
-          rss_feed: t('blog.rss_feed'),
-        }}
-      />
-
       <BlogFilters
         messages={{
           search_placeholder: t('blog.filters.search_placeholder'),
@@ -156,7 +153,15 @@ export default async function BlogPage(props: BlogPageProps) {
           date_to: t('blog.filters.date_to'),
           clear_filters: t('blog.filters.clear_filters'),
           apply_filters: t('blog.filters.apply_filters'),
+          filter_by_tag: t('blog.filters.filter_by_tag'),
+          all_tags: t('blog.filters.all_tags'),
         }}
+        tags={tagsData.map(tag => ({
+          id: tag.id,
+          name: tag.name,
+          slug: tag.slug,
+          color: tag.color,
+        }))}
       />
 
       <BlogPostList
