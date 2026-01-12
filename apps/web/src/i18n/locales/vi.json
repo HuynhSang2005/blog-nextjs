@@ -146,6 +146,12 @@
       "go_to_next_page": "Trang tiếp theo",
       "go_to_previous_page": "Trang trước đó",
       "back_to_blog": "Quay lại Blog"
+    },
+
+    "toc": {
+      "on_this_page": "Trên trang này",
+      "edit_page_on_github": "Đóng góp trên GitHub",
+      "start_discussion_on_github": "Thảo luận trên GitHub"
     }
   },
 

@@ -6,7 +6,6 @@ import '@/styles/mdx.css'
 
 import type { LocaleOptions } from '@/types/i18n'
 import { getBlogPost } from '@/services/blog-service'
-import { getTableOfContents } from '@/lib/core/utils/toc'
 import { siteConfig } from '@/config/site'
 import { absoluteUrl, cn, formatDate } from '@/lib/utils'
 import { CldImage } from '@/components/ui/cld-image'
@@ -52,16 +51,11 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
   }
   const t = await getTranslations('blog')
 
-  // Generate TOC from MDX content
-  const toc = post.content
-    ? await getTableOfContents(post.content)
-    : { items: [] }
-
   return (
-    <main className="container py-10 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_280px] xl:max-w-[1100px] xl:mx-auto">
+    <main className="container py-10 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_300px]">
       {/* Main Content */}
-      <div className="w-full min-w-0">
-        <article className="prose dark:prose-invert max-w-[75ch]">
+      <div className="mx-auto w-full min-w-0">
+        <article className="prose dark:prose-invert max-w-[65ch]">
           {/* Cover Image */}
           {post.cover_media && (
             <div className="relative aspect-video overflow-hidden rounded-lg mb-8 not-prose">
@@ -222,18 +216,18 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
       </div>
 
       {/* TOC Sidebar (Right) */}
-      <div className="hidden xl:block text-sm">
+      <div className="hidden text-sm xl:block">
         <div className="sticky top-16 -mt-10 pt-4">
           <ScrollArea className="pb-10">
             <div className="sticky top-16 -mt-10 h-fit py-12">
               <DashboardTableOfContents
                 messages={{
-                  onThisPage: t('toc.on_this_page'),
-                  editPageOnGitHub: t('toc.edit_page_on_github'),
-                  startDiscussionOnGitHub: t('toc.start_discussion_on_github'),
+                  onThisPage: t('on_this_page'),
+                  editPageOnGitHub: t('edit_on_github'),
+                  startDiscussionOnGitHub: t('start_discussion'),
                 }}
                 sourceFilePath=""
-                toc={toc}
+                toc={{ items: [] }}
               />
             </div>
           </ScrollArea>
