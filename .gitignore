@@ -52,3 +52,5 @@ bun-debug.log*
 .knowns/*
 !.knowns/docs/
 !.knowns/docs/**
+
+temp
