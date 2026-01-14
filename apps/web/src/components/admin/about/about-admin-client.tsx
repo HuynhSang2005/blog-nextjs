@@ -228,7 +228,9 @@ export function AboutAdminClient({
                 <TableRow>
                   <TableHead>{t('sections.table.section_key')}</TableHead>
                   <TableHead>{t('sections.table.title')}</TableHead>
-                  <TableHead className="text-center">{t('sections.table.visible')}</TableHead>
+                  <TableHead className="text-center">
+                    {t('sections.table.visible')}
+                  </TableHead>
                   <TableHead className="w-[80px] text-center">
                     {t('common.actions')}
                   </TableHead>
@@ -304,9 +306,15 @@ export function AboutAdminClient({
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('timeline.table.title')}</TableHead>
-                  <TableHead className="text-center">{t('timeline.table.type')}</TableHead>
-                  <TableHead className="text-center">{t('timeline.table.start_date')}</TableHead>
-                  <TableHead className="text-center">{t('timeline.table.current')}</TableHead>
+                  <TableHead className="text-center">
+                    {t('timeline.table.type')}
+                  </TableHead>
+                  <TableHead className="text-center">
+                    {t('timeline.table.start_date')}
+                  </TableHead>
+                  <TableHead className="text-center">
+                    {t('timeline.table.current')}
+                  </TableHead>
                   <TableHead className="w-[80px] text-center">
                     {t('common.actions')}
                   </TableHead>

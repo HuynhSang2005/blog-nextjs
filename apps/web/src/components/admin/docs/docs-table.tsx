@@ -278,8 +278,8 @@ export function DocsTable({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
                   <TableHead
-                    key={header.id}
                     className={header.column.columnDef.className}
+                    key={header.id}
                   >
                     {header.isPlaceholder
                       ? null
@@ -301,8 +301,8 @@ export function DocsTable({
                 >
                   {row.getVisibleCells().map(cell => (
                     <TableCell
-                      key={cell.id}
                       className={cell.column.columnDef.className}
+                      key={cell.id}
                     >
                       {flexRender(
                         cell.column.columnDef.cell,

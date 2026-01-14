@@ -180,7 +180,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
       setDeleteDialogOpen(false)
       setDeletingTag(null)
     } catch (error) {
-      toast.error(error instanceof Error ? error.message : t('messages.delete_error'))
+      toast.error(
+        error instanceof Error ? error.message : t('messages.delete_error')
+      )
     } finally {
       setIsDeleting(false)
     }
@@ -197,8 +199,8 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map(header => (
                     <TableHead
-                      key={header.id}
                       className={header.column.columnDef.className}
+                      key={header.id}
                     >
                       {header.isPlaceholder
                         ? null
@@ -220,8 +222,8 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
                   >
                     {row.getVisibleCells().map(cell => (
                       <TableCell
-                        key={cell.id}
                         className={cell.column.columnDef.className}
+                        key={cell.id}
                       >
                         {flexRender(
                           cell.column.columnDef.cell,
@@ -252,7 +254,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('delete.confirm_title')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('delete.confirm_description', { name: deletingTag?.name ?? '' })}
+              {t('delete.confirm_description', {
+                name: deletingTag?.name ?? '',
+              })}
               {deletingTag?.usageCount && deletingTag.usageCount > 0 ? (
                 <span className="mt-2 block text-destructive">
                   {t('delete.in_use', { count: deletingTag.usageCount })}
@@ -261,7 +265,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={isDeleting}>{t('actions.cancel')}</AlertDialogCancel>
+            <AlertDialogCancel disabled={isDeleting}>
+              {t('actions.cancel')}
+            </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
               disabled={isDeleting || (deletingTag?.usageCount || 0) > 0}
