@@ -152,10 +152,10 @@ function Tree({ tree, level = 1, activeItem }: TreeProps) {
           >
             <a
               className={cn(
-                'hover:text-foreground inline-block no-underline transition-colors',
+                'hover:text-foreground inline-block no-underline transition-colors line-clamp-2',
                 item.url === `#${activeItem}`
                   ? 'text-foreground border-l-primary-active border-l-2 pl-2 font-medium'
-                  : 'text-muted-foreground'
+                  : 'text-gray-600 hover:text-gray-900'
               )}
               href={item.url}
             >

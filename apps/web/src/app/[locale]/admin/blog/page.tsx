@@ -4,13 +4,6 @@ import { Plus } from 'lucide-react'
 import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { TableSkeleton } from '@/components/admin/table-skeleton'
 import { BlogPostsTable } from '@/components/admin/blog/posts-table'
 import { getBlogPosts } from '@/services/blog-service'
@@ -70,24 +63,16 @@ export default async function BlogPostsPage({
       </div>
 
       {/* Blog Posts Table */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('list.title')}</CardTitle>
-          <CardDescription>{t('list.description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Suspense fallback={<TableSkeleton />}>
-            <BlogPostsTable
-              data={posts}
-              initialSearch={search}
-              initialStatus={(sp.status ?? 'all') as any}
-              locale={locale}
-              page={pagination.page}
-              totalPages={pagination.totalPages}
-            />
-          </Suspense>
-        </CardContent>
-      </Card>
+      <Suspense fallback={<TableSkeleton />}>
+        <BlogPostsTable
+          data={posts}
+          initialSearch={search}
+          initialStatus={(sp.status ?? 'all') as any}
+          locale={locale}
+          page={pagination.page}
+          totalPages={pagination.totalPages}
+        />
+      </Suspense>
     </div>
   )
 }

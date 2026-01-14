@@ -3,13 +3,6 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card'
 import { ProjectsTable } from '@/components/admin/projects/projects-table'
 import { TableSkeleton } from '@/components/admin/table-skeleton'
 import { getProjects } from '@/services/project-service'
@@ -68,23 +61,15 @@ export default async function ProjectsPage({
         </Button>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('list.title')}</CardTitle>
-          <CardDescription>{t('list.description')}</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <Suspense fallback={<TableSkeleton />}>
-            <ProjectsTable
-              initialSearch={search}
-              initialStatus={(sp.status ?? 'all') as any}
-              page={pagination.page}
-              projects={projects}
-              totalPages={pagination.totalPages}
-            />
-          </Suspense>
-        </CardContent>
-      </Card>
+      <Suspense fallback={<TableSkeleton />}>
+        <ProjectsTable
+          initialSearch={search}
+          initialStatus={(sp.status ?? 'all') as any}
+          page={pagination.page}
+          projects={projects}
+          totalPages={pagination.totalPages}
+        />
+      </Suspense>
     </div>
   )
 }

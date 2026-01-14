@@ -55,7 +55,7 @@ export default async function AdminLayout({
         }}
       />
       <main className="flex w-full flex-1 flex-col">
-        <header className="sticky top-0 z-10 flex h-16 shrink-0 items-center gap-2 border-b bg-background px-4">
+        <header className="sticky top-0 z-10 flex h-10 shrink-0 items-center gap-2 px-4">
           <SidebarTrigger className="-ml-1" />
           <Separator className="mr-2 h-4" orientation="vertical" />
           <Breadcrumb>
@@ -69,7 +69,7 @@ export default async function AdminLayout({
             </BreadcrumbList>
           </Breadcrumb>
         </header>
-        <div className="flex flex-1 flex-col gap-4 p-4 pt-0">{children}</div>
+        <div className="flex flex-1 flex-col gap-4 p-4 pt-2">{children}</div>
       </main>
     </SidebarProvider>
   )

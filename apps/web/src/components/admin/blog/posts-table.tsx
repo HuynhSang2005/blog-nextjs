@@ -72,7 +72,9 @@ export function BlogPostsTable({
   const t = useTranslations('admin.blog')
   const [sorting, setSorting] = useState<SortingState>([])
   const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>([])
-  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({})
+  const [columnVisibility, setColumnVisibility] = useState<VisibilityState>({
+    author: false,
+  })
   const [rowSelection, setRowSelection] = useState({})
 
   const updateQueryParam = useCallback(
@@ -139,7 +141,7 @@ export function BlogPostsTable({
           | 'archived'
         const variant =
           status === 'published'
-            ? ('default' as const)
+            ? ('success' as const)
             : status === 'draft'
               ? ('secondary' as const)
               : ('outline' as const)
@@ -273,7 +275,7 @@ export function BlogPostsTable({
             updateQueryParam('status', value === 'all' ? null : value)
           }}
         >
-          <SelectTrigger className="w-full sm:w-[200px]">
+          <SelectTrigger className="w-full sm:w-50">
             <SelectValue placeholder={t('list.filter_by_status')} />
           </SelectTrigger>
           <SelectContent>
