@@ -244,6 +244,41 @@ export function hashContent(content: string): string {
 }
 
 // ============================================
+// CODE BLOCK FIXING
+// ============================================
+
+/**
+ * Fix malformed code blocks in markdown content
+ * Handles cases where code blocks don't have language identifiers
+ *
+ * Common issues:
+ * - Empty language: ```\ncode\n```
+ * - Text before code block without proper formatting
+ *
+ * @param content - MDX content string
+ * @returns Fixed content with valid code blocks
+ */
+export function fixMalformedCodeBlocks(content: string): string {
+  let fixed = content
+
+  // Fix 1: Code blocks without language (``` followed by newline)
+  // These appear as ```\n or ``` \n in markdown
+  // Replace with ```javascript as a sensible default
+  fixed = fixed.replace(/^```\s*\n/gm, '```javascript\n')
+
+  // Fix 2: Code blocks with only whitespace after opening: ```  \n
+  fixed = fixed.replace(/^```\s+(\S)/gm, '```javascript\n$1')
+
+  // Fix 3: Handle cases where text like "JavaScript" appears on line before code block
+  // This pattern: word on its own line, followed by empty line, then code block
+  // This is often a heading mistake - the word should be removed or formatted properly
+  // Pattern: line with single word, followed by ``` on next line
+  fixed = fixed.replace(/^([A-Za-z]+)\s*\n\s*```(\w*)\n/gm, '```$2\n')
+
+  return fixed
+}
+
+// ============================================
 // COMBINED PRECOMPUTE FUNCTION
 // ============================================
 

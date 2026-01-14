@@ -12,6 +12,7 @@ import '@/styles/mdx-editor.css'
 import '@/styles/mdx-editor-overrides.css'
 import { Loader2 } from 'lucide-react'
 import { useTranslations } from 'next-intl'
+import { fixMalformedCodeBlocks } from '@/lib/mdx/precompute'
 
 // Dynamic import để tránh SSR issues
 const MDXEditorComponent = dynamic(
@@ -53,7 +54,8 @@ export function MDXEditorWrapper({
   const lastExternalMarkdownRef = useRef<string>(value)
   const initialMarkdownRef = useRef<string | null>(null)
   if (initialMarkdownRef.current === null) {
-    initialMarkdownRef.current = value
+    // Fix malformed code blocks before passing to editor
+    initialMarkdownRef.current = fixMalformedCodeBlocks(value)
   }
   const initialMarkdown = initialMarkdownRef.current
   const [plugins, setPlugins] = useState<
