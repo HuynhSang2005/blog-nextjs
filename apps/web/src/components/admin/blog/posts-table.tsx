@@ -130,6 +130,7 @@ export function BlogPostsTable({
           </div>
         )
       },
+      // Keep first column left-aligned
     },
     {
       accessorKey: 'status',
@@ -148,6 +149,7 @@ export function BlogPostsTable({
 
         return <Badge variant={variant}>{t(`status.${status}`)}</Badge>
       },
+      className: 'text-center',
     },
     {
       accessorKey: 'author',
@@ -156,6 +158,7 @@ export function BlogPostsTable({
         const author = row.original.author
         return author?.full_name || '-'
       },
+      className: 'text-center',
     },
     {
       accessorKey: 'created_at',
@@ -174,6 +177,7 @@ export function BlogPostsTable({
         const date = row.getValue('created_at') as string
         return format(new Date(date), 'dd MMM yyyy', { locale: vi })
       },
+      className: 'text-center',
     },
     {
       accessorKey: 'published_at',
@@ -183,6 +187,7 @@ export function BlogPostsTable({
         if (!date) return <span className="text-muted-foreground">-</span>
         return format(new Date(date), 'dd MMM yyyy', { locale: vi })
       },
+      className: 'text-center',
     },
     {
       id: 'actions',
@@ -236,6 +241,7 @@ export function BlogPostsTable({
           </DropdownMenu>
         )
       },
+      className: 'text-center',
     },
   ]
 
@@ -300,7 +306,10 @@ export function BlogPostsTable({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className={header.column.columnDef.className}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -321,7 +330,10 @@ export function BlogPostsTable({
                   key={row.id}
                 >
                   {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.columnDef.className}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

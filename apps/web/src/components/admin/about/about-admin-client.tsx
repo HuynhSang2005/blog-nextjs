@@ -228,8 +228,8 @@ export function AboutAdminClient({
                 <TableRow>
                   <TableHead>{t('sections.table.section_key')}</TableHead>
                   <TableHead>{t('sections.table.title')}</TableHead>
-                  <TableHead>{t('sections.table.visible')}</TableHead>
-                  <TableHead className="w-[80px]">
+                  <TableHead className="text-center">{t('sections.table.visible')}</TableHead>
+                  <TableHead className="w-[80px] text-center">
                     {t('common.actions')}
                   </TableHead>
                 </TableRow>
@@ -244,10 +244,10 @@ export function AboutAdminClient({
                         </code>
                       </TableCell>
                       <TableCell className="font-medium">{s.title}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         {s.visible ? t('common.yes') : t('common.no')}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <RowActions
                           onDelete={() =>
                             setDeleteState({
@@ -304,10 +304,10 @@ export function AboutAdminClient({
               <TableHeader>
                 <TableRow>
                   <TableHead>{t('timeline.table.title')}</TableHead>
-                  <TableHead>{t('timeline.table.type')}</TableHead>
-                  <TableHead>{t('timeline.table.start_date')}</TableHead>
-                  <TableHead>{t('timeline.table.current')}</TableHead>
-                  <TableHead className="w-[80px]">
+                  <TableHead className="text-center">{t('timeline.table.type')}</TableHead>
+                  <TableHead className="text-center">{t('timeline.table.start_date')}</TableHead>
+                  <TableHead className="text-center">{t('timeline.table.current')}</TableHead>
+                  <TableHead className="w-[80px] text-center">
                     {t('common.actions')}
                   </TableHead>
                 </TableRow>
@@ -317,18 +317,18 @@ export function AboutAdminClient({
                   timeline.map(e => (
                     <TableRow key={e.id}>
                       <TableCell className="font-medium">{e.title}</TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         {timelineEventTypeOptions.find(
                           x => x.value === e.event_type
                         )?.label || e.event_type}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <code className="text-xs">{e.start_date}</code>
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         {e.is_current ? t('common.yes') : t('common.no')}
                       </TableCell>
-                      <TableCell>
+                      <TableCell className="text-center">
                         <RowActions
                           onDelete={() =>
                             setDeleteState({
@@ -401,12 +401,12 @@ export function AboutAdminClient({
                           <TableCell className="font-medium">
                             {s.name}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-center">
                             {typeof s.proficiency === 'number'
                               ? `${s.proficiency}%`
                               : t('common.na')}
                           </TableCell>
-                          <TableCell>
+                          <TableCell className="text-center">
                             <RowActions
                               onDelete={() =>
                                 setDeleteState({

@@ -124,6 +124,7 @@ export function ProjectsTable({
           </div>
         )
       },
+      // Keep first column left-aligned
     },
     {
       accessorKey: 'status',
@@ -141,6 +142,7 @@ export function ProjectsTable({
       filterFn: (row, id, value) => {
         return value === 'all' || row.getValue(id) === value
       },
+      className: 'text-center',
     },
     {
       accessorKey: 'demo_url',
@@ -150,7 +152,7 @@ export function ProjectsTable({
         const githubUrl = row.original.github_url
 
         return (
-          <div className="flex gap-2">
+          <div className="flex gap-2 justify-center">
             {demoUrl && (
               <Badge className="text-xs" variant="outline">
                 Demo
@@ -167,6 +169,7 @@ export function ProjectsTable({
           </div>
         )
       },
+      className: 'text-center',
     },
     {
       accessorKey: 'created_at',
@@ -177,6 +180,7 @@ export function ProjectsTable({
           ? format(new Date(date), 'dd MMM yyyy', { locale: vi })
           : '-'
       },
+      className: 'text-center',
     },
     {
       id: 'actions',
@@ -214,6 +218,7 @@ export function ProjectsTable({
           </DropdownMenu>
         )
       },
+      className: 'text-center',
     },
   ]
 
@@ -288,7 +293,10 @@ export function ProjectsTable({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => {
                   return (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className={header.column.columnDef.className}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -309,7 +317,10 @@ export function ProjectsTable({
                   key={row.id}
                 >
                   {row.getVisibleCells().map(cell => (
-                    <TableCell key={cell.id}>
+                    <TableCell
+                      key={cell.id}
+                      className={cell.column.columnDef.className}
+                    >
                       {flexRender(
                         cell.column.columnDef.cell,
                         cell.getContext()

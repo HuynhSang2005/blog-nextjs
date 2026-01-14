@@ -81,6 +81,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           </div>
         )
       },
+      // Keep first column left-aligned
     },
     {
       accessorKey: 'slug',
@@ -90,6 +91,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           {row.getValue('slug')}
         </code>
       ),
+      className: 'text-center',
     },
     {
       accessorKey: 'description',
@@ -104,6 +106,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           </span>
         )
       },
+      className: 'text-center',
     },
     {
       accessorKey: 'usageCount',
@@ -112,6 +115,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
         const count = row.getValue('usageCount') as number
         return <Badge variant="secondary">{count || 0}</Badge>
       },
+      className: 'text-center',
     },
     {
       id: 'actions',
@@ -147,6 +151,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           </DropdownMenu>
         )
       },
+      className: 'text-center',
     },
   ]
 
@@ -191,7 +196,10 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
               {table.getHeaderGroups().map(headerGroup => (
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map(header => (
-                    <TableHead key={header.id}>
+                    <TableHead
+                      key={header.id}
+                      className={header.column.columnDef.className}
+                    >
                       {header.isPlaceholder
                         ? null
                         : flexRender(
@@ -211,7 +219,10 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
                     key={row.id}
                   >
                     {row.getVisibleCells().map(cell => (
-                      <TableCell key={cell.id}>
+                      <TableCell
+                        key={cell.id}
+                        className={cell.column.columnDef.className}
+                      >
                         {flexRender(
                           cell.column.columnDef.cell,
                           cell.getContext()
