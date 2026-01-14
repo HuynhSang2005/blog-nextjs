@@ -142,7 +142,9 @@ export function ProjectsTable({
       filterFn: (row, id, value) => {
         return value === 'all' || row.getValue(id) === value
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'demo_url',
@@ -169,7 +171,9 @@ export function ProjectsTable({
           </div>
         )
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'created_at',
@@ -180,7 +184,9 @@ export function ProjectsTable({
           ? format(new Date(date), 'dd MMM yyyy', { locale: vi })
           : '-'
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       id: 'actions',
@@ -218,7 +224,9 @@ export function ProjectsTable({
           </DropdownMenu>
         )
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
   ]
 
@@ -294,7 +302,7 @@ export function ProjectsTable({
                 {headerGroup.headers.map(header => {
                   return (
                     <TableHead
-                      className={header.column.columnDef.className}
+                      className={header.column.columnDef.meta?.className}
                       key={header.id}
                     >
                       {header.isPlaceholder
@@ -318,7 +326,7 @@ export function ProjectsTable({
                 >
                   {row.getVisibleCells().map(cell => (
                     <TableCell
-                      className={cell.column.columnDef.className}
+                      className={cell.column.columnDef.meta?.className}
                       key={cell.id}
                     >
                       {flexRender(

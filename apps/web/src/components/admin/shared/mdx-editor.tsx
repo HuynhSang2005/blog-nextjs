@@ -287,6 +287,7 @@ export function MDXEditorWrapper({
         codeMirrorPlugin({
           autoLoadLanguageSupport: true,
           codeBlockLanguages: {
+            'N/A': 'Plain text',
             typescript: 'TypeScript',
             javascript: 'JavaScript',
             tsx: 'TSX',

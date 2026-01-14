@@ -91,7 +91,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           {row.getValue('slug')}
         </code>
       ),
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'description',
@@ -106,7 +108,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           </span>
         )
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'usageCount',
@@ -115,7 +119,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
         const count = row.getValue('usageCount') as number
         return <Badge variant="secondary">{count || 0}</Badge>
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       id: 'actions',
@@ -151,7 +157,9 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
           </DropdownMenu>
         )
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
   ]
 
@@ -199,7 +207,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
                 <TableRow key={headerGroup.id}>
                   {headerGroup.headers.map(header => (
                     <TableHead
-                      className={header.column.columnDef.className}
+                      className={header.column.columnDef.meta?.className}
                       key={header.id}
                     >
                       {header.isPlaceholder
@@ -222,7 +230,7 @@ export function TagsTable({ tags, onEdit, onDeleteSuccess }: TagsTableProps) {
                   >
                     {row.getVisibleCells().map(cell => (
                       <TableCell
-                        className={cell.column.columnDef.className}
+                        className={cell.column.columnDef.meta?.className}
                         key={cell.id}
                       >
                         {flexRender(

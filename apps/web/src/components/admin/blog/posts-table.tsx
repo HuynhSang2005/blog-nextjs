@@ -149,7 +149,9 @@ export function BlogPostsTable({
 
         return <Badge variant={variant}>{t(`status.${status}`)}</Badge>
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'author',
@@ -158,7 +160,9 @@ export function BlogPostsTable({
         const author = row.original.author
         return author?.full_name || '-'
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'created_at',
@@ -177,7 +181,9 @@ export function BlogPostsTable({
         const date = row.getValue('created_at') as string
         return format(new Date(date), 'dd MMM yyyy', { locale: vi })
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'published_at',
@@ -187,7 +193,9 @@ export function BlogPostsTable({
         if (!date) return <span className="text-muted-foreground">-</span>
         return format(new Date(date), 'dd MMM yyyy', { locale: vi })
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       id: 'actions',
@@ -241,7 +249,9 @@ export function BlogPostsTable({
           </DropdownMenu>
         )
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
   ]
 
@@ -307,7 +317,7 @@ export function BlogPostsTable({
                 {headerGroup.headers.map(header => {
                   return (
                     <TableHead
-                      className={header.column.columnDef.className}
+                      className={header.column.columnDef.meta?.className}
                       key={header.id}
                     >
                       {header.isPlaceholder
@@ -331,7 +341,7 @@ export function BlogPostsTable({
                 >
                   {row.getVisibleCells().map(cell => (
                     <TableCell
-                      className={cell.column.columnDef.className}
+                      className={cell.column.columnDef.meta?.className}
                       key={cell.id}
                     >
                       {flexRender(

@@ -140,13 +140,17 @@ export function DocsTable({
         const topicName = row.original.topic?.name
         return topicName || <span className="text-muted-foreground">-</span>
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'locale',
       header: t('table.columns.locale'),
       cell: ({ row }) => row.getValue('locale') || 'vi',
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       accessorKey: 'updated_at',
@@ -164,7 +168,9 @@ export function DocsTable({
         if (!date) return <span className="text-muted-foreground">-</span>
         return format(new Date(date), 'dd MMM yyyy', { locale: vi })
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
     {
       id: 'actions',
@@ -213,7 +219,9 @@ export function DocsTable({
           </DropdownMenu>
         )
       },
-      className: 'text-center',
+      meta: {
+        className: 'text-center',
+      },
     },
   ]
 
@@ -278,7 +286,7 @@ export function DocsTable({
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map(header => (
                   <TableHead
-                    className={header.column.columnDef.className}
+                    className={header.column.columnDef.meta?.className}
                     key={header.id}
                   >
                     {header.isPlaceholder
@@ -301,7 +309,7 @@ export function DocsTable({
                 >
                   {row.getVisibleCells().map(cell => (
                     <TableCell
-                      className={cell.column.columnDef.className}
+                      className={cell.column.columnDef.meta?.className}
                       key={cell.id}
                     >
                       {flexRender(
