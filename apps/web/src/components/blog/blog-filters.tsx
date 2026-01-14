@@ -168,8 +168,9 @@ export function BlogFilters({ messages, tags = [] }: BlogFiltersProps) {
           showMobileFilters ? 'grid-cols-1' : 'hidden',
           // Tablet: 2 columns
           'md:grid-cols-2',
-          // Desktop: 2 rows - Search 3 cols, then Sort + Tag + Date
-          'lg:grid lg:grid-cols-4 lg:grid-rows-2',
+          // Desktop: 2 rows - Search 3 cols, then Sort + Tag + Date + Apply button
+          // Use items-end to align Apply button with other inputs (no label)
+          'lg:grid lg:grid-cols-4 lg:grid-rows-2 lg:items-end',
           // Animation
           'transition-all duration-200'
         )}
@@ -277,12 +278,28 @@ export function BlogFilters({ messages, tags = [] }: BlogFiltersProps) {
           </Popover>
         </div>
 
-        {/* Apply button */}
+        {/* Apply button - No label, aligned to bottom with items-end on parent grid */}
         <div className="flex flex-col gap-2">
-          <div className="h-5" /> {/* Spacer for label alignment */}
           <Button className="h-11 w-full" onClick={applyFilters}>
             {messages.apply_filters}
           </Button>
+
+          {/* Clear filters button - only show when filters are active */}
+          {hasActiveFilters && (
+            <Button
+              className="h-9 w-full text-muted-foreground hover:text-destructive"
+              onClick={() => {
+                setSearch('')
+                setSort('newest')
+                setSelectedTag('')
+                setDateRange(undefined)
+                applyFilters()
+              }}
+              variant="ghost"
+            >
+              {messages.clear_filters}
+            </Button>
+          )}
         </div>
       </div>
     </div>

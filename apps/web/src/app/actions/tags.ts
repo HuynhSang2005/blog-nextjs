@@ -4,7 +4,10 @@ import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 import type { Database } from '@/types/database'
 import { locales } from '@/config/i18n'
-import type { PaginatedResponse, PaginationParams } from '@/types/supabase-helpers'
+import type {
+  PaginatedResponse,
+  PaginationParams,
+} from '@/types/supabase-helpers'
 
 type TagInsert = Database['public']['Tables']['tags']['Insert']
 type TagUpdate = Database['public']['Tables']['tags']['Update']

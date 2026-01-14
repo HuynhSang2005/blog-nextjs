@@ -119,32 +119,66 @@ function BlogPostCard({
             width={300}
           />
         ) : (
-          // Placeholder cho posts không có ảnh - làm sáng trong dark mode
+          // Placeholder cho posts không có ảnh - enhanced design
           <div
             className={cn(
               'w-full h-full',
-              // Light mode: subtle gradient
-              'bg-gradient-to-br from-secondary to-secondary/50',
+              // Light mode: subtle gradient với pattern
+              'bg-gradient-to-br from-secondary/30 to-secondary/10',
               // Dark mode: lighter, more visible placeholder
-              'dark:bg-gradient-to-br dark:from-zinc-700 dark:to-zinc-800',
+              'dark:bg-gradient-to-br dark:from-zinc-700/30 dark:to-zinc-800/10',
               'flex items-center justify-center',
-              // Text color - very subtle in light mode, visible in dark mode
-              'text-muted-foreground/20 dark:text-zinc-300'
+              // Pattern overlay
+              'relative overflow-hidden'
             )}
           >
-            {/* Placeholder content */}
-            <div className="flex flex-col items-center gap-2">
+            {/* Subtle pattern background */}
+            <div
+              className={cn(
+                'absolute inset-0 opacity-30',
+                'bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))]',
+                'from-primary/5 via-transparent to-transparent'
+              )}
+            />
+
+            {/* Placeholder content - centered */}
+            <div className="relative flex flex-col items-center gap-2">
+              {/* Icon circle */}
               <div
                 className={cn(
                   'w-10 h-10 lg:w-12 lg:h-12 rounded-full',
-                  'bg-background/10 dark:bg-zinc-600/20'
+                  'bg-primary/10 dark:bg-zinc-600/30',
+                  'flex items-center justify-center',
+                  'ring-1 ring-primary/10 dark:ring-zinc-500/20'
                 )}
-              />
+              >
+                {/* Image icon */}
+                <svg
+                  aria-label="Hình ảnh"
+                  className="w-5 h-5 lg:w-6 lg:h-6 text-primary/40 dark:text-zinc-400"
+                  fill="none"
+                  height="24"
+                  role="img"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  viewBox="0 0 24 24"
+                  width="24"
+                >
+                  <title>Hình ảnh</title>
+                  <rect height="18" rx="2" width="18" x="3" y="3" />
+                  <circle cx="8.5" cy="8.5" r="1.5" />
+                  <path d="m21 15-5-5L5 21" />
+                </svg>
+              </div>
+
+              {/* First letter of title */}
               <span
                 className={cn(
                   'text-xs lg:text-sm font-medium',
-                  'opacity-30 dark:opacity-60',
-                  'text-foreground dark:text-zinc-300'
+                  'text-primary/50 dark:text-zinc-400',
+                  'tracking-widest uppercase'
                 )}
               >
                 {post.title.charAt(0)}
@@ -161,13 +195,14 @@ function BlogPostCard({
           {primaryTag && (
             <span
               className={cn(
-                // Tag styling - title case, more subtle
-                'text-[10px] lg:text-xs',
+                // Figma spec: 11.8px, uppercase, 4% letter-spacing
+                'text-[11px] lg:text-xs',
                 'font-medium',
-                // Remove uppercase, use normal case
+                // Figma spec: uppercase with 4% letter-spacing
+                'uppercase tracking-wider',
                 // Figma colors: bg #EBFAFF, text #1F87AD
                 'bg-[var(--color-tag-bg)] text-[var(--color-tag-text)]',
-                'px-2 py-0.5 rounded-md'
+                'px-2.5 py-0.5 rounded-md'
               )}
             >
               {primaryTag.name}
@@ -180,8 +215,8 @@ function BlogPostCard({
         <h2
           className={cn(
             'font-normal text-lg lg:text-[24px]',
-            // Figma line-height 1.34, letter-spacing -3%
-            'leading-[1.34] tracking-tight',
+            // Figma spec: line-height 1.34, letter-spacing -3%
+            'leading-[1.34] tracking-[-0.03em]',
             // Title color #272727
             'text-[var(--color-title-primary)]',
             // Limit to 2 lines

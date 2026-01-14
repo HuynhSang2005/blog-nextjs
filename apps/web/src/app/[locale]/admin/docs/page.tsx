@@ -4,7 +4,10 @@ import Link from 'next/link'
 import { Plus } from 'lucide-react'
 
 import { Button } from '@/components/ui/button'
-import { getDocsAdminListPaginated, getDocsTopics } from '@/services/docs-service'
+import {
+  getDocsAdminListPaginated,
+  getDocsTopics,
+} from '@/services/docs-service'
 import { DocsTable } from '@/components/admin/docs/docs-table'
 
 interface AdminDocsPageProps {

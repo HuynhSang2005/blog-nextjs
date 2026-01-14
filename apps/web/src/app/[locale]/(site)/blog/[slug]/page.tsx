@@ -58,185 +58,189 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
     : { items: [] }
 
   return (
-    <main className="container py-10 lg:gap-10 lg:py-8 xl:grid xl:grid-cols-[1fr_280px] xl:max-w-[1100px] xl:mx-auto">
-      {/* Main Content */}
-      <div className="w-full min-w-0">
-        <article className="prose dark:prose-invert max-w-[75ch]">
-          {/* Cover Image */}
-          {post.cover_media && (
-            <div className="relative aspect-video overflow-hidden rounded-lg mb-8 not-prose">
-              <CldImage
-                alt={post.cover_media.alt_text || post.title}
-                className="object-cover"
-                crop="fill"
-                gravity="auto"
-                height={630}
-                priority
-                src={post.cover_media.public_id}
-                width={1200}
-              />
-            </div>
-          )}
-
-          {/* Header */}
-          <header className="not-prose mb-8">
-            <h1 className="text-3xl sm:text-4xl font-bold mb-4">
-              <Balancer>{post.title}</Balancer>
-            </h1>
-
-            {/* Author + Meta Info */}
-            <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
-              {/* Author Avatar & Name */}
-              {post.author && (
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage
-                      alt={post.author.full_name || undefined}
-                      src={post.author.avatar_media_id || undefined}
-                    />
-                    <AvatarFallback>
-                      {post.author.full_name?.charAt(0)?.toUpperCase() || '?'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <span className="font-medium text-foreground">
-                    {post.author.full_name}
-                  </span>
-                </div>
-              )}
-
-              {/* Date */}
-              {(post.published_at || post.created_at) && (
-                <time
-                  dateTime={post.published_at || post.created_at || undefined}
-                >
-                  {formatDate(
-                    (post.published_at || post.created_at) as string,
-                    dateLocales[locale]
-                  )}
-                </time>
-              )}
-
-              {/* Read Time */}
-              {post.reading_time_minutes && (
-                <ReadTime
-                  messages={{ min_read: t('min_read') }}
-                  time={post.reading_time_minutes}
+    <main className="container py-8 lg:py-10">
+      <div className="mx-auto xl:grid xl:grid-cols-[4fr_1fr] xl:max-w-[1200px] xl:gap-12 xl:items-start">
+        {/* Main Content */}
+        <div className="w-full min-w-0 xl:border-r xl:border-gray-200 xl:pr-12">
+          <article className="prose dark:prose-invert prose-base max-w-full">
+            {/* Cover Image */}
+            {post.cover_media && (
+              <div className="relative aspect-video overflow-hidden rounded-lg mb-8 not-prose">
+                <CldImage
+                  alt={post.cover_media.alt_text || post.title}
+                  className="object-cover"
+                  crop="fill"
+                  gravity="auto"
+                  height={630}
+                  priority
+                  src={post.cover_media.public_id}
+                  width={1200}
                 />
-              )}
-            </div>
-
-            {/* Tags */}
-            {post.tags && post.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2">
-                {post.tags.map(tag => (
-                  <Link
-                    className={cn(
-                      badgeVariants({ variant: 'secondary' }),
-                      'hover:bg-primary hover:text-primary-foreground transition-colors'
-                    )}
-                    href={`/blog?tag=${encodeURIComponent(tag.slug)}`}
-                    key={tag.id}
-                    style={{ backgroundColor: tag.color || undefined }}
-                  >
-                    {tag.name}
-                  </Link>
-                ))}
               </div>
             )}
-          </header>
 
-          {/* MDX Content */}
-          {post.content ? (
-            <MdxRemote source={post.content} />
-          ) : (
-            <div className="text-center py-12 text-muted-foreground">
-              <p>Nội dung đang được cập nhật...</p>
-            </div>
-          )}
+            {/* Header */}
+            <header className="not-prose mb-8">
+              <h1 className="text-3xl sm:text-4xl font-medium mb-4">
+                <Balancer>{post.title}</Balancer>
+              </h1>
 
-          {/* Author Footer */}
-          {post.author && (
-            <footer className="mt-12 pt-8 border-t not-prose">
-              <Card>
-                <CardHeader className="flex flex-row items-center gap-4">
-                  <Avatar className="h-16 w-16">
-                    <AvatarImage
-                      alt={post.author.full_name || undefined}
-                      src={post.author.avatar_media_id || undefined}
-                    />
-                    <AvatarFallback className="text-xl">
-                      {post.author.full_name?.charAt(0)?.toUpperCase() || '?'}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="flex-1">
-                    <CardTitle>{post.author.full_name}</CardTitle>
-                    {post.author.bio && (
-                      <CardDescription className="mt-1">
-                        {post.author.bio}
-                      </CardDescription>
-                    )}
-                    <div className="flex gap-2 mt-3">
-                      {post.author.twitter_username && (
-                        <Link
-                          className={cn(
-                            buttonVariants({ variant: 'ghost', size: 'sm' })
-                          )}
-                          href={`https://twitter.com/${post.author.twitter_username}`}
-                          rel="noopener noreferrer"
-                          target="_blank"
-                        >
-                          <TwitterLogoIcon className="h-4 w-4" />
-                        </Link>
-                      )}
-                      {post.author.github_username && (
-                        <Link
-                          className={cn(
-                            buttonVariants({ variant: 'ghost', size: 'sm' })
-                          )}
-                          href={`https://github.com/${post.author.github_username}`}
-                          rel="noopener noreferrer"
-                          target="_blank"
-                        >
-                          <Icons.gitHub className="h-4 w-4" />
-                        </Link>
-                      )}
-                      {post.author.linkedin_username && (
-                        <Link
-                          className={cn(
-                            buttonVariants({ variant: 'ghost', size: 'sm' })
-                          )}
-                          href={`https://linkedin.com/in/${post.author.linkedin_username}`}
-                          rel="noopener noreferrer"
-                          target="_blank"
-                        >
-                          <LinkedInLogoIcon className="h-4 w-4" />
-                        </Link>
-                      )}
-                    </div>
+              {/* Author + Meta Info */}
+              <div className="flex flex-wrap items-center gap-4 text-sm text-muted-foreground mb-4">
+                {/* Author Avatar & Name */}
+                {post.author && (
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage
+                        alt={post.author.full_name || undefined}
+                        src={post.author.avatar_media_id || undefined}
+                      />
+                      <AvatarFallback>
+                        {post.author.full_name?.charAt(0)?.toUpperCase() || '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <span className="font-medium text-foreground">
+                      {post.author.full_name}
+                    </span>
                   </div>
-                </CardHeader>
-              </Card>
-            </footer>
-          )}
-        </article>
-      </div>
+                )}
 
-      {/* TOC Sidebar (Right) */}
-      <div className="hidden xl:block text-sm">
-        <div className="sticky top-16 -mt-10 pt-4">
-          <ScrollArea className="pb-10">
-            <div className="sticky top-16 -mt-10 h-fit py-12">
-              <DashboardTableOfContents
-                messages={{
-                  onThisPage: t('toc.on_this_page'),
-                  editPageOnGitHub: t('toc.edit_page_on_github'),
-                  startDiscussionOnGitHub: t('toc.start_discussion_on_github'),
-                }}
-                sourceFilePath=""
-                toc={toc}
-              />
-            </div>
-          </ScrollArea>
+                {/* Date */}
+                {(post.published_at || post.created_at) && (
+                  <time
+                    dateTime={post.published_at || post.created_at || undefined}
+                  >
+                    {formatDate(
+                      (post.published_at || post.created_at) as string,
+                      dateLocales[locale]
+                    )}
+                  </time>
+                )}
+
+                {/* Read Time */}
+                {post.reading_time_minutes && (
+                  <ReadTime
+                    messages={{ min_read: t('min_read') }}
+                    time={post.reading_time_minutes}
+                  />
+                )}
+              </div>
+
+              {/* Tags */}
+              {post.tags && post.tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {post.tags.map(tag => (
+                    <Link
+                      className={cn(
+                        badgeVariants({ variant: 'secondary' }),
+                        'hover:bg-primary hover:text-primary-foreground transition-colors'
+                      )}
+                      href={`/blog?tag=${encodeURIComponent(tag.slug)}`}
+                      key={tag.id}
+                      style={{ backgroundColor: tag.color || undefined }}
+                    >
+                      {tag.name}
+                    </Link>
+                  ))}
+                </div>
+              )}
+            </header>
+
+            {/* MDX Content */}
+            {post.content ? (
+              <MdxRemote source={post.content} />
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <p>Nội dung đang được cập nhật...</p>
+              </div>
+            )}
+
+            {/* Author Footer */}
+            {post.author && (
+              <footer className="mt-12 pt-8 border-t not-prose">
+                <Card>
+                  <CardHeader className="flex flex-row items-center gap-4">
+                    <Avatar className="h-16 w-16">
+                      <AvatarImage
+                        alt={post.author.full_name || undefined}
+                        src={post.author.avatar_media_id || undefined}
+                      />
+                      <AvatarFallback className="text-xl">
+                        {post.author.full_name?.charAt(0)?.toUpperCase() || '?'}
+                      </AvatarFallback>
+                    </Avatar>
+                    <div className="flex-1">
+                      <CardTitle>{post.author.full_name}</CardTitle>
+                      {post.author.bio && (
+                        <CardDescription className="mt-1">
+                          {post.author.bio}
+                        </CardDescription>
+                      )}
+                      <div className="flex gap-2 mt-3">
+                        {post.author.twitter_username && (
+                          <Link
+                            className={cn(
+                              buttonVariants({ variant: 'ghost', size: 'sm' })
+                            )}
+                            href={`https://twitter.com/${post.author.twitter_username}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            <TwitterLogoIcon className="h-4 w-4" />
+                          </Link>
+                        )}
+                        {post.author.github_username && (
+                          <Link
+                            className={cn(
+                              buttonVariants({ variant: 'ghost', size: 'sm' })
+                            )}
+                            href={`https://github.com/${post.author.github_username}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            <Icons.gitHub className="h-4 w-4" />
+                          </Link>
+                        )}
+                        {post.author.linkedin_username && (
+                          <Link
+                            className={cn(
+                              buttonVariants({ variant: 'ghost', size: 'sm' })
+                            )}
+                            href={`https://linkedin.com/in/${post.author.linkedin_username}`}
+                            rel="noopener noreferrer"
+                            target="_blank"
+                          >
+                            <LinkedInLogoIcon className="h-4 w-4" />
+                          </Link>
+                        )}
+                      </div>
+                    </div>
+                  </CardHeader>
+                </Card>
+              </footer>
+            )}
+          </article>
+        </div>
+
+        {/* TOC Sidebar (Right) - 20% width */}
+        <div className="hidden xl:block text-sm xl:pl-4">
+          <div className="sticky top-16 -mt-10 pt-4">
+            <ScrollArea className="pb-10">
+              <div className="sticky top-16 -mt-10 h-fit py-12">
+                <DashboardTableOfContents
+                  messages={{
+                    onThisPage: t('toc.on_this_page'),
+                    editPageOnGitHub: t('toc.edit_page_on_github'),
+                    startDiscussionOnGitHub: t(
+                      'toc.start_discussion_on_github'
+                    ),
+                  }}
+                  sourceFilePath=""
+                  toc={toc}
+                />
+              </div>
+            </ScrollArea>
+          </div>
         </div>
       </div>
     </main>
